@@ -1,0 +1,2715 @@
+<title>Entre Nous</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Instrument+Sans:wght@400..700&display=swap">
+<style>
+/* Entre Nous.
+   Parti pris : une page de carnet étroite et deux encres. Le bleu (rond) est la
+   première personne, l'orange (carré) la seconde ; là où les encres se
+   recouvrent, c'est ce que le couple partage. */
+:root {
+  --bg: #f8f9fc;
+  --surface: #ffffff;
+  --wash: #e9ebf2;
+  --line: #d8dbe6;
+  --ink: #141829;
+  --ink-2: #454b63;
+  --muted: #646b82;
+  --a: #2a78d6;
+  --a-soft: #d6e5f8;
+  --b: #eb6834;
+  --b-soft: #fbe1d5;
+  --good: #0ca30c;
+  --warn: #fab219;
+  --crit: #d03b3b;
+  --on-fill: #ffffff;
+  --on-warn: #0b0b0b;
+  --btn: #141829;
+  --btn-fg: #ffffff;
+  --blend: multiply;
+  --display: "Bricolage Grotesque", "Avenir Next", "Trebuchet MS", sans-serif;
+  --body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1220;
+    --surface: #181c2e;
+    --wash: #222740;
+    --line: #2e3450;
+    --ink: #eef0f7;
+    --ink-2: #c5cade;
+    --muted: #9299b3;
+    --a: #3987e5;
+    --a-soft: #1c2f52;
+    --b: #d95926;
+    --b-soft: #47261a;
+    --good: #0ca30c;
+    --warn: #fab219;
+    --crit: #d03b3b;
+    --on-fill: #ffffff;
+    --on-warn: #0b0b0b;
+    --btn: #eef0f7;
+    --btn-fg: #141829;
+    --blend: screen;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1220;
+  --surface: #181c2e;
+  --wash: #222740;
+  --line: #2e3450;
+  --ink: #eef0f7;
+  --ink-2: #c5cade;
+  --muted: #9299b3;
+  --a: #3987e5;
+  --a-soft: #1c2f52;
+  --b: #d95926;
+  --b-soft: #47261a;
+  --good: #0ca30c;
+  --warn: #fab219;
+  --crit: #d03b3b;
+  --on-fill: #ffffff;
+  --on-warn: #0b0b0b;
+  --btn: #eef0f7;
+  --btn-fg: #141829;
+  --blend: screen;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 1rem/1.55 var(--body);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, p, ul, ol { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+a { color: inherit; text-underline-offset: 3px; }
+button, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--a); outline-offset: 2px; }
+[tabindex="-1"]:focus { outline: none; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Structure ---------- */
+.top, .wrap {
+  max-width: 46rem;
+  margin-inline: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-block: 1rem; }
+.wrap { display: flex; flex-direction: column; gap: 2.5rem; padding-block: 0.5rem 4rem; }
+.wrap.narrow { gap: 1.1rem; color: var(--ink-2); }
+.wrap.narrow h1, .wrap.narrow h2, .wrap.narrow h3, .wrap.narrow b { color: var(--ink); }
+
+.brand { display: inline-flex; align-items: center; gap: 0.55rem; font: 700 1.15rem var(--display); letter-spacing: -0.01em; text-decoration: none; }
+.logo { width: 2.2rem; height: auto; }
+.link { padding: 0.25rem 0; border: 0; background: none; color: var(--ink-2); font-size: 0.94rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.link:hover { color: var(--ink); }
+.eyebrow { font: 600 0.78rem var(--body); letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+.muted { color: var(--muted); font-size: 0.9rem; }
+
+/* Les deux encres */
+.inks { isolation: isolate; overflow: visible; }
+.ink-a { fill: var(--a); mix-blend-mode: var(--blend); }
+.ink-b { fill: var(--b); mix-blend-mode: var(--blend); }
+.ring-a, .ring-b { fill: none; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; mix-blend-mode: var(--blend); }
+.ring-a { stroke: var(--a); }
+.ring-b { stroke: var(--b); }
+.sw { display: inline-block; flex: none; width: 0.7rem; height: 0.7rem; border-radius: 50%; background: var(--a); }
+.sw.b { border-radius: 3px; background: var(--b); }
+
+/* ---------- Boutons et champs ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0.85rem 1.4rem; border: 1.5px solid var(--btn); border-radius: 999px;
+  background: var(--btn); color: var(--btn-fg);
+  font-weight: 600; text-align: center; text-decoration: none; cursor: pointer;
+}
+.btn:hover { opacity: 0.88; }
+.btn.alt { background: transparent; border-color: var(--ink); color: var(--ink); }
+.btn.alt:hover { background: var(--wash); opacity: 1; }
+.btn.small { padding: 0.5rem 1rem; font-size: 0.92rem; }
+.btn:disabled { opacity: 0.35; cursor: default; }
+.actions { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+
+.names { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+.name { flex: 1 1 12rem; min-width: 0; display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.85rem; color: var(--ink-2); }
+.name span { display: flex; align-items: center; gap: 0.4rem; }
+.name input { width: 100%; padding: 0.7rem 0.9rem; border: 1.5px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); font-size: 1rem; }
+.name.a input:focus-visible { outline-color: var(--a); }
+.name.b input:focus-visible { outline-color: var(--b); }
+
+.panel { display: flex; flex-direction: column; gap: 0.8rem; padding: 1.1rem; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); }
+.code-form, .share { display: flex; flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+.code-form label, .share label { font-size: 0.88rem; font-weight: 600; color: var(--ink); }
+.code-form textarea, .share textarea {
+  width: 100%; padding: 0.7rem 0.9rem; border: 1.5px solid var(--line); border-radius: 12px;
+  background: var(--surface); color: var(--ink); font: 0.82rem/1.45 var(--mono); overflow-wrap: anywhere; resize: vertical;
+}
+.share-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.8rem; }
+.share-msg { font-size: 0.88rem; color: var(--ink-2); }
+.err { padding-left: 0.7rem; border-left: 3px solid var(--crit); font-size: 0.92rem; color: var(--ink); }
+
+/* ---------- Accueil ---------- */
+.hero { display: flex; flex-direction: column; gap: 1rem; padding-top: 1.5rem; }
+.hero h1 { font: 700 clamp(2.5rem, 9vw, 4.2rem)/1 var(--display); letter-spacing: -0.035em; text-wrap: balance; }
+.sub { max-width: 36rem; font-size: 1.125rem; color: var(--ink-2); }
+.banner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.8rem 1.2rem; padding: 1rem 1.1rem; border-radius: 18px; background: var(--wash); }
+.banner-actions { display: flex; align-items: center; gap: 1rem; }
+
+.group { display: flex; flex-direction: column; gap: 0.9rem; }
+.group-title { font: 600 0.8rem var(--body); letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.cards { display: flex; flex-direction: column; gap: 0.6rem; }
+.card { position: relative; display: flex; align-items: flex-start; gap: 1rem; padding: 1.1rem; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); transition: border-color 0.15s; }
+.card:hover { border-color: var(--ink); }
+.glyph { flex: none; width: 3rem; }
+.glyph svg { display: block; width: 100%; height: auto; }
+.glyph.big { width: 4.5rem; }
+.card-body { min-width: 0; display: flex; flex-direction: column; gap: 0.3rem; }
+.card h3 { font: 650 1.3rem/1.2 var(--display); letter-spacing: -0.015em; text-wrap: balance; }
+.card-link { text-decoration: none; }
+.card-link::after { content: ""; position: absolute; inset: 0; border-radius: 18px; }
+.card-link:focus-visible { outline: none; }
+.card-link:focus-visible::after { outline: 2px solid var(--a); outline-offset: 2px; }
+.blurb { font-size: 0.95rem; color: var(--ink-2); }
+.meta { font-size: 0.85rem; color: var(--muted); }
+.card-state { position: relative; z-index: 1; align-self: flex-start; padding-top: 0.3rem; font-size: 0.9rem; }
+.foot { display: flex; flex-direction: column; gap: 0.4rem; max-width: 40rem; padding-top: 1.2rem; border-top: 1px solid var(--line); font-size: 0.88rem; color: var(--muted); }
+
+/* ---------- Présentation d'un test, passage de main, attente ---------- */
+.intro, .wait { padding-top: 1rem; }
+.handoff { padding-top: 3rem; }
+.intro h1, .handoff h1, .wait h1 { font: 700 clamp(1.9rem, 6.5vw, 2.75rem)/1.08 var(--display); letter-spacing: -0.025em; text-wrap: balance; }
+.wait h2 { padding-top: 1rem; font: 650 1.3rem/1.2 var(--display); }
+.facts { display: flex; flex-wrap: wrap; gap: 0.4rem 1.4rem; padding-block: 0.4rem; font-size: 0.95rem; }
+.hint, .prev { font-size: 0.9rem; color: var(--muted); }
+.note { padding: 0.8rem 1rem; border-radius: 12px; background: var(--wash); font-size: 0.88rem; color: var(--ink-2); }
+.invite { padding: 0.9rem 1rem; border-radius: 14px; background: var(--a-soft); color: var(--ink); }
+
+/* ---------- Questions ---------- */
+.quiz { --who: var(--a); --who-soft: var(--a-soft); padding-top: 1rem; }
+.quiz[data-who="b"] { --who: var(--b); --who-soft: var(--b-soft); }
+.quiz-top { display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; font-size: 0.9rem; }
+.chip { display: inline-flex; align-items: center; gap: 0.45rem; min-width: 0; padding: 0.3rem 0.75rem; border-radius: 999px; background: var(--who-soft); color: var(--ink); font-weight: 600; }
+.count { color: var(--muted); font-variant-numeric: tabular-nums; }
+.progress { height: 6px; border-radius: 999px; background: var(--who-soft); overflow: hidden; }
+.progress span { display: block; height: 100%; border-radius: 999px; background: var(--who); transition: width 0.25s; }
+.question { min-height: 2.4em; padding-block: 0.2rem 0.6rem; font: 650 clamp(1.45rem, 5vw, 2.05rem)/1.18 var(--display); letter-spacing: -0.02em; text-wrap: balance; }
+.options { display: flex; flex-direction: column; gap: 0.55rem; }
+.opt {
+  display: flex; align-items: center; gap: 0.8rem; width: 100%; padding: 0.9rem 1rem;
+  border: 1.5px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink);
+  font-size: 1.02rem; text-align: left; cursor: pointer; transition: border-color 0.12s, background 0.12s;
+}
+.opt:hover { border-color: var(--ink); }
+.opt.on { border-color: var(--who); background: var(--who-soft); }
+.opt kbd { flex: none; display: grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 8px; background: var(--wash); color: var(--muted); font: 600 0.78rem var(--body); }
+.opt.on kbd { background: var(--who); color: var(--on-fill); }
+.opt span { min-width: 0; }
+.quiz-nav { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.6rem; padding-top: 0.8rem; }
+@media (prefers-reduced-motion: no-preference) {
+  .question, .options { animation: rise 0.22s ease-out; }
+  @keyframes rise { from { opacity: 0.4; transform: translateY(6px); } }
+}
+
+/* ---------- Rapport ---------- */
+.report { gap: 2.75rem; }
+.rep-head { display: flex; flex-direction: column; gap: 0.5rem; padding-top: 0.5rem; }
+.rep-head h1 { display: flex; flex-wrap: wrap; align-items: center; gap: 0.1em 0.3em; font: 700 clamp(2rem, 7.5vw, 3.2rem)/1.05 var(--display); letter-spacing: -0.03em; }
+.rep-head h1 span { display: inline-flex; align-items: center; gap: 0.22em; min-width: 0; overflow-wrap: anywhere; }
+.rep-head h1 .amp { color: var(--muted); font-weight: 500; }
+.rep-head .sw { width: 0.4em; height: 0.4em; }
+
+.hero-block { display: flex; flex-direction: column; gap: 1.25rem; }
+.hero-fig { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); align-items: center; gap: 1rem 2rem; }
+.venn { display: block; width: 100%; max-width: 22rem; height: auto; }
+.hero-num { font: 700 clamp(3.5rem, 15vw, 5.5rem)/0.95 var(--body); letter-spacing: -0.04em; }
+.hero-num span { font-size: 0.42em; font-weight: 600; letter-spacing: 0; }
+.hero-lab { padding-top: 0.3rem; font: 600 0.8rem var(--body); letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+.hero-head { padding-top: 0.7rem; font: 600 1.35rem/1.25 var(--display); text-wrap: balance; }
+.counts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; }
+.counts li { display: flex; flex-direction: column; align-items: flex-start; gap: 0.3rem; padding: 0.9rem 1rem; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); font-size: 0.9rem; color: var(--ink-2); }
+.counts b { font: 700 1.9rem/1 var(--body); color: var(--ink); }
+.hero-note { max-width: 38rem; color: var(--ink-2); }
+@media (max-width: 34rem) {
+  .hero-fig { grid-template-columns: minmax(0, 1fr); }
+  .venn { max-width: 16rem; }
+}
+
+.sec { display: flex; flex-direction: column; gap: 0.9rem; }
+.sec h2 { font: 700 1.6rem/1.15 var(--display); letter-spacing: -0.02em; text-wrap: balance; }
+.sec-sub { margin-top: -0.45rem; max-width: 38rem; color: var(--ink-2); }
+.summary p { max-width: 38rem; color: var(--ink-2); }
+.summary b { color: var(--ink); }
+
+/* Pastilles d'état : = accord, ≈ proche, ≠ écart */
+.st { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; font-weight: 600; color: var(--ink); white-space: nowrap; }
+.st i { display: grid; place-items: center; width: 1.3rem; height: 1.3rem; border-radius: 50%; background: var(--good); color: var(--on-fill); font: 700 0.85rem/1 var(--body); }
+.st.near i { background: var(--warn); color: var(--on-warn); }
+.st.gap i { background: var(--crit); }
+.st.skip { font-weight: 500; color: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; font-size: 0.88rem; color: var(--ink-2); }
+.legend li { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+/* Graphiques */
+.chart { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+.chart-cap { font-size: 0.82rem; color: var(--muted); }
+.radar { width: 100%; max-width: 30rem; height: auto; overflow: visible; }
+.radar .grid, .quad .grid { fill: none; stroke: var(--line); stroke-width: 1; }
+.radar .tick { fill: var(--muted); font: 500 10px var(--body); }
+.radar .axis { fill: var(--ink-2); font: 600 13px var(--body); }
+.shape { stroke-width: 2; stroke-linejoin: round; }
+.shape.m { fill: var(--ink); fill-opacity: 0.07; stroke: var(--ink-2); }
+.shape.a { fill: var(--a); fill-opacity: 0.14; stroke: var(--a); }
+.shape.b { fill: var(--b); fill-opacity: 0.14; stroke: var(--b); }
+.pt { stroke: var(--bg); stroke-width: 2; }
+.pt.a { fill: var(--a); }
+.pt.b { fill: var(--b); }
+.mark circle { fill: var(--good); stroke: var(--bg); stroke-width: 2; }
+.mark.near circle { fill: var(--warn); }
+.mark.gap circle { fill: var(--crit); }
+.mark text { fill: var(--on-fill); font: 700 11px var(--body); }
+.mark.near text { fill: var(--on-warn); }
+.quad { width: 100%; max-width: 22rem; height: auto; }
+.quad .plot { fill: var(--surface); stroke: var(--line); stroke-width: 1; }
+.quad .zone { fill: var(--muted); font: 600 11px var(--body); letter-spacing: 0.05em; text-transform: uppercase; }
+.quad .axis { fill: var(--ink-2); font: 600 12px var(--body); }
+.quad .who { fill: var(--ink); font: 700 13px var(--body); }
+.quad .pt { stroke: var(--surface); }
+
+/* Carte des domaines : nom, barre segmentée, pourcentage, état */
+.doms { display: flex; flex-direction: column; }
+.dom { display: grid; grid-template-columns: minmax(0, 13rem) minmax(4rem, 1fr) 3.6rem 8.4rem; align-items: center; gap: 0.3rem 0.9rem; padding-block: 0.7rem; border-top: 1px solid var(--line); }
+.dom-name { min-width: 0; font-weight: 600; }
+.seg { display: flex; gap: 2px; height: 8px; min-width: 0; }
+.seg i { flex: 0 0 0; min-width: 4px; border-radius: 999px; background: var(--good); }
+.seg .near { background: var(--warn); }
+.seg .gap { background: var(--crit); }
+.num { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+@media (max-width: 38rem) {
+  .dom { grid-template-columns: minmax(0, 1fr) auto; }
+  .dom .dom-name { grid-area: 1 / 1; }
+  .dom .num { grid-area: 1 / 2; }
+  .dom .seg { grid-area: 2 / 1 / 3 / -1; }
+  .dom .dom-st { grid-area: 3 / 1 / 4 / -1; }
+}
+
+/* Barres de profil et de climat */
+.bars { display: grid; grid-template-columns: max-content minmax(3rem, 1fr) 2.2rem minmax(0, max-content); align-items: center; gap: 0.45rem 0.7rem; }
+.bar-who { display: inline-flex; align-items: center; gap: 0.4rem; max-width: 9rem; min-width: 0; font-size: 0.9rem; font-weight: 600; overflow-wrap: anywhere; }
+.track { display: block; height: 10px; border-radius: 4px; background: var(--a-soft); overflow: hidden; }
+.track.b { background: var(--b-soft); }
+.bar { display: block; height: 100%; border-radius: 0 4px 4px 0; background: var(--a); }
+.track.b .bar { background: var(--b); }
+.lvl { font-size: 0.82rem; color: var(--muted); }
+@media (max-width: 30rem) {
+  .bars { grid-template-columns: max-content minmax(2rem, 1fr) 2.2rem; }
+  .lvl { grid-column: 2 / -1; margin-top: -0.3rem; }
+}
+.pairs { display: flex; flex-direction: column; gap: 1.5rem; }
+.pair { display: flex; flex-direction: column; gap: 0.45rem; padding-top: 1.2rem; border-top: 1px solid var(--line); }
+.pair h3 { font: 650 1.15rem/1.2 var(--display); }
+.pair-desc { font-size: 0.9rem; color: var(--muted); }
+.pair-text { max-width: 38rem; padding-top: 0.3rem; color: var(--ink-2); }
+
+/* Questions et réponses côte à côte */
+.qtext { font-size: 1.05rem; font-weight: 600; }
+.answers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+.ans { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; padding: 0.6rem 0.75rem; border-radius: 12px; background: var(--wash); }
+.ans-who { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.78rem; font-weight: 600; color: var(--ink-2); }
+.ans-val { font-size: 0.95rem; overflow-wrap: anywhere; }
+@media (max-width: 26rem) { .answers { grid-template-columns: minmax(0, 1fr); } }
+
+.talks { display: flex; flex-direction: column; gap: 0.8rem; }
+.talk { display: flex; flex-direction: column; gap: 0.6rem; padding: 1.1rem; border: 1px solid var(--line); border-radius: 18px; background: var(--surface); }
+.prompt { font-style: italic; color: var(--ink-2); }
+.prompt span { display: block; font: 600 0.75rem var(--body); letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+
+.verdict { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.4rem 1.6rem; }
+.vcol { display: flex; flex-direction: column; gap: 0.5rem; }
+.vcol h3 { display: flex; align-items: center; gap: 0.45rem; font: 650 1.05rem/1.2 var(--display); }
+.vcount { font-weight: 500; color: var(--muted); }
+.vcol ul { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.95rem; color: var(--ink-2); }
+@media (max-width: 34rem) { .verdict { grid-template-columns: minmax(0, 1fr); } }
+
+.dets { border-bottom: 1px solid var(--line); }
+.det { border-top: 1px solid var(--line); }
+.det summary { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding-block: 0.9rem; list-style: none; cursor: pointer; }
+.det summary::-webkit-details-marker { display: none; }
+.det-name { min-width: 0; font-weight: 600; }
+.det-name::before { content: "+"; display: inline-block; width: 1.2rem; color: var(--muted); font-weight: 500; }
+.det[open] .det-name::before { content: "–"; }
+.det-counts { flex: none; display: inline-flex; gap: 0.7rem; }
+.qlist { display: flex; flex-direction: column; gap: 1.1rem; }
+.det .qlist { padding-bottom: 1.3rem; }
+.qrow { display: flex; flex-direction: column; align-items: flex-start; gap: 0.45rem; }
+.qrow .answers { align-self: stretch; }
+
+/* Répartition des tâches : une barre par point de vue */
+.splits { display: flex; flex-direction: column; gap: 0.8rem; }
+.split-row { display: flex; flex-direction: column; gap: 0.3rem; }
+.split-lab { font-size: 0.9rem; font-weight: 600; }
+.split { display: flex; gap: 2px; height: 28px; }
+.split span { flex: 0 0 0; min-width: 6px; display: flex; align-items: center; padding-inline: 0.5rem; border-radius: 4px; background: var(--a); color: var(--on-fill); font-size: 0.85rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.split .b { justify-content: flex-end; background: var(--b); }
+
+/* Accueil : résultats déjà obtenus */
+.res { display: grid; grid-template-columns: minmax(0, 12rem) minmax(3rem, 1fr) 3.6rem; align-items: center; gap: 0.55rem 0.9rem; }
+.res li { display: contents; }
+.res a { min-width: 0; font-weight: 600; }
+.track.m { background: var(--wash); }
+.track.m .bar { background: var(--ink-2); }
+</style>
+<div id="app"></div>
+<script>
+/* Test général : le tour d'horizon. 12 thèmes, 3 questions chacun.
+   more: identifiant du test qui approfondit le thème. */
+(window.TESTS = window.TESTS || []).push({
+  id: "general",
+  v: 1,
+  group: "commencer",
+  kind: "accord",
+  title: "Test général",
+  hook: "Est-ce qu'on est faits pour s'entendre ?",
+  blurb: "Le tour d'horizon en 36 questions : rythme, argent, projets, valeurs, disputes, affection. Le rapport indique ensuite quels tests approfondir.",
+  minutes: 8,
+  simLabel: "de compatibilité",
+  intro: [
+    "Douze thèmes de la vie à deux, trois questions chacun. C'est le test à faire en premier : il donne une vue d'ensemble et repère les sujets qui méritent un test complet.",
+    "Réponds pour toi, sans chercher à deviner ce que l'autre dirait. Tu peux passer une question qui ne te concerne pas."
+  ],
+  dims: [
+    { id: "rythme", name: "Rythme de vie", short: "Rythme", more: "rythme", talk: ["À quoi ressemble ta journée idéale, du réveil au coucher ?"] },
+    { id: "maison", name: "La vie à la maison", short: "Maison", more: "charge", talk: ["Qu'est-ce qui te pèse le plus dans la vie à la maison ?"] },
+    { id: "social", name: "Vie sociale", short: "Social", more: "perso", talk: ["De combien de temps avec les autres as-tu besoin pour te sentir bien ?"] },
+    { id: "argent", name: "L'argent", short: "Argent", more: "argent", talk: ["Qu'est-ce qui te rassure, et qu'est-ce qui t'inquiète, quand on parle d'argent ?"] },
+    { id: "projets", name: "Les grands projets", short: "Projets", more: "parents", talk: ["Décris notre vie dans cinq ans si tout se passe comme tu le souhaites."] },
+    { id: "valeurs", name: "Valeurs et convictions", short: "Valeurs", more: "valeurs", talk: ["Sur quoi ne transigerais-tu jamais ?"] },
+    { id: "dialogue", name: "Se parler", short: "Dialogue", more: "amour", talk: ["Qu'est-ce qui t'aide à parler de ce que tu ressens ?"] },
+    { id: "conflits", name: "Les désaccords", short: "Conflits", more: "conflits", talk: ["De quoi as-tu besoin juste après une dispute ?"] },
+    { id: "affection", name: "Affection et intimité", short: "Affection", more: "desir", talk: ["Quel geste de ma part te fait le plus de bien ?"] },
+    { id: "liberte", name: "Fusion et indépendance", short: "Liberté", more: "attachement", talk: ["De quel espace as-tu besoin pour te sentir bien avec moi ?"] },
+    { id: "loisirs", name: "Loisirs et vacances", short: "Loisirs", more: "voyages", talk: ["Quelle activité aimerais-tu qu'on fasse ensemble plus souvent ?"] },
+    { id: "nous", name: "Nous deux aujourd'hui", short: "Nous", mood: true, more: "bilan", talk: ["Qu'est-ce qui te ferait du bien dans notre couple en ce moment ?"] }
+  ],
+  questions: [
+    { d: "rythme", q: "Je suis plutôt :", o: ["Du matin, très tôt", "Plutôt du matin", "Plutôt du soir", "Oiseau de nuit"] },
+    { d: "rythme", q: "Le week-end, côté énergie :", o: ["Il me faut un programme", "J'aime prévoir une activité", "Je préfère improviser", "J'ai besoin de ne rien faire"] },
+    { d: "rythme", q: "Mon rapport à la ponctualité :", o: ["Toujours en avance", "À l'heure", "Quelques minutes de retard", "L'heure est une indication"] },
+
+    { d: "maison", q: "Mon seuil de tolérance au désordre :", o: ["Très bas", "Plutôt bas", "Plutôt haut", "Très haut"] },
+    { d: "maison", t: "nom", q: "Entre nous, les tâches ménagères devraient être :", o: ["Partagées à égalité, quoi qu'il arrive", "Partagées selon le temps de chacun", "Réparties selon les goûts de chacun", "Faites par celui que ça dérange"] },
+    { d: "maison", q: "Chez nous, avoir un espace rien qu'à moi :", o: ["Indispensable", "Appréciable", "Pas nécessaire", "Je préfère tout partager"] },
+
+    { d: "social", q: "Une soirée réussie :", o: ["Une grande fête", "Un dîner à plusieurs", "Un tête-à-tête", "Chacun son activité, côte à côte"] },
+    { d: "social", q: "Voir du monde, pour moi :", o: ["Ça me recharge", "J'aime bien, à petite dose", "Ça me fatigue vite", "Je préfère éviter"] },
+    { d: "social", q: "Nos familles dans notre vie :", o: ["Très présentes", "Présentes", "À distance raisonnable", "Le moins possible"] },
+
+    { d: "argent", q: "Devant une rentrée d'argent imprévue :", o: ["Je mets tout de côté", "J'épargne l'essentiel", "Je me fais plaisir avec une bonne partie", "Je dépense tout"] },
+    { d: "argent", q: "Dans un couple, l'argent devrait être :", o: ["Entièrement mis en commun", "Surtout commun", "Surtout séparé", "Entièrement séparé"] },
+    { d: "argent", q: "Un gros achat, ça se décide :", o: ["Toujours à deux", "À deux au-delà d'un certain montant", "Chacun pour son argent", "Sur un coup de cœur"] },
+
+    { d: "projets", w: 2, q: "Je nous imagine avec des enfants (ou d'autres enfants) :", o: ["Sans aucun doute", "Probablement", "Probablement pas", "Certainement pas"] },
+    { d: "projets", w: 2, q: "Dans cinq ans, je nous vois vivre :", o: ["Au même endroit", "Dans la même région, ailleurs", "Dans une autre région", "Dans un autre pays"] },
+    { d: "projets", w: 2, q: "Officialiser notre couple (mariage, PACS) :", o: ["C'est important pour moi", "J'aimerais bien", "Ça m'est égal", "Je n'en ai pas envie"] },
+
+    { d: "valeurs", t: "nom", q: "Ce qui passe en premier dans ma vie :", o: ["La famille", "Le couple", "Le travail", "Ma liberté"] },
+    { d: "valeurs", q: "Mes convictions (politiques, religieuses, écologiques) :", o: ["Elles guident mes choix au quotidien", "Elles comptent beaucoup", "Elles restent en arrière-plan", "Je n'en ai pas de très arrêtées"] },
+    { d: "valeurs", q: "Dire toute la vérité à l'autre :", o: ["Toujours, même si ça blesse", "Presque toujours", "Pas quand ça ferait du mal pour rien", "Chacun a droit à ses secrets"] },
+
+    { d: "dialogue", q: "Parler de ce que je ressens :", o: ["Facile, je le fais spontanément", "Plutôt facile", "Difficile, il me faut du temps", "Très difficile"] },
+    { d: "dialogue", t: "nom", q: "Quand l'autre me raconte un souci, j'ai tendance à :", o: ["Chercher une solution", "Écouter sans rien proposer", "Lui changer les idées", "Relativiser"] },
+    { d: "dialogue", q: "Nos vraies discussions (autre chose que l'organisation) :", o: ["Tous les jours", "Plusieurs fois par semaine", "De temps en temps", "Rarement"] },
+
+    { d: "conflits", q: "Quand on n'est pas d'accord, je préfère :", o: ["Régler ça tout de suite", "En parler dans la journée", "Laisser passer quelques jours", "Éviter le sujet"] },
+    { d: "conflits", t: "nom", q: "Dans une dispute, ce qui compte le plus pour moi :", o: ["Qu'on me comprenne", "Trouver une solution", "Que ça s'arrête vite", "Avoir le dernier mot"] },
+    { d: "conflits", q: "Après une dispute :", o: ["J'oublie vite", "Il me faut quelques heures", "Il me faut quelques jours", "J'y repense longtemps"] },
+
+    { d: "affection", q: "Les câlins et les gestes tendres :", o: ["Tout le temps", "Souvent", "Parfois", "Rarement"] },
+    { d: "affection", q: "La place de la sexualité dans un couple :", o: ["Essentielle", "Importante", "Secondaire", "Peu importante"] },
+    { d: "affection", q: "Dire « je t'aime » :", o: ["Plusieurs fois par jour", "Tous les jours", "De temps en temps", "Je le montre plutôt que je ne le dis"] },
+
+    { d: "liberte", q: "Passer une soirée chacun de son côté :", o: ["J'en ai besoin souvent", "De temps en temps, ça fait du bien", "Rarement", "Je préfère qu'on soit ensemble"] },
+    { d: "liberte", q: "Savoir où est l'autre et avec qui :", o: ["J'en ai besoin", "J'aime autant", "Ça m'est égal", "Chacun vit sa vie"] },
+    { d: "liberte", q: "Partir en week-end sans l'autre :", o: ["Naturel", "Possible de temps en temps", "Exceptionnel", "Je n'aime pas l'idée"] },
+
+    { d: "loisirs", t: "nom", q: "Des vacances idéales :", o: ["Farniente", "Découvertes et visites", "Sport et aventure", "À la maison, au calme"] },
+    { d: "loisirs", q: "Nos loisirs :", o: ["On fait presque tout ensemble", "Beaucoup en commun", "Quelques-uns en commun", "Chacun les siens"] },
+    { d: "loisirs", t: "nom", q: "Le soir, les écrans :", o: ["Ensemble devant la même chose", "Chacun le sien, côte à côte", "Chacun dans son coin", "Le moins possible"] },
+
+    { d: "nous", q: "Aujourd'hui, notre couple me fait :", o: ["Beaucoup de bien", "Plutôt du bien", "Ni bien ni mal", "Du mal"] },
+    { d: "nous", q: "Avec l'autre, je me sens libre d'être moi-même :", o: ["Toujours", "Souvent", "Rarement", "Jamais"] },
+    { d: "nous", w: 2, q: "Je nous vois encore ensemble dans dix ans :", o: ["Sans aucun doute", "Probablement", "Je ne sais pas", "Probablement pas"] }
+  ]
+});
+</script>
+<script>
+/* Qui de nous deux ? Toutes les questions sont en miroir : chacun répond
+   « moi » ou « l'autre », et le rapport compare les deux versions. */
+(window.TESTS = window.TESTS || []).push({
+  id: "quidenous",
+  v: 1,
+  group: "commencer",
+  kind: "accord",
+  verdict: true,
+  title: "Qui de nous deux ?",
+  hook: "Est-ce qu'on se voit de la même façon ?",
+  blurb: "Vingt-quatre questions légères : qui s'entête le plus, qui a fait le premier pas, qui dépense le plus. Le rapport compare vos deux versions.",
+  minutes: 4,
+  simLabel: "de versions identiques",
+  intro: [
+    "Pour chaque question, tu désignes l'un de vous deux. L'autre fait pareil de son côté, et le rapport montre où vos versions concordent.",
+    "C'est le test le plus léger de la série : idéal pour commencer."
+  ],
+  headline: function (p) {
+    return p >= 85 ? "Vous racontez la même histoire."
+      : p >= 70 ? "Presque la même version des faits."
+      : p >= 55 ? "Deux versions qui se discutent."
+      : "Chacun a sa version de l'histoire.";
+  },
+  dims: [
+    { id: "quotidien", name: "Au quotidien", short: "Quotidien", talk: ["Donne un exemple récent qui explique ta réponse."] },
+    { id: "caractere", name: "Caractère", short: "Caractère", talk: ["Raconte la dernière fois où ça s'est vu."] },
+    { id: "social", name: "Avec les autres", short: "Social", talk: ["Que diraient vos amis si on leur posait la question ?"] },
+    { id: "amour", name: "En amour", short: "Amour", talk: ["Raconte ta version : comment tu t'en souviens ?"] }
+  ],
+  questions: [
+    { d: "quotidien", t: "mir", q: "Qui met le plus de temps à se préparer ?" },
+    { d: "quotidien", t: "mir", q: "Qui laisse le plus de bazar derrière soi ?" },
+    { d: "quotidien", t: "mir", q: "Qui dépense le plus facilement ?" },
+    { d: "quotidien", t: "mir", q: "Qui s'endort en premier devant un film ?" },
+    { d: "quotidien", t: "mir", q: "Qui cuisine le mieux ?" },
+    { d: "quotidien", t: "mir", q: "Qui passe le plus de temps sur son téléphone ?" },
+
+    { d: "caractere", t: "mir", q: "Qui s'entête le plus ?" },
+    { d: "caractere", t: "mir", q: "Qui s'énerve le plus vite ?" },
+    { d: "caractere", t: "mir", q: "Qui a le plus le sens de l'organisation ?" },
+    { d: "caractere", t: "mir", q: "Qui s'inquiète le plus ?" },
+    { d: "caractere", t: "mir", q: "Qui se perd le plus facilement en chemin ?" },
+    { d: "caractere", t: "mir", q: "Qui fait preuve de la plus grande mauvaise foi ?" },
+
+    { d: "social", t: "mir", q: "Qui est le plus à l'aise en soirée ?" },
+    { d: "social", t: "mir", q: "Qui fait le plus rire l'autre ?" },
+    { d: "social", t: "mir", q: "Qui raconte le mieux les histoires ?" },
+    { d: "social", t: "mir", q: "Qui arrive le plus souvent en retard ?" },
+    { d: "social", t: "mir", q: "Qui oublie le plus les anniversaires ?" },
+    { d: "social", t: "mir", q: "Qui a le plus de mal à dire non ?" },
+
+    { d: "amour", t: "mir", q: "Qui a fait le premier pas ?" },
+    { d: "amour", t: "mir", q: "Qui dit « je t'aime » le plus souvent ?" },
+    { d: "amour", t: "mir", q: "Qui ressent le plus de jalousie ?" },
+    { d: "amour", t: "mir", q: "Qui a le plus la fibre romantique ?" },
+    { d: "amour", t: "mir", q: "Qui s'excuse en premier après une dispute ?" },
+    { d: "amour", t: "mir", q: "Qui réclame le plus de câlins ?" }
+  ]
+});
+</script>
+<script>
+/* Tu me connais vraiment ? Chaque thème donne deux écrans : ta réponse, puis
+   ce que tu penses que l'autre répondra. Le rapport compare les intuitions de
+   chacun aux vraies réponses de l'autre.
+   Dans la phrase « devine », {p} = prénom de l'autre, {de_p} = « de Tom » / « d'Inès ». */
+(function () {
+  var ITEMS = [
+    { q: "Mon dimanche idéal :", g: "Le dimanche idéal {de_p} :", o: ["Grasse matinée et canapé", "Une balade en pleine nature", "Un repas avec des amis ou la famille", "Des projets et du bricolage"] },
+    { q: "Si je gagnais 10 000 € demain :", g: "Si {p} gagnait 10 000 € demain :", o: ["Je mettrais tout de côté", "Je partirais en voyage", "Je gâterais mes proches", "Je m'offrirais un gros plaisir"] },
+    { q: "Ce qui me stresse le plus :", g: "Ce qui stresse le plus {p} :", o: ["Le travail", "L'argent", "Les tensions avec les proches", "La santé"] },
+    { q: "Pour me remonter le moral, il faut :", g: "Pour remonter le moral {de_p}, il faut :", o: ["M'écouter", "Me changer les idées", "Me laisser tranquille un moment", "Me prendre dans les bras"] },
+    { q: "Mon plus gros défaut :", g: "Le plus gros défaut {de_p}, selon {p} :", o: ["L'impatience", "L'entêtement", "La susceptibilité", "La désorganisation"] },
+    { q: "Ma plus grande fierté :", g: "La plus grande fierté {de_p} :", o: ["Mon parcours professionnel", "Mes relations (famille, amis)", "Ce que j'ai surmonté", "Ce que je sais créer ou réparer"] },
+    { q: "En vacances, je préfère :", g: "En vacances, {p} préfère :", o: ["Ne rien faire au soleil", "Visiter du matin au soir", "Le sport et l'aventure", "Rester à la maison"] },
+    { q: "Le cadeau qui me ferait le plus plaisir :", g: "Le cadeau qui ferait le plus plaisir à {p} :", o: ["Une expérience (concert, week-end)", "Un objet dont j'ai besoin", "Une surprise faite à la main", "De quoi choisir moi-même"] },
+    { q: "Ce qui m'agace le plus chez les autres :", g: "Ce qui agace le plus {p} chez les autres :", o: ["Le retard", "Le mensonge", "Le manque d'écoute", "La négativité"] },
+    { q: "Moi, le matin :", g: "{p}, le matin :", o: ["Debout tôt et en forme", "Ça va après un café", "Pas un mot avant 10 h", "Le matin n'existe pas"] },
+    { q: "Devant un conflit, mon premier réflexe :", g: "Devant un conflit, le premier réflexe {de_p} :", o: ["En parler tout de suite", "Prendre du recul", "Faire comme si de rien n'était", "M'énerver"] },
+    { q: "Ce qui compte le plus pour moi dans un couple :", g: "Ce qui compte le plus pour {p} dans un couple :", o: ["La confiance", "La complicité", "Le désir", "Les projets communs"] },
+    { q: "Pour une soirée film, je choisis :", g: "Pour une soirée film, {p} choisit :", o: ["Une comédie", "Un thriller ou un film d'horreur", "Une romance ou un drame", "De la science-fiction ou du fantastique"] },
+    { q: "Mon plus grand rêve :", g: "Le plus grand rêve {de_p} :", o: ["Voyager longtemps", "Réussir un projet professionnel", "Fonder ou agrandir une famille", "Avoir un endroit bien à moi"] },
+    { q: "Si on était séparés un mois, ce qui me manquerait le plus :", g: "Si vous étiez séparés un mois, ce qui manquerait le plus à {p} :", o: ["Nos discussions", "Les câlins", "Rire ensemble", "Le quotidien à deux"] }
+  ];
+
+  var questions = [];
+  ITEMS.forEach(function (it) {
+    questions.push({ d: "moi", t: "nom", q: it.q, o: it.o });
+    questions.push({ d: "toi", t: "nom", guess: true, q: it.g, o: it.o });
+  });
+
+  (window.TESTS = window.TESTS || []).push({
+    id: "connais",
+    v: 1,
+    group: "commencer",
+    kind: "devine",
+    title: "Tu me connais vraiment ?",
+    hook: "Est-ce qu'on se connaît par cœur ?",
+    blurb: "Quinze thèmes : tu réponds pour toi, puis tu devines ce que l'autre répondra. Le rapport montre qui connaît le mieux l'autre, et où sont les surprises.",
+    minutes: 6,
+    simLabel: "de bonnes intuitions",
+    units: [ITEMS.length, "thèmes"],
+    words: {
+      ok: ["bonne intuition", "bonnes intuitions"],
+      near: ["réponse voisine", "réponses voisines"],
+      gap: ["surprise", "surprises"]
+    },
+    intro: [
+      "Pour chaque thème, deux écrans : d'abord ta propre réponse, puis celle que tu attends de l'autre. L'autre fait la même chose de son côté.",
+      "Le rapport compare tes intuitions aux vraies réponses de l'autre, et inversement. Les surprises sont les meilleurs sujets de discussion."
+    ],
+    headline: function (p) {
+      return p >= 85 ? "Vous vous connaissez par cœur."
+        : p >= 70 ? "Vous vous connaissez bien."
+        : p >= 55 ? "Il vous reste des choses à découvrir."
+        : "Vous avez encore beaucoup à apprendre l'un de l'autre.";
+    },
+    dims: [
+      { id: "moi", name: "Ta réponse", short: "Moi" },
+      { id: "toi", name: "Ton intuition", short: "L'autre" }
+    ],
+    questions: questions
+  });
+})();
+</script>
+<script>
+/* Bilan de couple : 72 questions, 12 domaines. Chaque question propose des réponses
+   ordonnées ; le rapport mesure la distance entre les deux réponses.
+   t: "mir" = question miroir (moi / l'autre), t: "nom" = réponses sans ordre,
+   w: 2 = sujet décisif (pèse double dans le choix des conversations). */
+(window.TESTS = window.TESTS || []).push({
+  id: "bilan",
+  v: 1,
+  group: "couple",
+  kind: "accord",
+  title: "Bilan de couple",
+  hook: "Est-ce qu'on est bien dans notre couple ?",
+  blurb: "Douze domaines de la vie à deux passés en revue. Le rapport montre où vous êtes d'accord et de quoi il vaut mieux parler.",
+  minutes: 15,
+  simLabel: "d'alignement",
+  intro: [
+    "Chacun répond de son côté, sans voir les réponses de l'autre. À la fin, le rapport compare vos réponses question par question : accords, réponses proches et écarts.",
+    "Réponds pour toi, sans chercher la bonne réponse ni deviner ce que l'autre dirait. Si une question ne te concerne pas, tu peux la passer."
+  ],
+  note: "Ce test montre à chacun les réponses de l'autre. Si tu as peur de la réaction de ton ou ta partenaire, ne le fais pas à deux. En France, le 3919 répond gratuitement et anonymement, 24 h sur 24.",
+  dims: [
+    { id: "quotidien", name: "Le quotidien à la maison", short: "Quotidien", talk: ["Qu'est-ce qui te pèse le plus à la maison en ce moment ?", "Quelle tâche aimerais-tu qu'on répartisse autrement dès cette semaine ?"] },
+    { id: "temps", name: "Le temps à deux et le temps pour soi", short: "Temps", talk: ["À quoi ressemblerait une semaine où tu aurais assez de temps avec moi, et assez pour toi ?", "Quel moment à deux te manque le plus ?"] },
+    { id: "entourage", name: "Famille et amis", short: "Entourage", talk: ["Avec qui aimerais-tu qu'on passe plus de temps, ou moins ?", "Qu'est-ce que j'ignore sur ta façon de vivre les moments avec ma famille ?"] },
+    { id: "travail", name: "Le travail et les ambitions", short: "Travail", talk: ["Où aimerais-tu en être professionnellement dans cinq ans ?", "Qu'est-ce que je pourrais faire pour mieux te soutenir dans ton travail ?"] },
+    { id: "argent", name: "L'argent", short: "Argent", talk: ["Qu'est-ce que l'argent représente pour toi : de la sécurité, de la liberté, du plaisir ?", "Quelle dépense de l'autre as-tu du mal à comprendre ?"] },
+    { id: "logement", name: "Où et comment vivre", short: "Logement", talk: ["Décris l'endroit où tu nous imagines dans dix ans.", "À quoi ne renoncerais-tu jamais dans un lieu de vie ?"] },
+    { id: "enfants", name: "Les enfants", short: "Enfants", talk: ["Qu'est-ce qui te fait envie, et qu'est-ce qui te fait peur, dans l'idée d'être parent ?", "Que voudrais-tu reprendre de ta propre enfance, et surtout pas ?"] },
+    { id: "valeurs", name: "Les valeurs", short: "Valeurs", talk: ["Sur quoi ne ferais-tu jamais de compromis ?", "Quelle conviction a le plus changé chez toi ces dernières années ?"] },
+    { id: "disputes", name: "La communication et les disputes", short: "Disputes", talk: ["Qu'est-ce qui t'aide à redescendre quand le ton monte ?", "Quelle phrase de moi te blesse plus que je ne le crois ?"] },
+    { id: "confiance", name: "La confiance et la fidélité", short: "Confiance", talk: ["Qu'est-ce qui te fait te sentir en sécurité avec moi ?", "Où places-tu la limite entre vie privée et secret ?"] },
+    { id: "intimite", name: "L'intimité et la tendresse", short: "Intimité", talk: ["Qu'est-ce qui te donne envie de te rapprocher de moi ?", "Qu'aimerais-tu qu'on fasse plus souvent, ou autrement ?"] },
+    { id: "climat", name: "Comment on se sent", short: "Climat", mood: true, talk: ["De quoi aurais-tu besoin pour te sentir mieux dans notre couple ?", "Quel est ton meilleur souvenir de nous cette année ?"] }
+  ],
+  questions: [
+    /* Le quotidien */
+    { d: "quotidien", t: "mir", q: "Le ménage, le linge, les courses : qui en fait le plus ?" },
+    { d: "quotidien", t: "mir", q: "La liste invisible des choses à ne pas oublier (papiers, rendez-vous, anniversaires) : qui la porte ?" },
+    { d: "quotidien", q: "La répartition actuelle des tâches me paraît :", o: ["Tout à fait juste", "Plutôt juste", "Plutôt déséquilibrée", "Franchement déséquilibrée"] },
+    { d: "quotidien", q: "Mon niveau d'exigence pour le rangement et la propreté :", o: ["Tout doit être net en permanence", "J'aime que ce soit rangé, sans obsession", "Un peu de bazar ne me gêne pas", "Le bazar, je ne le vois même pas"] },
+    { d: "quotidien", q: "Les repas à la maison, idéalement :", o: ["On cuisine presque tous les jours", "On cuisine souvent, avec des raccourcis", "Du simple et rapide la plupart du temps", "Livraison et restaurant dès que possible"] },
+    { d: "quotidien", q: "Quand une tâche n'est pas faite, je préfère :", o: ["Le dire tout de suite", "Attendre le bon moment pour en parler", "La faire moi-même sans rien dire", "Laisser couler"] },
+
+    /* Le temps */
+    { d: "temps", q: "Le temps qu'on passe vraiment à deux en ce moment :", o: ["Beaucoup trop peu", "Un peu trop peu", "Juste ce qu'il faut", "Un peu trop, j'ai besoin d'air"] },
+    { d: "temps", q: "Mon besoin de moments en solo :", o: ["Très grand, plusieurs fois par semaine", "Régulier", "De temps en temps", "Très faible, je préfère qu'on soit ensemble"] },
+    { d: "temps", q: "Un week-end idéal :", o: ["Programme chargé, des sorties et du monde", "Une ou deux sorties, le reste tranquille", "À la maison, avec une petite sortie", "Rien de prévu, on ne bouge pas"] },
+    { d: "temps", q: "Les vacances :", o: ["Toujours tous les deux", "Surtout à deux, parfois avec d'autres", "Souvent avec des amis ou la famille", "Partir chacun de son côté ne me gêne pas"] },
+    { d: "temps", q: "Les écrans (téléphone, séries, jeux) quand on est ensemble :", o: ["Ça prend beaucoup trop de place", "Ça prend un peu trop de place", "C'est équilibré", "Ce n'est pas un sujet pour moi"] },
+    { d: "temps", q: "Avoir des loisirs ou des sorties chacun de son côté :", o: ["Indispensable, chaque semaine", "Important, régulièrement", "De temps en temps", "Je préfère qu'on fasse presque tout ensemble"] },
+
+    /* Famille et amis */
+    { d: "entourage", q: "La fréquence idéale pour voir nos familles :", o: ["Chaque semaine", "Deux ou trois fois par mois", "Une fois par mois environ", "Quelques fois par an"] },
+    { d: "entourage", q: "La place de nos familles dans nos décisions de couple :", o: ["Leur avis compte beaucoup", "On les écoute, puis on décide", "On les informe une fois décidé", "Ça ne les regarde pas"] },
+    { d: "entourage", q: "Je me sens à l'aise avec la famille de mon ou ma partenaire :", o: ["Tout à fait", "Plutôt", "Pas vraiment", "Pas du tout"] },
+    { d: "entourage", q: "Recevoir du monde à la maison :", o: ["Le plus souvent possible", "Régulièrement", "De temps en temps", "Rarement, la maison est notre refuge"] },
+    { d: "entourage", q: "Les soirées entre amis, idéalement :", o: ["Toujours ensemble", "Le plus souvent ensemble", "Autant ensemble que séparément", "Le plus souvent chacun avec les siens"] },
+    { d: "entourage", q: "Si un proche critique mon ou ma partenaire :", o: ["Je prends sa défense immédiatement", "Je prends sa défense, puis on en reparle à deux", "J'écoute sans prendre parti", "Je préfère ne pas m'en mêler"] },
+
+    /* Le travail */
+    { d: "travail", q: "La place du travail dans ma vie :", o: ["Une priorité absolue", "Important, mais pas au détriment du reste", "Surtout un moyen de bien vivre", "Le moins possible"] },
+    { d: "travail", w: 2, q: "Si l'un de nous reçoit une belle offre dans une autre ville :", o: ["On déménage sans hésiter", "On étudie sérieusement la question", "Seulement si l'autre y gagne aussi", "On reste là où est notre vie"] },
+    { d: "travail", q: "Travailler le soir ou le week-end :", o: ["Normal quand il le faut", "Acceptable de temps en temps", "À éviter autant que possible", "Hors de question"] },
+    { d: "travail", q: "Je me sens soutenu dans mes projets professionnels par mon ou ma partenaire :", o: ["Tout à fait", "Plutôt", "Pas vraiment", "Pas du tout"] },
+    { d: "travail", q: "Si l'un de nous veut tout quitter pour se reconvertir ou monter sa boîte :", o: ["On fonce, on s'adaptera", "Oui, avec un plan et une échéance", "Seulement si nos finances restent stables", "Trop risqué pour nous"] },
+    { d: "travail", q: "Parler boulot à la maison :", o: ["J'en ai besoin tous les jours", "Volontiers, un moment", "Le moins possible", "La maison n'est pas faite pour ça"] },
+
+    /* L'argent */
+    { d: "argent", q: "Comptes bancaires : la formule qui me convient le mieux :", o: ["Tout sur un compte joint", "Un compte joint pour le foyer, chacun garde le reste", "Des comptes séparés et un partage des factures", "Des comptes séparés, celui qui peut paie"] },
+    { d: "argent", q: "Quand nos revenus sont différents, les dépenses communes se paient :", o: ["Moitié-moitié, strictement", "À peu près moitié-moitié, avec de la souplesse", "En proportion des revenus", "Celui qui gagne le plus paie l'essentiel"] },
+    { d: "argent", q: "Mon rapport à l'épargne :", o: ["J'épargne d'abord, je dépense ce qui reste", "J'épargne régulièrement", "Quand il en reste à la fin du mois", "L'argent est fait pour être dépensé"] },
+    { d: "argent", q: "À partir de quel montant on se consulte avant un achat personnel ?", o: ["Dès 50 €", "Autour de 200 €", "Autour de 500 €", "Jamais, chacun fait ce qu'il veut de son argent"] },
+    { d: "argent", q: "Emprunter (crédit conso, découvert) pour se faire plaisir :", o: ["Jamais", "Exceptionnellement", "Pourquoi pas si on peut rembourser", "Aucun problème"] },
+    { d: "argent", q: "Parler d'argent entre nous :", o: ["Facile, on en parle ouvertement", "Plutôt facile", "Un peu tendu", "On évite le sujet"] },
+
+    /* Le logement */
+    { d: "logement", w: 2, q: "L'endroit où je me vois vivre dans dix ans :", o: ["En plein centre d'une grande ville", "En ville, dans un quartier calme", "Dans une petite ville ou en périphérie", "À la campagne ou en pleine nature"] },
+    { d: "logement", w: 2, q: "Partir vivre à l'étranger :", o: ["J'en rêve", "Pourquoi pas quelques années", "Seulement s'il le faut vraiment", "Non, ma vie est ici"] },
+    { d: "logement", q: "Acheter un logement :", o: ["Une priorité, dès que possible", "Un objectif à moyen terme", "Si l'occasion se présente", "Pas important, louer me convient"] },
+    { d: "logement", q: "Vivre près de nos familles :", o: ["Indispensable", "Préférable", "Sans importance", "Je préfère garder de la distance"] },
+    { d: "logement", q: "Chez nous, la décoration et l'aménagement :", o: ["J'y tiens beaucoup, j'ai des idées précises", "J'aime donner mon avis", "Peu importe tant que c'est confortable", "Je laisse l'autre décider"] },
+    { d: "logement", q: "Un animal à la maison :", o: ["Oui, c'est indispensable", "Oui, pourquoi pas", "Plutôt non", "Non, vraiment pas"] },
+
+    /* Les enfants */
+    { d: "enfants", w: 2, q: "Avoir des enfants (ou en avoir d'autres) :", o: ["Oui, c'est sûr", "Plutôt oui", "Plutôt non", "Non, c'est sûr"] },
+    { d: "enfants", w: 2, q: "Le bon moment pour un (prochain) enfant :", o: ["Dès maintenant", "D'ici deux ou trois ans", "Plus tard, rien ne presse", "Jamais ou plus jamais"] },
+    { d: "enfants", w: 2, q: "Le nombre d'enfants idéal dans une famille :", o: ["Aucun", "Un", "Deux", "Trois ou plus"] },
+    { d: "enfants", q: "L'éducation, plutôt :", o: ["Un cadre strict et des règles claires", "Des règles fermes, mais expliquées", "Peu de règles, beaucoup de dialogue", "L'enfant apprend surtout par lui-même"] },
+    { d: "enfants", q: "À l'arrivée d'un enfant, côté travail :", o: ["Chacun garde son activité à temps plein", "Chacun réduit un peu son temps de travail", "L'un des deux réduit ou s'arrête un temps", "L'un des deux reste durablement à la maison"] },
+    { d: "enfants", q: "Les écrans pour les enfants :", o: ["Aucun avant longtemps", "Très encadrés", "Avec modération", "Ce n'est pas un problème"] },
+
+    /* Les valeurs */
+    { d: "valeurs", w: 2, q: "Le mariage (ou le PACS) :", o: ["Essentiel pour moi", "Important", "Agréable mais pas nécessaire", "Sans intérêt"] },
+    { d: "valeurs", w: 2, q: "La place de la religion ou de la spiritualité dans ma vie :", o: ["Centrale", "Importante", "Discrète", "Absente"] },
+    { d: "valeurs", q: "Nos opinions politiques :", o: ["Je tiens à ce qu'on soit du même bord", "Je préfère qu'on soit proches", "Des désaccords ne me gênent pas", "Je ne m'y intéresse pas"] },
+    { d: "valeurs", q: "L'écologie dans nos choix de tous les jours (transports, alimentation, achats) :", o: ["Une priorité, quitte à se priver", "Un critère important", "On fait attention quand c'est simple", "Ce n'est pas un critère"] },
+    { d: "valeurs", t: "nom", q: "Réussir sa vie, c'est avant tout :", o: ["Fonder une famille unie", "S'accomplir dans ce qu'on fait", "Être libre de son temps", "Profiter de chaque jour"] },
+    { d: "valeurs", q: "Un petit mensonge pour éviter une dispute :", o: ["Jamais acceptable", "À éviter", "Parfois utile", "Tout à fait acceptable"] },
+
+    /* Les disputes */
+    { d: "disputes", q: "Quand quelque chose me contrarie :", o: ["J'en parle tout de suite", "J'en parle une fois au calme", "J'attends que l'autre le remarque", "Je le garde pour moi"] },
+    { d: "disputes", q: "Pendant une dispute, j'ai tendance à :", o: ["Hausser le ton", "Argumenter jusqu'au bout", "Chercher vite un compromis", "Me fermer ou quitter la pièce"] },
+    { d: "disputes", q: "Après une dispute, on se réconcilie :", o: ["Dans l'heure", "Dans la journée", "En quelques jours", "Certains sujets ne se referment jamais"] },
+    { d: "disputes", t: "mir", q: "Qui fait le plus souvent le premier pas pour se réconcilier ?" },
+    { d: "disputes", q: "Quand je parle de ce que je ressens, je me sens écouté :", o: ["Toujours", "Souvent", "Rarement", "Jamais"] },
+    { d: "disputes", q: "Les mêmes reproches reviennent d'une dispute à l'autre :", o: ["Jamais", "Rarement", "Souvent", "Tout le temps"] },
+
+    /* La confiance */
+    { d: "confiance", q: "Regarder le téléphone de l'autre :", o: ["Normal, on n'a rien à cacher", "Acceptable si on demande avant", "Seulement en cas de gros doute", "Jamais, c'est privé"] },
+    { d: "confiance", q: "Garder contact avec ses ex :", o: ["Aucun problème", "Acceptable si c'est transparent", "Ça me met mal à l'aise", "Je préfère que non"] },
+    { d: "confiance", w: 2, q: "Pour moi, l'infidélité commence :", o: ["Dès les messages ambigus", "À un flirt assumé", "À un baiser", "À une relation sexuelle"] },
+    { d: "confiance", w: 2, q: "Si l'un de nous était infidèle :", o: ["Ce serait la fin immédiate", "Probablement la fin", "On essaierait de reconstruire", "Tout dépendrait de la situation"] },
+    { d: "confiance", q: "Je peux tout dire à mon ou ma partenaire sans craindre sa réaction :", o: ["Tout à fait", "Plutôt", "Pas vraiment", "Pas du tout"] },
+    { d: "confiance", q: "La jalousie entre nous :", o: ["Absente", "Légère", "Présente, elle crée des tensions", "Envahissante"] },
+
+    /* L'intimité */
+    { d: "intimite", q: "La fréquence de nos rapports en ce moment :", o: ["J'en voudrais beaucoup plus", "J'en voudrais un peu plus", "Elle me convient", "J'en voudrais moins"] },
+    { d: "intimite", q: "Les gestes tendres au quotidien (câlins, baisers, mots doux) :", o: ["J'en ai besoin sans arrêt", "J'en ai besoin souvent", "De temps en temps me suffit", "J'en ai peu besoin"] },
+    { d: "intimite", q: "Parler de nos envies et de ce qui nous plaît :", o: ["Facile et naturel", "Possible, avec un peu de gêne", "Difficile", "On n'en parle jamais"] },
+    { d: "intimite", t: "mir", q: "Qui prend le plus souvent l'initiative des moments intimes ?" },
+    { d: "intimite", q: "Essayer de nouvelles choses dans notre vie intime :", o: ["J'adore", "Volontiers", "À petites doses", "Je préfère nos habitudes"] },
+    { d: "intimite", q: "Les marques d'affection en public :", o: ["J'aime beaucoup", "J'aime bien", "Avec discrétion", "Je préfère éviter"] },
+
+    /* Le climat (réponses classées du mieux au moins bien) */
+    { d: "climat", q: "En ce moment, dans notre couple, je me sens :", o: ["Très bien", "Plutôt bien", "Entre deux", "Mal"] },
+    { d: "climat", q: "Je sens que je compte pour l'autre :", o: ["Tous les jours", "Souvent", "Rarement", "Presque jamais"] },
+    { d: "climat", q: "On rit ensemble :", o: ["Tous les jours", "Souvent", "Rarement", "Presque jamais"] },
+    { d: "climat", q: "Quand je pense à nous dans cinq ans :", o: ["Ça m'enthousiasme", "Ça me rassure", "Ça me laisse des doutes", "Ça m'inquiète"] },
+    { d: "climat", q: "Face aux difficultés, on forme une équipe :", o: ["Toujours", "Souvent", "Rarement", "Jamais"] },
+    { d: "climat", w: 2, q: "Si c'était à refaire, je choisirais la même personne :", o: ["Sans hésiter", "Probablement", "Je ne sais pas", "Probablement pas"] }
+  ]
+});
+</script>
+<script>
+/* Nos façons de nous disputer : 5 réflexes, 4 phrases chacun, notées par fréquence. */
+(function () {
+  var NAMES = { attaque: "monter au front", retrait: "se retirer", compromis: "chercher l'accord" };
+  var DUOS = {
+    "attaque+attaque": "Deux tempéraments qui montent au front : vos disputes s'enflamment vite. Une pause convenue à l'avance est votre meilleure alliée.",
+    "attaque+retrait": "L'un pousse pour régler le problème, l'autre se retire pour se protéger, et chacun aggrave la réaction de l'autre. Mettez-vous d'accord sur une pause courte, avec une heure de reprise.",
+    "attaque+compromis": "L'un s'emporte, l'autre cherche la solution. Cela fonctionne tant que la personne qui apaise ne finit pas par se taire pour avoir la paix.",
+    "retrait+retrait": "Peu de cris, mais des sujets qui restent en suspens. Le risque n'est pas la dispute, c'est le non-dit.",
+    "compromis+retrait": "L'un cherche à discuter, l'autre a besoin de temps. Laissez ce temps, à condition qu'il ait une fin annoncée.",
+    "compromis+compromis": "Vous cherchez tous les deux l'accord en premier : vos désaccords se règlent le plus souvent dans la discussion."
+  };
+  function reflex(p) {
+    return ["attaque", "retrait", "compromis"].sort(function (x, y) { return (p[y] || 0) - (p[x] || 0); })[0];
+  }
+
+  (window.TESTS = window.TESTS || []).push({
+    id: "conflits",
+    v: 1,
+    group: "couple",
+    kind: "profil",
+    title: "Nos disputes",
+    hook: "Comment est-ce qu'on se dispute ?",
+    blurb: "Monter au front, se retirer, chercher l'accord, réparer, ressasser : le réflexe de chacun quand le ton monte, et ce que donne votre duo.",
+    minutes: 4,
+    simLabel: "de réflexes communs",
+    lead: "Quand on se dispute, à quelle fréquence ?",
+    scale: ["Jamais", "Rarement", "Parfois", "Souvent", "Presque toujours"],
+    levels: ["Rare", "Occasionnel", "Fréquent"],
+    intro: [
+      "Vingt phrases qui décrivent ce qu'on fait quand le ton monte. Tu indiques à quelle fréquence chacune t'arrive, en pensant à vos dernières disputes.",
+      "Tous les couples se disputent. Ce qui compte, c'est la manière : le rapport décrit vos réflexes et la façon dont ils se combinent."
+    ],
+    note: "Ce test parle de disputes ordinaires. Si tu as peur des réactions de ton ou ta partenaire, ce n'est pas une affaire de style : en France, le 3919 répond gratuitement et anonymement, 24 h sur 24.",
+    dims: [
+      {
+        id: "attaque", name: "Monter au front", short: "Attaque",
+        desc: "Hausser le ton, critiquer, vouloir avoir raison.",
+        gap: "{hi} monte vite dans les tours, {lo} beaucoup moins. Pour {lo}, le ton compte autant que les mots : parler moins fort aide le message à passer.",
+        both: "Vous montez tous les deux vite dans les tours : convenez d'un mot qui veut dire « pause », et respectez-le.",
+        none: "Vos disputes restent calmes dans le ton, pour l'un comme pour l'autre."
+      },
+      {
+        id: "retrait", name: "Se retirer", short: "Retrait",
+        desc: "Se taire, s'éloigner, attendre que ça passe.",
+        gap: "{hi} se retire quand ça chauffe, ce que {lo} peut vivre comme de l'indifférence. Annoncer « j'ai besoin de vingt minutes, je reviens » change tout.",
+        both: "Vous évitez tous les deux l'affrontement : peu d'éclats, mais des sujets qui ne se règlent pas. Donnez-vous rendez-vous pour en parler.",
+        none: "Aucun de vous ne fuit la discussion."
+      },
+      {
+        id: "compromis", name: "Chercher l'accord", short: "Accord",
+        desc: "Écouter, reconnaître sa part, proposer une solution.",
+        gap: "{hi} cherche plus souvent le terrain d'entente. Veillez à ce que l'effort ne repose pas toujours sur la même personne.",
+        both: "Vous cherchez tous les deux l'accord : c'est votre meilleur atout.",
+        none: "Chercher un terrain d'entente n'est un réflexe pour aucun de vous : essayez de reformuler ce que l'autre vient de dire avant de répondre."
+      },
+      {
+        id: "reparation", name: "Réparer", short: "Réparation",
+        desc: "Faire le premier pas, s'excuser, apaiser.",
+        gap: "{hi} fait plus souvent le premier pas. {lo} peut prendre le relais de temps en temps : c'est un geste qui compte.",
+        both: "Vous savez tous les deux revenir l'un vers l'autre : vos disputes laissent peu de traces.",
+        none: "Le premier pas ne vient facilement d'aucun côté : décidez à l'avance d'un rituel de réconciliation."
+      },
+      {
+        id: "rancune", name: "Ressasser", short: "Rancune",
+        desc: "Garder en tête, bouder, y repenser longtemps.",
+        gap: "{hi} garde les disputes en tête plus longtemps. Pour {hi}, une dispute n'est finie que lorsqu'on en a reparlé au calme.",
+        both: "Vous ressassez tous les deux : prenez l'habitude de clore chaque dispute à voix haute (« c'est réglé pour moi, et pour toi ? »).",
+        none: "Une fois la dispute passée, vous tournez la page tous les deux."
+      }
+    ],
+    questions: [
+      { d: "attaque", q: "Je hausse le ton." },
+      { d: "retrait", q: "Je me tais et j'attends que ça passe." },
+      { d: "compromis", q: "Je propose une solution qui convient aux deux." },
+      { d: "reparation", q: "Je fais le premier pas pour me réconcilier." },
+      { d: "rancune", q: "Je repense à la dispute pendant des jours." },
+
+      { d: "attaque", q: "Je ressors d'anciens reproches." },
+      { d: "retrait", q: "Je quitte la pièce." },
+      { d: "compromis", q: "J'essaie de comprendre le point de vue de l'autre avant de répondre." },
+      { d: "reparation", q: "Je m'excuse quand j'ai dépassé les bornes." },
+      { d: "rancune", q: "Je boude." },
+
+      { d: "attaque", q: "Je cherche à prouver que j'ai raison." },
+      { d: "retrait", q: "Je fais comme si de rien n'était." },
+      { d: "compromis", q: "Je reconnais ma part de responsabilité." },
+      { d: "reparation", q: "Je détends l'atmosphère par un geste ou une blague." },
+      { d: "rancune", q: "Je garde en mémoire la liste de ce qui m'a fait mal." },
+
+      { d: "attaque", q: "Je dis des choses que je regrette ensuite." },
+      { d: "retrait", q: "Je réponds « rien » quand on me demande ce qui ne va pas." },
+      { d: "compromis", q: "Je cède sur ce qui compte moins pour moi." },
+      { d: "reparation", q: "Je reviens sur le sujet au calme pour le clore vraiment." },
+      { d: "rancune", q: "Je pardonne en paroles, mais pas vraiment au fond." }
+    ],
+    summary: function (pa, pb, N) {
+      var ra = reflex(pa), rb = reflex(pb);
+      return [
+        {
+          title: "Le premier réflexe de chacun",
+          html: "<p><b>" + N.a + "</b> : " + NAMES[ra] + ".</p><p><b>" + N.b + "</b> : " + NAMES[rb] + ".</p>"
+        },
+        { title: "Votre duo", html: "<p>" + DUOS[[ra, rb].sort().join("+")] + "</p>" }
+      ];
+    }
+  });
+})();
+</script>
+<script>
+/* Désir et intimité : 5 domaines, 4 questions chacun. Formulations sobres,
+   toute question peut être passée. */
+(window.TESTS = window.TESTS || []).push({
+  id: "desir",
+  v: 1,
+  group: "couple",
+  kind: "accord",
+  title: "Désir et intimité",
+  hook: "Est-ce qu'on a les mêmes envies ?",
+  blurb: "Fréquence, tendresse, nouveauté, limites : vingt questions pour parler d'un sujet qu'on aborde rarement à froid.",
+  minutes: 5,
+  simLabel: "d'envies partagées",
+  intro: [
+    "Vingt questions sur votre vie intime : ce dont chacun a envie, ce qui est facile ou difficile à dire, ce qui met à l'aise.",
+    "Réponds avec sincérité plutôt que pour faire plaisir. Si une question te gêne, passe-la : elle ne sera pas comparée."
+  ],
+  note: "Ce test montre à chacun les réponses de l'autre. Vos réponses restent sur l'appareil. Aucune réponse n'est meilleure qu'une autre : l'objectif est de savoir où vous en êtes, chacun.",
+  dims: [
+    { id: "envies", name: "Envies et fréquence", short: "Envies", talk: ["À quel moment te sens-tu le plus proche de moi ?", "Qu'est-ce qui fait monter ou retomber ton envie ?"] },
+    { id: "parole", name: "En parler", short: "Parole", talk: ["Qu'est-ce qui rendrait ces conversations plus faciles pour toi ?"] },
+    { id: "tendresse", name: "Tendresse et séduction", short: "Tendresse", talk: ["Quel geste tendre te manque en ce moment ?"] },
+    { id: "nouveaute", name: "Nouveauté et fantasmes", short: "Nouveauté", talk: ["Y a-t-il quelque chose que tu aimerais essayer, sans oser le proposer ?"] },
+    { id: "cadre", name: "Limites et confort", short: "Confort", talk: ["Qu'est-ce qui t'aide à te sentir en confiance dans ces moments ?"] }
+  ],
+  questions: [
+    { d: "envies", q: "La fréquence idéale de nos rapports :", o: ["Plusieurs fois par semaine", "Une fois par semaine environ", "Deux ou trois fois par mois", "Plus rarement"] },
+    { d: "envies", q: "Mon désir en ce moment :", o: ["Très présent", "Présent", "En retrait", "Presque absent"] },
+    { d: "envies", q: "Chez moi, le désir vient :", o: ["Spontanément, sans raison", "Facilement si l'ambiance s'y prête", "Après un moment de tendresse", "Seulement quand tout est réuni"] },
+    { d: "envies", t: "nom", q: "Le moment que je préfère :", o: ["Le matin", "En journée, quand l'occasion se présente", "Le soir", "Peu importe"] },
+
+    { d: "parole", q: "Dire ce qui me plaît pendant un moment intime :", o: ["Facile", "Plutôt facile", "Plutôt difficile", "Très difficile"] },
+    { d: "parole", q: "Dire non quand je n'ai pas envie :", o: ["Facile, sans culpabilité", "Facile, avec un peu de gêne", "Difficile", "Je préfère me forcer que refuser"] },
+    { d: "parole", q: "Quand l'autre me dit non :", o: ["Je l'accepte sans problème", "Ça me déçoit un peu", "Je le prends pour moi", "Ça me blesse vraiment"] },
+    { d: "parole", q: "Reparler ensuite de ce qui s'est bien ou mal passé :", o: ["Volontiers", "Si l'autre en a envie", "Ça me gêne", "Je préfère éviter"] },
+
+    { d: "tendresse", q: "Les câlins sans arrière-pensée :", o: ["Indispensables", "Importants", "Agréables", "Pas vraiment mon truc"] },
+    { d: "tendresse", q: "Continuer à se séduire (tenues, messages, rendez-vous) :", o: ["Très important", "Important", "De temps en temps", "Inutile entre nous"] },
+    { d: "tendresse", q: "S'embrasser longuement :", o: ["Tous les jours", "Souvent", "Parfois", "Rarement"] },
+    { d: "tendresse", q: "Pour dormir :", o: ["Collés toute la nuit", "Collés pour s'endormir", "Chacun de son côté du lit", "Idéalement chacun son lit"] },
+
+    { d: "nouveaute", q: "Changer nos habitudes (lieux, moments, façons de faire) :", o: ["J'en ai très envie", "Volontiers", "Un peu", "Je préfère ce qu'on connaît"] },
+    { d: "nouveaute", q: "Partager mes fantasmes :", o: ["Je le fais déjà", "J'aimerais le faire", "Ça me gêne", "Je préfère les garder pour moi"] },
+    { d: "nouveaute", q: "Les accessoires, les jeux ou les scénarios :", o: ["J'adore", "Ça m'intrigue", "Sans plus", "Pas pour moi"] },
+    { d: "nouveaute", t: "nom", q: "Les films ou lectures érotiques dans notre couple :", o: ["À partager à deux", "Chacun de son côté, sans tabou", "Chacun de son côté, sans en parler", "Je préfère qu'il n'y en ait pas"] },
+
+    { d: "cadre", q: "Quand quelque chose ne me convient pas, je le dis :", o: ["Tout de suite", "Juste après", "Bien plus tard", "Jamais"] },
+    { d: "cadre", q: "Le regard de l'autre sur mon corps :", o: ["Je suis très à l'aise", "Plutôt à l'aise", "Plutôt mal à l'aise", "Très mal à l'aise"] },
+    { d: "cadre", t: "nom", q: "Après une longue période sans rapports :", o: ["On en parle ouvertement", "On attend que ça revienne", "Je m'inquiète sans le dire", "Ça ne me pose pas de question"] },
+    { d: "cadre", w: 2, q: "Notre vie intime actuelle me convient :", o: ["Tout à fait", "Plutôt", "Pas vraiment", "Pas du tout"] }
+  ]
+});
+</script>
+<script>
+/* Charge mentale : 24 tâches, toutes en miroir (« qui s'en occupe le plus ? »).
+   share: true ajoute au rapport la répartition vue par chacun. */
+(function () {
+  var TASKS = {
+    maison: [
+      "Passer l'aspirateur et laver les sols",
+      "Lancer, étendre et ranger le linge",
+      "Nettoyer la salle de bain et les toilettes",
+      "Sortir les poubelles et gérer le tri",
+      "Ranger ce qui traîne",
+      "Changer les draps"
+    ],
+    cuisine: [
+      "Décider de ce qu'on mange",
+      "Faire les courses",
+      "Cuisiner au quotidien",
+      "Faire la vaisselle ou vider le lave-vaisselle",
+      "Vérifier ce qui manque (frigo, produits ménagers)",
+      "Préparer le repas quand on reçoit"
+    ],
+    papiers: [
+      "Payer les factures et suivre les comptes",
+      "Faire les démarches administratives (impôts, assurances)",
+      "Prendre les rendez-vous (médecin, garage, artisans)",
+      "Gérer les pannes et les réparations",
+      "Comparer et acheter les gros équipements",
+      "Entretenir la voiture ou gérer les transports"
+    ],
+    orga: [
+      "Penser aux anniversaires et aux cadeaux",
+      "Organiser les vacances et les week-ends",
+      "Garder le lien avec la famille et les amis (appels, invitations)",
+      "Planifier la semaine (qui fait quoi, et quand)",
+      "S'occuper au quotidien des enfants, des animaux ou des plantes",
+      "Anticiper ce qui arrive (rentrée, fêtes, échéances)"
+    ]
+  };
+  var questions = [];
+  Object.keys(TASKS).forEach(function (d) {
+    TASKS[d].forEach(function (q) { questions.push({ d: d, t: "mir", q: q }); });
+  });
+
+  (window.TESTS = window.TESTS || []).push({
+    id: "charge",
+    v: 1,
+    group: "quotidien",
+    kind: "accord",
+    verdict: true,
+    share: true,
+    title: "Charge mentale",
+    hook: "Qui fait quoi, vraiment ?",
+    blurb: "Vingt-quatre tâches de la maison passées en revue. Chacun dit qui s'en occupe : le rapport compare vos deux versions et la part que chacun pense porter.",
+    minutes: 4,
+    simLabel: "de même vision",
+    lead: "Qui s'en occupe le plus ?",
+    intro: [
+      "Pour chaque tâche, tu indiques qui s'en occupe le plus aujourd'hui : toi, l'autre, ou les deux à égalité. Pense à qui y pense et l'organise, pas seulement à qui l'exécute.",
+      "On surestime presque toujours sa propre part, parce qu'on voit mieux ses efforts que ceux de l'autre. Le rapport met vos deux versions côte à côte."
+    ],
+    headline: function (p) {
+      return p >= 85 ? "Vous voyez la répartition de la même façon."
+        : p >= 70 ? "Presque la même vision de qui fait quoi."
+        : p >= 55 ? "Vos visions de la répartition divergent."
+        : "Vous ne décrivez pas la même maison.";
+    },
+    dims: [
+      { id: "maison", name: "La maison", short: "Maison", talk: ["Quelle tâche te pèse le plus, et laquelle te dérange le moins ?"] },
+      { id: "cuisine", name: "Les repas et les courses", short: "Repas", talk: ["Qu'aimerais-tu ne plus avoir à décider ?"] },
+      { id: "papiers", name: "Les papiers et la logistique", short: "Papiers", talk: ["Quelle démarche aimerais-tu me confier entièrement ?"] },
+      { id: "orga", name: "L'organisation et les proches", short: "Organisation", talk: ["Qu'est-ce que tu portes sans que je le voie ?"] }
+    ],
+    questions: questions
+  });
+})();
+</script>
+<script>
+/* Rythme de vie : 4 domaines, 4 questions chacun. */
+(window.TESTS = window.TESTS || []).push({
+  id: "rythme",
+  v: 1,
+  group: "quotidien",
+  kind: "accord",
+  title: "Rythme de vie",
+  hook: "Est-ce qu'on vit au même rythme ?",
+  blurb: "Sommeil, sorties, habitudes, ponctualité : seize questions sur les petits décalages qui pèsent quand on vit ensemble.",
+  minutes: 3,
+  simLabel: "de rythme commun",
+  intro: [
+    "Seize questions sur ton rythme naturel : quand tu dors, quand tu sors, comment tu t'organises.",
+    "Ces différences ne se règlent pas en changeant l'autre, mais elles se négocient très bien une fois qu'on les a nommées."
+  ],
+  dims: [
+    { id: "sommeil", name: "Sommeil et horaires", short: "Sommeil", talk: ["De quoi as-tu besoin pour bien dormir ?"] },
+    { id: "energie", name: "Énergie et sorties", short: "Sorties", talk: ["Combien de soirées libres te faut-il par semaine ?"] },
+    { id: "habitudes", name: "Habitudes de vie", short: "Habitudes", talk: ["Quelle habitude aimerais-tu qu'on prenne ensemble ?"] },
+    { id: "tempo", name: "Organisation du temps", short: "Tempo", talk: ["Qu'est-ce qui te stresse dans notre façon de nous organiser ?"] }
+  ],
+  questions: [
+    { d: "sommeil", q: "L'heure idéale pour me coucher :", o: ["Avant 22 h", "Entre 22 h et 23 h 30", "Entre 23 h 30 et 1 h", "Après 1 h"] },
+    { d: "sommeil", q: "Le week-end, je me lève :", o: ["Comme en semaine", "Une heure plus tard", "En fin de matinée", "Midi passé s'il le faut"] },
+    { d: "sommeil", q: "Dans la chambre, il me faut :", o: ["Le noir et le silence complets", "Le noir, un peu de bruit ne me gêne pas", "Une veilleuse ou un fond sonore", "Peu importe, je dors partout"] },
+    { d: "sommeil", q: "La température de la chambre :", o: ["Fraîche, fenêtre ouverte", "Plutôt fraîche", "Plutôt chaude", "Bien chaude"] },
+
+    { d: "energie", q: "Un soir de semaine idéal :", o: ["Sortir", "Voir un ou deux amis", "Un film ou une série à deux", "Chacun tranquille de son côté"] },
+    { d: "energie", q: "Le nombre de sorties par semaine qui me convient :", o: ["Trois ou plus", "Deux", "Une", "Aucune ou presque"] },
+    { d: "energie", q: "Le dimanche :", o: ["Un programme prévu à l'avance", "Une sortie décidée le matin", "À la maison, à mon rythme", "En pyjama toute la journée"] },
+    { d: "energie", q: "En rentrant du travail, j'ai besoin :", o: ["De raconter ma journée tout de suite", "De discuter un peu", "D'un quart d'heure de calme", "D'une bonne heure sans parler"] },
+
+    { d: "habitudes", q: "Mon alimentation :", o: ["Très surveillée", "Équilibrée, sans me priver", "Je mange ce qui me fait envie", "Je ne m'en occupe pas"] },
+    { d: "habitudes", q: "Le sport dans ma semaine :", o: ["Presque tous les jours", "Deux ou trois fois", "De temps en temps", "Jamais"] },
+    { d: "habitudes", q: "L'alcool :", o: ["Jamais", "Rarement", "Le week-end", "Régulièrement"] },
+    { d: "habitudes", q: "Mon téléphone au lit ou à table :", o: ["Jamais", "Rarement", "Souvent", "Toujours à portée de main"] },
+
+    { d: "tempo", q: "À un rendez-vous, j'arrive :", o: ["En avance", "Pile à l'heure", "Avec quelques minutes de retard", "Quand j'arrive"] },
+    { d: "tempo", q: "Un agenda partagé pour nous deux :", o: ["Indispensable", "Pratique", "Pas nécessaire", "Trop contraignant"] },
+    { d: "tempo", q: "Préparer un départ (valise, trajet) :", o: ["Plusieurs jours avant", "La veille", "Le matin même", "Au dernier moment"] },
+    { d: "tempo", q: "Ce qu'il y a à faire, je le fais :", o: ["Tout de suite", "Dans la journée", "Quand j'y pense", "Quand ça devient urgent"] }
+  ]
+});
+</script>
+<script>
+/* Notre rapport à l'argent : 5 domaines, 4 questions chacun. */
+(window.TESTS = window.TESTS || []).push({
+  id: "argent",
+  v: 1,
+  group: "quotidien",
+  kind: "accord",
+  title: "Notre rapport à l'argent",
+  hook: "Est-ce qu'on compte de la même façon ?",
+  blurb: "Dépenser ou épargner, comptes communs ou séparés, risque, transparence : ce que chacun attend vraiment côté argent.",
+  minutes: 5,
+  simLabel: "d'alignement",
+  intro: [
+    "Vingt questions sur votre façon de gagner, de dépenser, d'épargner et d'en parler. L'argent est l'un des premiers sujets de dispute dans un couple, souvent parce qu'on n'en discute qu'au moment d'un problème.",
+    "Réponds selon ce que tu fais vraiment, pas selon ce qu'il faudrait faire."
+  ],
+  dims: [
+    { id: "profil", name: "Dépenser ou épargner", short: "Dépenses", talk: ["Quel achat récent t'a fait vraiment plaisir, et lequel regrettes-tu ?"] },
+    { id: "commun", name: "L'organisation à deux", short: "Commun", talk: ["Quelle organisation te paraîtrait la plus juste entre nous ?"] },
+    { id: "risque", name: "Risque et projets", short: "Projets", talk: ["Quel projet aimerais-tu qu'on finance en premier ?"] },
+    { id: "parole", name: "Transparence", short: "Parole", talk: ["Qu'est-ce qui rend l'argent difficile à aborder entre nous ?"] },
+    { id: "sens", name: "Ce que l'argent représente", short: "Sens", talk: ["Qu'as-tu appris sur l'argent dans ta famille ?"] }
+  ],
+  questions: [
+    { d: "profil", q: "En fin de mois, il me reste :", o: ["Toujours de quoi épargner", "Souvent un peu", "Rarement quelque chose", "Je suis souvent à découvert"] },
+    { d: "profil", q: "Un achat plaisir à 150 € :", o: ["J'y réfléchis des semaines", "J'y réfléchis quelques jours", "Je l'achète si j'en ai envie", "Je l'ai déjà acheté"] },
+    { d: "profil", q: "Mes comptes, je les regarde :", o: ["Tous les jours", "Chaque semaine", "Une fois par mois", "Le moins possible"] },
+    { d: "profil", q: "Comparer les prix avant d'acheter :", o: ["Toujours, pour tout", "Pour les gros achats", "Rarement", "Jamais, je prends ce qui me plaît"] },
+
+    { d: "commun", q: "La part de nos revenus mise en commun :", o: ["Tout", "La majorité", "De quoi payer les charges", "Rien"] },
+    { d: "commun", t: "nom", q: "Si l'un gagne beaucoup plus que l'autre :", o: ["Tout se partage, le niveau de vie est commun", "Celui qui gagne plus contribue plus", "Chacun paie la moitié", "Chacun vit selon ses moyens"] },
+    { d: "commun", t: "mir", q: "Qui gère les comptes du foyer ?" },
+    { d: "commun", q: "Avoir chacun de l'argent sans comptes à rendre :", o: ["Indispensable", "Important", "Pas nécessaire", "Contraire à l'idée du couple"] },
+
+    { d: "risque", q: "Mon épargne, je la préfère :", o: ["Disponible et sans risque", "Surtout sécurisée", "En partie investie", "Investie, quitte à prendre des risques"] },
+    { d: "risque", q: "S'endetter pour un projet (logement, entreprise) :", o: ["Aucun problème", "Si c'est bien calculé", "Avec beaucoup de prudence", "J'évite à tout prix"] },
+    { d: "risque", t: "nom", w: 2, q: "Notre priorité financière des prochaines années :", o: ["Acheter un logement", "Constituer une épargne de sécurité", "Voyager et profiter", "Financer un projet (enfant, entreprise, études)"] },
+    { d: "risque", q: "Prêter de l'argent à un proche :", o: ["Oui, sans hésiter", "Oui, si on en parle avant", "Seulement une petite somme", "Non, ça finit mal"] },
+
+    { d: "parole", q: "Connaître précisément les revenus et les économies de l'autre :", o: ["Indispensable", "Normal", "Pas nécessaire", "Ça ne me regarde pas"] },
+    { d: "parole", w: 2, q: "Un achat que l'autre désapprouverait :", o: ["J'en parle avant", "J'en parle après", "Je minimise le prix", "Je ne dis rien"] },
+    { d: "parole", q: "Nos discussions d'argent se terminent :", o: ["Sereinement", "Plutôt bien", "Souvent en tension", "On les évite"] },
+    { d: "parole", q: "Faire un point budget ensemble :", o: ["Chaque mois", "Quelques fois par an", "Seulement en cas de problème", "Jamais"] },
+
+    { d: "sens", t: "nom", q: "L'argent, pour moi, c'est avant tout :", o: ["De la sécurité", "De la liberté", "Du plaisir", "Une preuve de réussite"] },
+    { d: "sens", q: "Gagner plus en travaillant plus :", o: ["Oui, sans hésiter", "Oui, pendant quelques années", "Seulement si c'est nécessaire", "Non, le temps vaut plus"] },
+    { d: "sens", t: "nom", q: "Dans ma famille, l'argent était :", o: ["Un sujet d'inquiétude", "Un sujet tabou", "Un sujet dont on parlait librement", "Jamais un problème"] },
+    { d: "sens", q: "Offrir et inviter :", o: ["J'adore gâter les autres", "Volontiers pour les grandes occasions", "Avec mesure", "Chacun paie sa part"] }
+  ]
+});
+</script>
+<script>
+/* Projet bébé et parentalité : 5 domaines, 4 questions chacun.
+   Valable avant un premier enfant comme pour des parents. */
+(window.TESTS = window.TESTS || []).push({
+  id: "parents",
+  v: 1,
+  group: "projets",
+  kind: "accord",
+  title: "Projet bébé et parentalité",
+  hook: "Est-ce qu'on veut la même famille ?",
+  blurb: "Envie d'enfant, organisation, éducation, place des grands-parents, vie de couple : les questions à se poser avant, ou à se reposer une fois parents.",
+  minutes: 5,
+  simLabel: "d'alignement",
+  intro: [
+    "Vingt questions sur l'envie d'enfant et la façon d'être parents. Elles valent pour un premier enfant comme pour le suivant.",
+    "Si vous êtes déjà parents, réponds en pensant à ce que tu souhaites, pas seulement à ce qui se passe aujourd'hui."
+  ],
+  dims: [
+    { id: "envie", name: "L'envie d'enfant", short: "Envie", talk: ["Qu'est-ce qui te fait envie, et qu'est-ce qui te fait peur, dans l'idée d'être parent ?"] },
+    { id: "orga", name: "L'organisation", short: "Organisation", talk: ["À quoi ressemblerait une semaine type avec un enfant, selon toi ?"] },
+    { id: "educ", name: "L'éducation", short: "Éducation", talk: ["Que voudrais-tu reprendre de ton éducation, et que changerais-tu ?"] },
+    { id: "famille", name: "La famille autour", short: "Entourage", talk: ["Quelle place veux-tu donner à nos familles auprès d'un enfant ?"] },
+    { id: "couple", name: "Le couple, une fois parents", short: "Couple", talk: ["Comment protégerait-on notre couple avec un enfant à la maison ?"] }
+  ],
+  questions: [
+    { d: "envie", w: 2, q: "Devenir parent (ou le redevenir), pour moi :", o: ["Un rêve", "Une envie", "Une possibilité", "Pas pour moi"] },
+    { d: "envie", w: 2, q: "Le calendrier idéal :", o: ["Le plus tôt possible", "Dans un an ou deux", "Dans plusieurs années", "Je ne sais pas, ou jamais"] },
+    { d: "envie", w: 2, q: "La famille que j'imagine :", o: ["Sans enfant", "Un enfant", "Deux enfants", "Trois enfants ou plus"] },
+    { d: "envie", t: "nom", q: "Si un enfant ne venait pas naturellement :", o: ["On irait vers la PMA", "On irait vers l'adoption", "On tenterait les deux", "On accepterait une vie sans enfant"] },
+
+    { d: "orga", q: "Le congé parental :", o: ["Chacun en prend une longue part", "Chacun en prend une part, selon ses possibilités", "Surtout l'un des deux", "Le moins possible, on fait garder"] },
+    { d: "orga", t: "mir", q: "Qui se lèverait (ou se lève) le plus souvent la nuit ?" },
+    { d: "orga", t: "nom", q: "Le mode de garde idéal avant l'école :", o: ["La crèche", "Une assistante maternelle", "Un parent à la maison", "Les grands-parents"] },
+    { d: "orga", t: "mir", q: "Qui lèverait le pied côté travail ?" },
+
+    { d: "educ", q: "Devant un caprice :", o: ["On tient bon, toujours", "On tient bon le plus souvent", "On négocie", "On cède pour avoir la paix"] },
+    { d: "educ", q: "Les punitions :", o: ["Nécessaires", "Utiles parfois", "En dernier recours", "Jamais"] },
+    { d: "educ", q: "La réussite scolaire :", o: ["Une priorité", "Importante", "Moins importante que l'épanouissement", "Chaque enfant fait ce qu'il peut"] },
+    { d: "educ", q: "Les repas, le sommeil, les horaires :", o: ["Un cadre strict", "Un cadre avec des exceptions", "De la souplesse", "L'enfant se régule"] },
+
+    { d: "famille", q: "La place des grands-parents :", o: ["Très présents, chaque semaine", "Présents régulièrement", "De temps en temps", "À distance"] },
+    { d: "famille", q: "Les conseils de nos familles sur l'éducation :", o: ["Bienvenus", "Écoutés poliment", "Tolérés", "À éviter"] },
+    { d: "famille", w: 2, q: "Transmettre une religion ou une culture familiale :", o: ["Essentiel", "Important", "Au choix de l'enfant", "Non"] },
+    { d: "famille", q: "Confier l'enfant pour partir en week-end à deux :", o: ["Dès les premiers mois", "Après la première année", "Quand l'enfant sera grand", "Je ne me vois pas le faire"] },
+
+    { d: "couple", q: "Une fois parents, notre couple :", o: ["Reste la priorité", "Compte autant que les enfants", "Passe après les enfants quelques années", "Passe après les enfants, c'est normal"] },
+    { d: "couple", q: "Du temps à deux, sans enfant :", o: ["Chaque semaine", "Chaque mois", "Quelques fois par an", "Quand ce sera possible"] },
+    { d: "couple", q: "L'enfant dans notre lit ou notre chambre :", o: ["Pas question", "Les premiers mois seulement", "Tant qu'il en a besoin", "Aucun problème"] },
+    { d: "couple", t: "nom", q: "Ce qui m'inquiète le plus :", o: ["Le manque de sommeil et de temps", "L'argent", "Notre couple", "Ne pas être à la hauteur"] }
+  ]
+});
+</script>
+<script>
+/* Voyages : 3 domaines, 5 questions chacun. */
+(window.TESTS = window.TESTS || []).push({
+  id: "voyages",
+  v: 1,
+  group: "projets",
+  kind: "accord",
+  title: "Voyages",
+  hook: "Est-ce qu'on voyage bien ensemble ?",
+  blurb: "Destination, rythme, préparation, budget : quinze questions à se poser avant de réserver les prochaines vacances.",
+  minutes: 3,
+  simLabel: "d'envies communes",
+  intro: [
+    "Quinze questions sur ta façon de voyager. Les vacances concentrent en quelques jours tous les sujets de la vie à deux : le rythme, l'argent, l'organisation.",
+    "Réponds selon ce que tu préfères vraiment, pas selon vos dernières vacances."
+  ],
+  dims: [
+    { id: "style", name: "Le style de voyage", short: "Style", talk: ["Raconte ton meilleur souvenir de voyage : qu'est-ce qui l'a rendu si bon ?"] },
+    { id: "orga", name: "La préparation", short: "Préparation", talk: ["Qu'aimes-tu qu'on prévoie, et qu'aimes-tu laisser au hasard ?"] },
+    { id: "confort", name: "Budget et confort", short: "Confort", talk: ["Sur quoi préfères-tu dépenser en vacances, et sur quoi économiser ?"] }
+  ],
+  questions: [
+    { d: "style", t: "nom", q: "La destination qui me fait rêver :", o: ["Une plage et du soleil", "Une grande ville à explorer", "La montagne ou la pleine nature", "Un pays lointain et dépaysant"] },
+    { d: "style", q: "Le rythme sur place :", o: ["Tout voir, debout tôt", "Une ou deux visites par jour", "Une activité de temps en temps", "Ne rien faire du tout"] },
+    { d: "style", q: "Rencontrer des gens en voyage :", o: ["C'est ce que je préfère", "Volontiers", "Si ça se présente", "Je préfère qu'on reste entre nous"] },
+    { d: "style", q: "La cuisine locale :", o: ["Je goûte tout", "Je goûte presque tout", "Avec prudence", "Je cherche ce que je connais"] },
+    { d: "style", q: "La durée idéale d'un voyage :", o: ["Un long week-end", "Une semaine", "Deux ou trois semaines", "Plusieurs mois"] },
+
+    { d: "orga", q: "Avant de partir :", o: ["Tout est réservé et planifié", "Les grandes lignes sont prévues", "Seulement le premier hébergement", "Rien, on verra sur place"] },
+    { d: "orga", t: "mir", q: "Qui organise nos voyages ?" },
+    { d: "orga", q: "Un imprévu (retard, réservation annulée) :", o: ["Ça fait partie de l'aventure", "Ça m'agace un moment", "Ça me stresse beaucoup", "Ça me gâche le voyage"] },
+    { d: "orga", q: "Les photos :", o: ["Je photographie tout", "Quelques-unes pour le souvenir", "Très peu", "Aucune, je profite"] },
+    { d: "orga", t: "nom", q: "Pour le trajet, je préfère :", o: ["L'avion, pour aller vite et loin", "Le train dès que possible", "La voiture, pour être libres", "Peu importe"] },
+
+    { d: "confort", q: "L'hébergement :", o: ["Camping ou bivouac", "Auberge ou logement simple", "Bel hôtel ou belle location", "Le grand luxe"] },
+    { d: "confort", q: "Le budget vacances :", o: ["Le minimum, pour partir plus souvent", "Raisonnable", "Confortable, c'est une priorité", "On ne compte pas"] },
+    { d: "confort", q: "Les souvenirs et les achats sur place :", o: ["Jamais", "Un petit objet", "Quelques achats", "Une valise en plus"] },
+    { d: "confort", q: "Partir :", o: ["Toujours à deux", "Surtout à deux", "Souvent avec des amis ou la famille", "En groupe, c'est mieux"] },
+    { d: "confort", q: "Se séparer une journée pendant le voyage pour faire chacun ce qu'on aime :", o: ["Bonne idée", "Pourquoi pas", "Dommage", "Hors de question"] }
+  ]
+});
+</script>
+<script>
+/* Nos valeurs : 8 familles de valeurs, 3 phrases chacune, notées par importance. */
+(window.TESTS = window.TESTS || []).push({
+  id: "valeurs",
+  v: 1,
+  group: "liens",
+  kind: "profil",
+  title: "Nos valeurs",
+  hook: "Est-ce qu'on a les mêmes valeurs ?",
+  blurb: "Famille, réussite, liberté, engagement : ce qui compte le plus pour chacun, et là où vos priorités se rejoignent.",
+  minutes: 5,
+  simLabel: "de valeurs communes",
+  lead: "Quelle importance pour toi ?",
+  scale: ["Pas important", "Peu important", "Assez important", "Très important", "Essentiel"],
+  levels: ["Secondaire", "Important", "Central"],
+  intro: [
+    "Vingt-quatre phrases, huit familles de valeurs. Pour chacune, tu indiques l'importance qu'elle a dans ta vie, pas celle qu'elle devrait avoir.",
+    "Le rapport classe vos valeurs, montre celles que vous partagez et celles où vos priorités divergent."
+  ],
+  dims: [
+    {
+      id: "famille", name: "Famille et transmission", short: "Famille",
+      desc: "La place des proches et de ce qu'on transmet.",
+      gap: "{hi} place la famille plus haut, {lo} un peu moins. Parlez du temps et de l'énergie que chacun veut y consacrer, surtout autour des fêtes et des grandes décisions.",
+      both: "La famille est un pilier pour vous deux : un socle solide pour vos projets.",
+      none: "Ni l'un ni l'autre ne met la famille au centre : vous construisez votre vie d'abord à deux."
+    },
+    {
+      id: "reussite", name: "Réussite et ambition", short: "Réussite",
+      desc: "L'envie de réussir, de progresser et de voir son travail reconnu.",
+      gap: "{hi} a besoin d'objectifs ambitieux, {lo} beaucoup moins. Cela se joue dans le temps donné au travail : mettez-vous d'accord sur ce qui reste protégé.",
+      both: "Vous avez tous les deux de l'ambition : veillez à ce qu'il reste de la place pour le couple dans vos agendas.",
+      none: "La carrière n'est une priorité pour aucun de vous : vous cherchez votre équilibre ailleurs."
+    },
+    {
+      id: "securite", name: "Sécurité et stabilité", short: "Sécurité",
+      desc: "Le besoin de prévoir, d'épargner et d'éviter les mauvaises surprises.",
+      gap: "{hi} a besoin de filets de sécurité, {lo} supporte mieux l'incertitude. Avant un grand changement, {hi} aura besoin d'un plan.",
+      both: "Vous aimez tous les deux savoir où vous allez : vos décisions seront réfléchies et vos finances suivies.",
+      none: "L'incertitude ne vous fait pas peur. Gardez seulement un œil sur l'épargne."
+    },
+    {
+      id: "liberte", name: "Liberté et indépendance", short: "Liberté",
+      desc: "Le besoin de décider par soi-même et de garder un espace à soi.",
+      gap: "{hi} tient beaucoup à son indépendance, {lo} en a moins besoin. Ce n'est pas un manque d'amour : précisez ensemble ce qui relève du « nous » et ce qui reste à chacun.",
+      both: "Vous tenez tous les deux à votre indépendance. Cela fonctionne tant que vous gardez des rendez-vous à deux.",
+      none: "Vous aimez décider et vivre les choses ensemble : votre couple est votre projet commun."
+    },
+    {
+      id: "aventure", name: "Découverte et nouveauté", short: "Découverte",
+      desc: "Le goût du voyage, du changement et de l'inconnu.",
+      gap: "{hi} a soif de nouveauté, {lo} préfère les valeurs sûres. Alternez : une découverte choisie par {hi}, puis un classique choisi par {lo}.",
+      both: "Vous aimez tous les deux la nouveauté : gardez toujours un projet de découverte en cours.",
+      none: "Vous appréciez tous les deux vos habitudes : inutile de vous forcer à l'aventure."
+    },
+    {
+      id: "tradition", name: "Traditions et spiritualité", short: "Traditions",
+      desc: "L'attachement aux rites, à la culture d'origine et à la vie spirituelle.",
+      gap: "{hi} tient aux traditions ou à la spiritualité, {lo} beaucoup moins. Le sujet ressortira aux grandes étapes (mariage, enfants, fêtes) : mieux vaut en parler avant.",
+      both: "Traditions et spiritualité comptent pour vous deux. Vérifiez simplement que vous parlez des mêmes.",
+      none: "Vous êtes peu attachés aux traditions : vous inventez vos propres rituels."
+    },
+    {
+      id: "engagement", name: "Justice et engagement", short: "Engagement",
+      desc: "L'envie d'agir pour les autres et de vivre selon ses convictions.",
+      gap: "{hi} a besoin d'agir pour ses convictions, {lo} moins. {lo} n'a pas à s'engager autant, mais peut soutenir ce qui compte pour {hi}.",
+      both: "Vous partagez le besoin d'agir pour quelque chose de plus grand que vous : un engagement commun vous rapprocherait encore.",
+      none: "Les grandes causes ne dirigent pas vos choix : vous agissez surtout pour vos proches."
+    },
+    {
+      id: "plaisir", name: "Plaisir et confort", short: "Plaisir",
+      desc: "La place du plaisir immédiat, du confort et des belles choses.",
+      gap: "{hi} s'accorde du plaisir facilement, {lo} se restreint davantage. C'est une source classique de frictions sur les dépenses : fixez un budget plaisir sans comptes à rendre.",
+      both: "Vous savez tous les deux profiter. Gardez juste un œil commun sur le budget.",
+      none: "Vous vous méfiez tous les deux du superflu : pensez quand même à vous faire plaisir."
+    }
+  ],
+  questions: [
+    { d: "famille", q: "Passer du temps avec ma famille, même quand l'agenda est plein." },
+    { d: "reussite", q: "Réussir professionnellement et voir mon travail reconnu." },
+    { d: "securite", q: "Avoir une vie stable, sans mauvaises surprises." },
+    { d: "liberte", q: "Prendre mes décisions sans avoir à me justifier." },
+    { d: "aventure", q: "Voyager et découvrir d'autres façons de vivre." },
+    { d: "tradition", q: "Respecter les traditions de ma famille ou de ma culture." },
+    { d: "engagement", q: "Agir pour une cause qui me dépasse (écologie, justice, solidarité)." },
+    { d: "plaisir", q: "Me faire plaisir sans culpabiliser." },
+
+    { d: "famille", q: "Transmettre quelque chose à la génération suivante." },
+    { d: "reussite", q: "Me fixer des objectifs ambitieux et les atteindre." },
+    { d: "securite", q: "Mettre de l'argent de côté pour l'avenir." },
+    { d: "liberte", q: "Garder du temps et des projets rien qu'à moi." },
+    { d: "aventure", q: "Essayer régulièrement des choses que je n'ai jamais faites." },
+    { d: "tradition", q: "Avoir une vie spirituelle ou religieuse." },
+    { d: "engagement", q: "Aider des gens que je ne connais pas." },
+    { d: "plaisir", q: "Profiter du présent plutôt que tout planifier." },
+
+    { d: "famille", q: "Répondre présent quand mes proches ont besoin de moi, même si ça me coûte." },
+    { d: "reussite", q: "Bien gagner ma vie." },
+    { d: "securite", q: "Savoir à quoi ressembleront les prochaines années." },
+    { d: "liberte", q: "Pouvoir changer de vie si l'envie m'en prend." },
+    { d: "aventure", q: "Sortir de ma zone de confort." },
+    { d: "tradition", q: "Marquer les grandes étapes de la vie par des rituels (mariage, fêtes, cérémonies)." },
+    { d: "engagement", q: "Vivre en accord avec mes convictions, même quand c'est moins confortable." },
+    { d: "plaisir", q: "M'entourer de belles choses et de confort." }
+  ],
+  summary: function (pa, pb, N, h) {
+    var ta = h.top(this, pa, 3), tb = h.top(this, pb, 3);
+    var common = ta.filter(function (d) { return tb.indexOf(d) >= 0; });
+    var list = function (ds) { return ds.map(function (d) { return d.name.toLowerCase(); }).join(", "); };
+    return [{
+      title: "Vos trois valeurs phares",
+      html: "<p><b>" + N.a + "</b> : " + list(ta) + ".</p><p><b>" + N.b + "</b> : " + list(tb) + ".</p>" +
+        (common.length
+          ? "<p>En commun dans vos trois premières : " + list(common) + ".</p>"
+          : "<p>Aucune valeur commune dans vos trois premières. Vos priorités diffèrent : cela demande d'en parler, pas forcément de s'en inquiéter.</p>")
+    }];
+  }
+});
+</script>
+<script>
+/* Nos façons d'aimer : 5 manières de recevoir de l'affection, 4 situations chacune. */
+(window.TESTS = window.TESTS || []).push({
+  id: "amour",
+  v: 1,
+  group: "liens",
+  kind: "profil",
+  title: "Nos façons d'aimer",
+  hook: "Qu'est-ce qui nous touche vraiment ?",
+  blurb: "Mots, temps, coups de main, attentions, contact : ce qui fait que chacun se sent aimé, et comment viser juste.",
+  minutes: 4,
+  simLabel: "de sensibilités communes",
+  lead: "À quel point ça te touche ?",
+  scale: ["Ça ne me fait rien", "Un peu", "Ça me fait plaisir", "Ça me touche beaucoup", "Rien ne me touche autant"],
+  levels: ["Peu sensible", "Sensible", "Très sensible"],
+  intro: [
+    "Vingt situations du quotidien. Pour chacune, tu indiques à quel point elle te touche quand elle vient de ton ou ta partenaire.",
+    "On donne souvent l'affection sous la forme qu'on aimerait recevoir. Le rapport montre ce qui compte vraiment pour chacun."
+  ],
+  dims: [
+    {
+      id: "mots", name: "Les mots", short: "Mots",
+      desc: "Compliments, encouragements, messages tendres.",
+      tip: "dire ce que tu ressens avec des mots précis, et l'écrire de temps en temps",
+      gap: "{hi} a besoin d'entendre les choses, {lo} beaucoup moins. Pour {hi}, un compliment dit à voix haute compte plus qu'il n'y paraît.",
+      both: "Vous êtes tous les deux sensibles aux mots : ne gardez pas vos compliments pour vous.",
+      none: "Les grandes déclarations ne sont pas votre langue : vous vous le montrez autrement."
+    },
+    {
+      id: "temps", name: "Le temps partagé", short: "Temps",
+      desc: "Des moments à deux, avec une attention entière.",
+      tip: "bloquer du temps rien que pour vous deux, téléphones rangés",
+      gap: "Pour {hi}, l'amour se mesure d'abord au temps passé ensemble. {lo} peut penser en faire assez autrement : rien ne remplace un vrai moment à deux.",
+      both: "Le temps à deux compte énormément pour l'un comme pour l'autre : protégez-le dans vos agendas.",
+      none: "Vous n'avez pas besoin d'être souvent ensemble pour vous sentir proches."
+    },
+    {
+      id: "gestes", name: "Les coups de main", short: "Services",
+      desc: "Les tâches prises en charge, l'aide concrète.",
+      tip: "prendre en charge une corvée sans attendre qu'on le demande",
+      gap: "Pour {hi}, un coup de main est une preuve d'amour. {lo} y voit plutôt de la logistique : une corvée prise en charge fera pourtant plus d'effet qu'un bouquet.",
+      both: "Vous vous montrez votre amour en vous facilitant la vie : continuez à vous le dire quand vous le remarquez.",
+      none: "L'aide pratique ne dit pas grand-chose de vos sentiments, et c'est vrai pour vous deux."
+    },
+    {
+      id: "attentions", name: "Les attentions", short: "Attentions",
+      desc: "Les cadeaux et les petites surprises qui montrent qu'on a pensé à l'autre.",
+      tip: "noter ses envies et arriver avec une petite surprise, même minuscule",
+      gap: "{hi} est sensible aux petites attentions, {lo} y accorde peu d'importance. Pas besoin de dépenser : c'est le fait d'y avoir pensé qui compte pour {hi}.",
+      both: "Vous aimez tous les deux les surprises : un détail rapporté de la journée suffit à faire mouche.",
+      none: "Les cadeaux ne sont pas votre langue : inutile de vous mettre la pression aux anniversaires."
+    },
+    {
+      id: "contact", name: "Le contact", short: "Contact",
+      desc: "Câlins, mains tenues, proximité physique.",
+      tip: "multiplier les gestes tendres dans la journée, sans raison particulière",
+      gap: "{hi} a besoin de contact physique, {lo} moins. Trouvez des gestes qui conviennent aux deux, et dites-vous quand vous en avez envie ou pas.",
+      both: "Le contact compte beaucoup pour vous deux : un geste tendre vaut souvent mieux qu'un long discours.",
+      none: "Vous êtes tous les deux peu tactiles : vous vous sentez proches sans vous toucher beaucoup."
+    }
+  ],
+  questions: [
+    { d: "mots", q: "Recevoir un message tendre au milieu de la journée." },
+    { d: "temps", q: "Une soirée entière à deux, téléphones rangés." },
+    { d: "gestes", q: "Qu'on s'occupe d'une corvée à ma place sans que je le demande." },
+    { d: "attentions", q: "Recevoir un petit cadeau sans occasion particulière." },
+    { d: "contact", q: "Qu'on me prenne dans les bras en rentrant." },
+
+    { d: "mots", q: "Entendre « j'ai de la chance de t'avoir »." },
+    { d: "temps", q: "Qu'on m'écoute raconter ma journée sans rien faire d'autre en même temps." },
+    { d: "gestes", q: "Qu'on me prépare à manger quand je rentre tard." },
+    { d: "attentions", q: "Qu'on se souvienne d'une envie que j'avais mentionnée, et qu'on me l'offre." },
+    { d: "contact", q: "Se tenir la main en marchant." },
+
+    { d: "mots", q: "Qu'on me dise précisément ce qu'on aime chez moi." },
+    { d: "temps", q: "Partir se promener ou faire une activité rien que nous deux." },
+    { d: "gestes", q: "Qu'on règle pour moi un problème pénible (un papier, une réparation)." },
+    { d: "attentions", q: "Qu'on me rapporte quelque chose d'un voyage ou d'une sortie." },
+    { d: "contact", q: "S'endormir l'un contre l'autre." },
+
+    { d: "mots", q: "Recevoir une lettre ou un petit mot écrit à la main." },
+    { d: "temps", q: "Que l'autre libère du temps pour moi dans une semaine chargée." },
+    { d: "gestes", q: "Qu'on anticipe ce dont je vais avoir besoin." },
+    { d: "attentions", q: "Un cadeau d'anniversaire choisi avec soin." },
+    { d: "contact", q: "Un massage ou des caresses, sans raison." }
+  ],
+  summary: function (pa, pb, N, h) {
+    var ta = h.top(this, pa, 2), tb = h.top(this, pb, 2);
+    var line = function (name, top) {
+      return "<p><b>Pour toucher " + name + "</b> (" + top[0].name.toLowerCase() + ", puis " + top[1].name.toLowerCase() + ") : " + top[0].tip + ".</p>";
+    };
+    return [{
+      title: "Comment viser juste",
+      html: line(N.a, ta) + line(N.b, tb) + "<p>" +
+        (ta[0] === tb[0]
+          ? "Vous êtes d'abord sensibles à la même chose : ce que tu aimes recevoir fera aussi plaisir à l'autre."
+          : "Vos premières sensibilités sont différentes. On donne souvent ce qu'on aimerait recevoir, et on passe à côté : donne à l'autre dans sa langue, pas dans la tienne.") +
+        "</p>"
+    }];
+  }
+});
+</script>
+<script>
+/* Styles d'attachement : deux curseurs (besoin d'être rassuré, besoin de distance),
+   8 phrases chacun. r: true = phrase inversée. */
+(function () {
+  var STYLES = {
+    secure: { name: "sécure", txt: "À l'aise avec la proximité comme avec l'autonomie, sans inquiétude excessive pour la relation." },
+    anxieux: { name: "anxieux", txt: "Un fort besoin de signes que tout va bien, et du mal à supporter le silence ou la distance." },
+    evitant: { name: "évitant", txt: "Un grand besoin d'autonomie, des émotions gardées pour soi, et une gêne quand la relation devient très proche." },
+    craintif: { name: "craintif", txt: "Une envie de proximité mêlée de crainte, avec des allers-retours entre rapprochement et retrait." }
+  };
+  var DUOS = {
+    "secure+secure": "Deux styles sécures : la base la plus confortable. Vos désaccords portent sur des sujets, pas sur le lien lui-même.",
+    "anxieux+secure": "Un duo qui fonctionne bien quand la personne sécure rassure sans s'agacer, et que la personne anxieuse dit son besoin au lieu de tester l'autre.",
+    "evitant+secure": "La personne sécure peut laisser de l'espace sans le vivre comme un rejet. En échange, la personne évitante a tout à gagner à dire ce qu'elle ressent, même en peu de mots.",
+    "craintif+secure": "La stabilité de l'un aide l'autre à faire confiance. Cela demande de la constance : mêmes réactions, mêmes repères, jour après jour.",
+    "anxieux+anxieux": "Deux inquiétudes qui peuvent s'emballer l'une l'autre. Quand la tension monte, faites une pause et dites chacun ce dont vous avez besoin, plutôt que ce que l'autre a mal fait.",
+    "anxieux+evitant": "Le duo le plus classique : l'un poursuit, l'autre s'éloigne, et chacun renforce la réaction de l'autre. Pour en sortir, la personne évitante annonce quand elle reviendra, et la personne anxieuse laisse ce délai sans relancer.",
+    "anxieux+craintif": "Beaucoup d'intensité et d'inquiétude des deux côtés. Mettez-vous d'accord, au calme, sur les gestes qui rassurent chacun.",
+    "evitant+evitant": "Peu de conflits, mais le risque de vivre en parallèle. Créez des rendez-vous réguliers où chacun parle de soi, même brièvement.",
+    "craintif+evitant": "Chacun protège sa distance, pour des raisons différentes. Avancez par petites confidences, à un rythme qui convient aux deux.",
+    "craintif+craintif": "Vous avez tous les deux envie de proximité et peur d'être blessés. Aller lentement et tenir ses promesses compte plus que les grands gestes."
+  };
+  function style(p) {
+    var x = p.anxiete >= 50, y = p.evitement >= 50;
+    return x && y ? "craintif" : x ? "anxieux" : y ? "evitant" : "secure";
+  }
+
+  (window.TESTS = window.TESTS || []).push({
+    id: "attachement",
+    v: 1,
+    group: "liens",
+    kind: "profil",
+    title: "Styles d'attachement",
+    hook: "Comment on s'attache l'un à l'autre ?",
+    blurb: "Besoin d'être rassuré, besoin d'espace : deux curseurs qui expliquent beaucoup de malentendus. Le rapport situe chacun et décrit votre duo.",
+    minutes: 4,
+    simLabel: "de ressemblance",
+    lead: "Es-tu d'accord ?",
+    scale: ["Pas du tout d'accord", "Plutôt pas d'accord", "Entre les deux", "Plutôt d'accord", "Tout à fait d'accord"],
+    levels: ["Faible", "Moyen", "Élevé"],
+    quad: {
+      x: "anxiete", y: "evitement",
+      xl: "Besoin d'être rassuré", yl: "Besoin de distance",
+      ll: "Sécure", lr: "Anxieux", ul: "Évitant", ur: "Craintif"
+    },
+    intro: [
+      "Seize phrases sur ta façon de vivre les relations amoureuses. Réponds en pensant à ce que tu ressens le plus souvent, pas à ce que tu aimerais ressentir.",
+      "La théorie de l'attachement décrit deux tendances : s'inquiéter pour le lien, et se protéger de la proximité. Le rapport situe chacun sur ces deux axes."
+    ],
+    note: "Un style d'attachement n'est ni un diagnostic ni une étiquette définitive : il évolue avec les expériences et avec la relation.",
+    dims: [
+      {
+        id: "anxiete", name: "Besoin d'être rassuré", short: "Inquiétude",
+        desc: "La crainte de perdre l'autre ou de compter moins pour lui.",
+        gap: "{hi} s'inquiète plus vite pour la relation. Des signes simples {de_lo} (un message, un « tout va bien entre nous ») désamorcent beaucoup de choses.",
+        both: "Vous vous inquiétez tous les deux facilement pour la relation : rassurez-vous à voix haute, souvent, sans attendre que l'autre le demande.",
+        none: "Vous êtes tous les deux sereins sur la solidité du lien."
+      },
+      {
+        id: "evitement", name: "Besoin de distance", short: "Distance",
+        desc: "L'inconfort face à la dépendance et aux émotions partagées.",
+        gap: "{hi} a besoin de plus d'espace et se confie moins. Ce n'est pas un rejet : {lo} peut proposer un moment précis pour parler plutôt que d'insister à chaud.",
+        both: "Vous gardez tous les deux vos émotions pour vous, au risque de vivre côte à côte. Fixez-vous un moment régulier pour parler de vous.",
+        none: "La proximité vous est facile à tous les deux."
+      }
+    ],
+    questions: [
+      { d: "anxiete", q: "Quand l'autre met du temps à répondre à un message, j'imagine vite le pire." },
+      { d: "evitement", q: "Je préfère régler mes problèmes de mon côté plutôt que d'en parler." },
+      { d: "anxiete", q: "J'ai besoin qu'on me répète qu'on m'aime." },
+      { d: "evitement", q: "Quand la relation devient très fusionnelle, j'ai besoin de prendre du recul." },
+      { d: "anxiete", q: "J'ai peur que l'autre finisse par se lasser de moi." },
+      { d: "evitement", q: "Montrer mes émotions me met mal à l'aise." },
+      { d: "anxiete", q: "Après une dispute, je ne suis pas tranquille tant que tout n'est pas réglé." },
+      { d: "evitement", q: "Dépendre de quelqu'un m'inquiète." },
+      { d: "anxiete", q: "Je m'inquiète de tenir à l'autre plus que l'autre ne tient à moi." },
+      { d: "evitement", q: "Quand l'autre va mal, je ne sais pas trop comment réconforter." },
+      { d: "anxiete", q: "Quand l'autre a besoin d'espace, je le vis comme un rejet." },
+      { d: "evitement", q: "Je garde une partie de ma vie rien que pour moi." },
+      { d: "anxiete", q: "Je guette les petits signes qui montreraient que quelque chose ne va pas entre nous." },
+      { d: "evitement", q: "Les grandes déclarations me gênent plus qu'elles ne me touchent." },
+      { d: "anxiete", r: true, q: "Passer quelques jours loin l'un de l'autre ne m'inquiète pas." },
+      { d: "evitement", r: true, q: "Demander de l'aide à mon ou ma partenaire m'est facile." }
+    ],
+    summary: function (pa, pb, N) {
+      var sa = style(pa), sb = style(pb);
+      var duo = DUOS[[sa, sb].sort().join("+")];
+      return [
+        {
+          title: "Vos deux styles",
+          html: "<p><b>" + N.a + "</b> : style <b>" + STYLES[sa].name + "</b>. " + STYLES[sa].txt + "</p>" +
+            "<p><b>" + N.b + "</b> : style <b>" + STYLES[sb].name + "</b>. " + STYLES[sb].txt + "</p>"
+        },
+        { title: "Votre duo", html: "<p>" + duo + "</p>" }
+      ];
+    }
+  });
+})();
+</script>
+<script>
+/* Personnalité : les cinq grands traits, 5 phrases chacun. Phrases originales.
+   r: true = phrase inversée. */
+(window.TESTS = window.TESTS || []).push({
+  id: "perso",
+  v: 1,
+  group: "cerveau",
+  kind: "profil",
+  title: "Personnalités",
+  hook: "Est-ce qu'on a le même caractère ?",
+  blurb: "Ouverture, rigueur, extraversion, conciliation, émotivité : vos deux profils sur les cinq grands traits, et ce que vos différences changent au quotidien.",
+  minutes: 5,
+  simLabel: "de ressemblance",
+  lead: "Cette phrase te ressemble-t-elle ?",
+  scale: ["Pas du tout moi", "Plutôt pas moi", "Entre les deux", "Plutôt moi", "Tout à fait moi"],
+  levels: ["Bas", "Moyen", "Élevé"],
+  intro: [
+    "Vingt-cinq phrases pour situer chacun sur les cinq grands traits de personnalité utilisés en psychologie.",
+    "Aucun profil n'est meilleur qu'un autre, et un couple n'a pas besoin de se ressembler. Le rapport montre où vous vous complétez et où ça peut frotter."
+  ],
+  note: "Version courte inspirée du modèle des cinq grands traits. Elle donne une tendance, pas une évaluation professionnelle.",
+  dims: [
+    {
+      id: "ouverture", name: "Ouverture", short: "Ouverture",
+      desc: "Curiosité, imagination, goût des idées et de la nouveauté.",
+      gap: "{hi} a besoin de nouveauté et d'idées, {lo} de repères. {hi} amène de l'air, {lo} de la stabilité : alternez découvertes et valeurs sûres.",
+      both: "Deux esprits curieux : nourrissez votre couple de projets et de découvertes.",
+      none: "Vous aimez tous les deux le concret et le connu : votre vie n'a pas besoin de surprises pour être bonne."
+    },
+    {
+      id: "rigueur", name: "Rigueur", short: "Rigueur",
+      desc: "Organisation, persévérance, sens de l'engagement.",
+      gap: "{hi} planifie et range, {lo} improvise. C'est une source classique d'agacement : répartissez les tâches selon vos forces plutôt que d'attendre que l'autre change.",
+      both: "Vous êtes tous les deux organisés : la maison tourne rond, pensez à lâcher prise de temps en temps.",
+      none: "L'organisation n'est le fort d'aucun de vous : quelques routines partagées vous éviteront les oublis."
+    },
+    {
+      id: "extraversion", name: "Extraversion", short: "Extraversion",
+      desc: "Énergie tirée des autres, goût de l'action et de la parole.",
+      gap: "{hi} se recharge au contact des autres, {lo} dans le calme. Vous n'avez pas à tout faire ensemble : {hi} peut sortir sans {lo}, sans que ce soit un problème.",
+      both: "Vous aimez tous les deux le monde et le mouvement : gardez aussi des moments rien qu'à deux.",
+      none: "Vous préférez tous les deux le calme : votre cocon vous suffit."
+    },
+    {
+      id: "conciliation", name: "Conciliation", short: "Conciliation",
+      desc: "Confiance, empathie, envie d'éviter les heurts.",
+      gap: "{hi} cède plus facilement pour éviter un conflit, {lo} dit les choses plus franchement. Veillez à ce que {hi} exprime aussi ses désaccords.",
+      both: "Vous êtes tous les deux conciliants : peu de heurts, mais prenez soin de dire quand quelque chose ne va pas.",
+      none: "Vous êtes tous les deux francs et directs : les discussions peuvent être vives, mais rien ne reste caché."
+    },
+    {
+      id: "emotivite", name: "Sensibilité au stress", short: "Émotivité",
+      desc: "Tendance à s'inquiéter, à douter et à ressentir fortement les contrariétés.",
+      gap: "{hi} ressent le stress plus fortement. {lo} peut aider en écoutant sans minimiser, et {hi} en disant ce qui rassure.",
+      both: "Vous êtes tous les deux sensibles au stress : évitez les grandes discussions quand vous êtes fatigués, et rassurez-vous souvent.",
+      none: "Vous gardez tous les deux votre calme : un vrai confort dans les périodes difficiles."
+    }
+  ],
+  questions: [
+    { d: "ouverture", q: "J'aime les idées qui bousculent ma façon de penser." },
+    { d: "rigueur", q: "Je finis ce que je commence." },
+    { d: "extraversion", q: "Je vais facilement vers les inconnus." },
+    { d: "conciliation", q: "Je fais facilement confiance aux gens." },
+    { d: "emotivite", q: "Je m'inquiète facilement." },
+
+    { d: "ouverture", q: "Je m'intéresse à l'art, à la musique ou à la littérature." },
+    { d: "rigueur", q: "Mes affaires sont rangées et mes papiers à jour." },
+    { d: "extraversion", q: "J'aime être au centre de l'attention." },
+    { d: "conciliation", q: "Je me mets facilement à la place des autres." },
+    { d: "emotivite", q: "Mon humeur change vite." },
+
+    { d: "ouverture", q: "J'ai beaucoup d'imagination." },
+    { d: "rigueur", q: "Je prépare les choses à l'avance." },
+    { d: "extraversion", q: "Je parle beaucoup." },
+    { d: "conciliation", q: "Je cède volontiers pour éviter un conflit." },
+    { d: "emotivite", q: "Un imprévu peut me gâcher la journée." },
+
+    { d: "ouverture", q: "J'aime essayer des plats, des lieux ou des activités que je ne connais pas." },
+    { d: "rigueur", q: "On peut compter sur moi pour tenir un engagement." },
+    { d: "extraversion", q: "Après une soirée animée, j'ai encore de l'énergie." },
+    { d: "conciliation", q: "J'aime rendre service." },
+    { d: "emotivite", q: "Je doute souvent de moi." },
+
+    { d: "ouverture", r: true, q: "Je préfère mes habitudes aux expériences nouvelles." },
+    { d: "rigueur", r: true, q: "Je remets souvent à plus tard." },
+    { d: "extraversion", r: true, q: "Dans un groupe, je préfère rester en retrait." },
+    { d: "conciliation", r: true, q: "Je dis ce que je pense, même si ça froisse." },
+    { d: "emotivite", r: true, q: "Je reste calme sous la pression." }
+  ],
+  summary: function (pa, pb, N) {
+    var ds = this.dims.filter(function (d) { return pa[d.id] != null && pb[d.id] != null; });
+    var byGap = ds.slice().sort(function (x, y) { return Math.abs(pa[x.id] - pb[x.id]) - Math.abs(pa[y.id] - pb[y.id]); });
+    var near = byGap[0], far = byGap[byGap.length - 1];
+    var top = function (p) { return ds.slice().sort(function (x, y) { return p[y.id] - p[x.id]; })[0]; };
+    return [{
+      title: "Vos deux caractères",
+      html: "<p><b>" + N.a + "</b> : trait le plus marqué, " + top(pa).name.toLowerCase() + ". <b>" + N.b + "</b> : " + top(pb).name.toLowerCase() + ".</p>" +
+        "<p>Vous vous ressemblez le plus sur : " + near.name.toLowerCase() + ". Vous différez le plus sur : " + far.name.toLowerCase() + ".</p>"
+    }];
+  }
+});
+</script>
+<script>
+/* Traits autistiques : 6 domaines, 5 phrases chacun. Phrases originales,
+   sans valeur diagnostique. r: true = phrase inversée. */
+(window.TESTS = window.TESTS || []).push({
+  id: "autisme",
+  v: 1,
+  group: "cerveau",
+  kind: "profil",
+  title: "Traits autistiques",
+  hook: "Est-ce qu'on est autistes au même point ?",
+  blurb: "Sensorialité, codes sociaux, routines, passions : comparez vos fonctionnements domaine par domaine. Ce n'est pas un diagnostic.",
+  minutes: 6,
+  simLabel: "de ressemblance",
+  lead: "Cette phrase te ressemble-t-elle ?",
+  scale: ["Pas du tout moi", "Plutôt pas moi", "Entre les deux", "Plutôt moi", "Tout à fait moi"],
+  levels: ["Peu marqué", "Modéré", "Marqué"],
+  intro: [
+    "Trente phrases sur six domaines où les personnes autistes décrivent souvent un fonctionnement différent. Tu indiques à quel point chacune te ressemble.",
+    "Le rapport ne dit pas si l'un de vous est autiste. Il montre où vos fonctionnements se ressemblent, où ils diffèrent, et comment en tenir compte à deux."
+  ],
+  note: "Ce questionnaire n'a aucune valeur médicale. Beaucoup de ces traits existent aussi chez des personnes non autistes, et seul un bilan mené par des professionnels formés permet de poser un diagnostic. En France, les Centres de Ressources Autisme (CRA) orientent vers ce type de bilan.",
+  dims: [
+    {
+      id: "social", name: "Codes sociaux", short: "Social",
+      desc: "L'aisance dans les échanges informels et la lecture des signaux des autres.",
+      gap: "{hi} dépense plus d'énergie dans les situations sociales. En soirée, convenez d'un signal pour partir, et {lo} peut se charger des présentations.",
+      both: "Les codes sociaux vous coûtent à tous les deux : entre vous, pas besoin de faire semblant, et c'est reposant.",
+      none: "Vous êtes tous les deux à l'aise avec les codes sociaux."
+    },
+    {
+      id: "comm", name: "Communication", short: "Langage",
+      desc: "Le rapport à l'implicite, au second degré et à la parole directe.",
+      gap: "{hi} prend les mots au plus près de leur sens. {lo} gagnera à dire les choses clairement plutôt qu'à les sous-entendre.",
+      both: "Vous préférez tous les deux une parole directe : dites les choses telles qu'elles sont, cela vous convient.",
+      none: "Sous-entendus et second degré passent bien entre vous."
+    },
+    {
+      id: "sens", name: "Sensorialité", short: "Sens",
+      desc: "La sensibilité aux bruits, aux lumières, aux matières et aux odeurs.",
+      gap: "{hi} est plus sensible aux bruits, aux lumières ou aux textures. Ce qui est un détail pour {lo} peut être épuisant pour {hi} : choisissez ensemble l'ambiance de la maison et des sorties.",
+      both: "Vous êtes tous les deux très sensibles à votre environnement : faites de votre logement un endroit calme, à votre mesure.",
+      none: "L'environnement sensoriel vous gêne peu, l'un comme l'autre."
+    },
+    {
+      id: "routine", name: "Routines et prévisibilité", short: "Routines",
+      desc: "Le besoin de savoir à l'avance et de garder ses habitudes.",
+      gap: "{hi} a besoin de prévisibilité. Quand un plan change, {lo} peut prévenir le plus tôt possible et proposer une alternative précise.",
+      both: "Vous aimez tous les deux savoir à quoi vous attendre : planifier ensemble vous fera du bien.",
+      none: "L'imprévu ne vous dérange ni l'un ni l'autre."
+    },
+    {
+      id: "interets", name: "Passions et attention aux détails", short: "Passions",
+      desc: "L'intensité des centres d'intérêt et la capacité à s'y absorber.",
+      gap: "{hi} peut s'absorber longtemps dans ses passions. Ce n'est pas du désintérêt pour {lo} : fixez des moments où chacun sait que l'autre est disponible.",
+      both: "Vous avez tous les deux des passions intenses : respectez les temps de concentration de l'autre, et partagez vos découvertes.",
+      none: "Vos centres d'intérêt restent souples, pour l'un comme pour l'autre."
+    },
+    {
+      id: "energie", name: "Énergie sociale et camouflage", short: "Énergie",
+      desc: "La fatigue après les interactions et l'effort fourni pour paraître à l'aise.",
+      gap: "{hi} se fatigue vite en société et fournit des efforts qui ne se voient pas toujours. Prévoyez du temps de récupération après les sorties, sans le prendre personnellement.",
+      both: "Vous avez tous les deux besoin de récupérer après avoir vu du monde : protégez vos temps calmes.",
+      none: "Les moments en société vous coûtent peu d'énergie à tous les deux."
+    }
+  ],
+  questions: [
+    { d: "social", q: "Dans un groupe, j'ai du mal à savoir quand c'est à moi de parler." },
+    { d: "comm", q: "Je prends souvent les phrases au pied de la lettre avant de comprendre qu'il y avait un sous-entendu." },
+    { d: "sens", q: "Certains bruits que les autres ignorent (mastication, néons, tic-tac) me sont pénibles." },
+    { d: "routine", q: "Un changement de programme de dernière minute me perturbe pour un bon moment." },
+    { d: "interets", q: "Quand un sujet m'intéresse, je veux tout savoir dessus, jusqu'aux détails." },
+    { d: "energie", q: "Après un moment en société, j'ai besoin de temps au calme pour récupérer." },
+
+    { d: "social", q: "Les conversations pour ne rien dire (météo, banalités) me demandent un effort." },
+    { d: "comm", q: "On m'a déjà reproché d'être trop direct alors que je voulais juste être précis." },
+    { d: "sens", q: "Une étiquette, une couture ou une matière de vêtement peut me gâcher la journée." },
+    { d: "routine", q: "J'aime faire les choses dans le même ordre, de la même façon." },
+    { d: "interets", q: "Je peux rester sur une activité au point d'oublier de manger ou de dormir." },
+    { d: "energie", q: "En public, j'ai l'impression de jouer un rôle pour paraître à l'aise." },
+
+    { d: "social", q: "Je comprends mieux les gens quand ils disent les choses clairement que quand je dois deviner leur humeur." },
+    { d: "comm", q: "L'ironie et le second degré m'échappent parfois." },
+    { d: "sens", q: "Les lieux bruyants et bondés m'épuisent vite." },
+    { d: "routine", q: "J'ai besoin de savoir à l'avance comment une journée va se dérouler." },
+    { d: "interets", q: "Je remarque des détails ou des erreurs que les autres ne voient pas." },
+    { d: "energie", q: "J'ai appris les codes sociaux en observant les autres plutôt que d'instinct." },
+
+    { d: "social", q: "Soutenir le regard de quelqu'un pendant qu'on se parle m'est inconfortable." },
+    { d: "comm", q: "Je préfère un message écrit à un appel téléphonique." },
+    { d: "sens", q: "Je suis très sensible aux lumières vives, aux odeurs ou à la texture des aliments." },
+    { d: "routine", q: "Je mange volontiers les mêmes plats, encore et encore." },
+    { d: "interets", q: "J'aime classer, lister ou organiser les choses selon ma propre logique." },
+    { d: "energie", q: "Il m'arrive de préparer mes phrases avant une conversation." },
+
+    { d: "social", r: true, q: "Je me fais facilement de nouveaux amis." },
+    { d: "comm", q: "Quand un sujet me passionne, je peux en parler longtemps sans voir que l'autre a décroché." },
+    { d: "sens", q: "J'ai des gestes répétitifs qui m'apaisent (me balancer, triturer un objet)." },
+    { d: "routine", r: true, q: "L'imprévu me stimule plus qu'il ne me stresse." },
+    { d: "interets", q: "Quand je suis en pleine concentration, m'interrompre me coûte beaucoup." },
+    { d: "energie", q: "Après une journée chargée, je peux me retrouver à plat au point de ne plus pouvoir parler." }
+  ],
+  summary: function (pa, pb, N, h) {
+    var ga = h.global(pa), gb = h.global(pb), diff = Math.abs(ga - gb), hi = ga >= gb ? N.a : N.b;
+    var verdict = diff < 10 ? "Vous êtes à peu près au même point : vos traits sont d'une intensité comparable."
+      : diff < 25 ? hi + " a des traits un peu plus marqués."
+      : hi + " a des traits nettement plus marqués.";
+    return [{
+      title: "Au même point ?",
+      html: "<p>" + verdict + "</p>" +
+        "<p><b>" + N.a + "</b> : " + ga + " sur 100 (" + h.level(this, ga).toLowerCase() + "). <b>" + N.b + "</b> : " + gb + " sur 100 (" + h.level(this, gb).toLowerCase() + ").</p>" +
+        "<p>Ces chiffres résument vos réponses, rien de plus : un score élevé ne suffit pas à parler d'autisme, et un score bas ne l'exclut pas.</p>"
+    }];
+  }
+});
+</script>
+<script>
+/* Traits TDAH : 3 domaines, 6 phrases chacun, notées par fréquence.
+   Phrases originales, sans valeur diagnostique. */
+(window.TESTS = window.TESTS || []).push({
+  id: "tdah",
+  v: 1,
+  group: "cerveau",
+  kind: "profil",
+  title: "Traits TDAH",
+  hook: "Est-ce que nos cerveaux tournent pareil ?",
+  blurb: "Attention, agitation, émotions : comparez vos modes de fonctionnement et repérez ce qui frotte au quotidien. Ce n'est pas un diagnostic.",
+  minutes: 4,
+  simLabel: "de ressemblance",
+  lead: "À quelle fréquence ?",
+  scale: ["Jamais", "Rarement", "Parfois", "Souvent", "Très souvent"],
+  levels: ["Peu marqué", "Modéré", "Marqué"],
+  intro: [
+    "Dix-huit phrases sur l'attention, l'agitation et les émotions. Tu indiques à quelle fréquence chacune t'arrive, en pensant aux six derniers mois.",
+    "Le rapport compare vos deux profils et propose des ajustements pour le quotidien à deux."
+  ],
+  note: "Ce questionnaire n'a aucune valeur médicale. Tout le monde connaît ces difficultés par moments. Un TDAH se diagnostique auprès d'un médecin, en tenant compte de l'enfance et des conséquences au quotidien.",
+  dims: [
+    {
+      id: "attention", name: "Attention et organisation", short: "Attention",
+      desc: "La capacité à rester sur une tâche, à s'organiser et à ne rien oublier.",
+      gap: "{hi} oublie, se disperse ou sous-estime le temps plus souvent. Ce n'est pas de la mauvaise volonté : un agenda commun et des listes visibles marchent mieux que les rappels oraux {de_lo}.",
+      both: "Vous vous dispersez tous les deux : notez tout (agenda commun, alarmes, liste sur le frigo) plutôt que de compter sur la mémoire de l'autre.",
+      none: "L'organisation et l'attention ne posent de difficulté à aucun de vous."
+    },
+    {
+      id: "agitation", name: "Agitation et impulsivité", short: "Agitation",
+      desc: "Le besoin de bouger, de parler et d'agir tout de suite.",
+      gap: "{hi} a besoin de bouger et décide vite, {lo} avance plus lentement. Pour les décisions importantes, laissez passer une nuit ; pour le reste, laissez {hi} aller à son rythme.",
+      both: "Deux tempéraments rapides : on ne s'ennuie pas, mais donnez-vous une règle pour les grosses dépenses et les grandes décisions.",
+      none: "Vous êtes tous les deux d'un tempérament calme et patient."
+    },
+    {
+      id: "emotions", name: "Émotions et motivation", short: "Émotions",
+      desc: "L'intensité des émotions, la sensibilité aux critiques et les variations d'énergie.",
+      gap: "Les émotions {de_hi} montent plus vite et plus fort. {lo} peut éviter les remarques à chaud et attendre que la vague soit passée pour parler du fond.",
+      both: "Vous vivez tous les deux les choses intensément : convenez d'un mot pour faire une pause quand ça déborde, et reprenez plus tard.",
+      none: "Vos émotions restent stables, pour l'un comme pour l'autre."
+    }
+  ],
+  questions: [
+    { d: "attention", q: "Je commence une tâche, puis une autre, et je me retrouve avec plusieurs choses à moitié faites." },
+    { d: "agitation", q: "Rester longtemps sans bouger sur une chaise m'est difficile." },
+    { d: "emotions", q: "Mes émotions montent très vite et très fort." },
+    { d: "attention", q: "Je perds mes clés, mon téléphone ou mes papiers." },
+    { d: "agitation", q: "Je coupe la parole ou je finis les phrases des autres." },
+    { d: "emotions", q: "Une remarque ou une critique peut me miner pendant des heures." },
+    { d: "attention", q: "Pendant qu'on me parle, mon esprit part ailleurs sans que je le décide." },
+    { d: "agitation", q: "J'achète ou je décide sur un coup de tête." },
+    { d: "emotions", q: "Je peux passer des heures sur ce qui me passionne, et ne pas réussir à démarrer le reste." },
+    { d: "attention", q: "J'oublie des rendez-vous ou des choses que j'avais promis de faire." },
+    { d: "agitation", q: "J'ai l'impression d'avoir un moteur interne qui ne s'arrête pas." },
+    { d: "emotions", q: "Mon énergie et ma motivation changent beaucoup d'un jour à l'autre." },
+    { d: "attention", q: "Je repousse les tâches ennuyeuses jusqu'à la dernière limite." },
+    { d: "agitation", q: "Attendre mon tour (file d'attente, embouteillage) me met à bout." },
+    { d: "emotions", q: "Je m'ennuie vite et j'ai besoin de nouveauté." },
+    { d: "attention", q: "J'ai du mal à estimer le temps qu'une chose va me prendre." },
+    { d: "agitation", q: "Je parle beaucoup, parfois plus que je ne le voudrais." },
+    { d: "emotions", q: "Le soir, mes pensées tournent trop pour que je m'endorme facilement." }
+  ],
+  summary: function (pa, pb, N, h) {
+    var ga = h.global(pa), gb = h.global(pb), diff = Math.abs(ga - gb), hi = ga >= gb ? N.a : N.b;
+    var verdict = diff < 10 ? "Vos cerveaux tournent à peu près au même régime : vos traits sont d'une intensité comparable."
+      : diff < 25 ? hi + " a des traits un peu plus marqués."
+      : hi + " a des traits nettement plus marqués.";
+    return [{
+      title: "Au même régime ?",
+      html: "<p>" + verdict + "</p>" +
+        "<p><b>" + N.a + "</b> : " + ga + " sur 100 (" + h.level(this, ga).toLowerCase() + "). <b>" + N.b + "</b> : " + gb + " sur 100 (" + h.level(this, gb).toLowerCase() + ").</p>" +
+        "<p>Ces chiffres résument vos réponses, rien de plus : un score élevé ne suffit pas à parler de TDAH, et un score bas ne l'exclut pas.</p>"
+    }];
+  }
+});
+</script>
+<script>
+/* Hypersensibilité : 4 domaines, 4 phrases chacun. Phrases originales. */
+(window.TESTS = window.TESTS || []).push({
+  id: "sensible",
+  v: 1,
+  group: "cerveau",
+  kind: "profil",
+  title: "Hypersensibilité",
+  hook: "Est-ce qu'on est aussi sensibles l'un que l'autre ?",
+  blurb: "Sens, émotions, saturation, empathie : seize phrases pour comparer ce que chacun perçoit et encaisse, et ajuster le quotidien.",
+  minutes: 3,
+  simLabel: "de ressemblance",
+  lead: "Cette phrase te ressemble-t-elle ?",
+  scale: ["Pas du tout moi", "Plutôt pas moi", "Entre les deux", "Plutôt moi", "Tout à fait moi"],
+  levels: ["Peu marquée", "Modérée", "Marquée"],
+  intro: [
+    "Seize phrases sur ta sensibilité : à ce qui t'entoure, à tes émotions, à celles des autres.",
+    "Une sensibilité élevée n'est ni un défaut ni une fragilité. Le rapport montre où vos seuils diffèrent, pour que chacun comprenne ce que l'autre perçoit."
+  ],
+  note: "L'hypersensibilité n'est pas un diagnostic médical : c'est un trait de tempérament, plus ou moins marqué selon les personnes.",
+  dims: [
+    {
+      id: "sens", name: "Sensibilité sensorielle", short: "Sens",
+      desc: "La réaction aux bruits, aux lumières, aux odeurs et aux matières.",
+      gap: "{hi} perçoit les bruits, les lumières ou les odeurs plus fort. Ce n'est pas de la comédie : baisser le son ou la lumière coûte peu à {lo} et change beaucoup pour {hi}.",
+      both: "Vous êtes tous les deux très réceptifs à votre environnement : soignez l'ambiance de la maison, elle compte pour vous deux.",
+      none: "L'environnement vous dérange peu, l'un comme l'autre."
+    },
+    {
+      id: "emotion", name: "Intensité émotionnelle", short: "Émotions",
+      desc: "La force avec laquelle les joies, les peines et les critiques sont ressenties.",
+      gap: "{hi} ressent les choses plus intensément. Une remarque anodine pour {lo} peut toucher {hi} longtemps : choisissez le moment et les mots.",
+      both: "Vous vivez tous les deux les émotions intensément : c'est une grande richesse, à condition de vous laisser le temps de redescendre.",
+      none: "Vos émotions restent mesurées, pour l'un comme pour l'autre."
+    },
+    {
+      id: "saturation", name: "Saturation", short: "Saturation",
+      desc: "Le besoin de calme quand il y a trop de choses à la fois.",
+      gap: "{hi} sature plus vite quand tout s'accumule. Prévoir des temps calmes dans les journées chargées évite bien des tensions.",
+      both: "Vous saturez tous les deux vite : n'empilez pas les obligations, et prévoyez des sas de calme.",
+      none: "Les journées chargées vous fatiguent peu, l'un comme l'autre."
+    },
+    {
+      id: "empathie", name: "Empathie", short: "Empathie",
+      desc: "La capacité à capter l'humeur et les besoins des autres.",
+      gap: "{hi} capte l'humeur des autres et s'en imprègne. {lo} peut dire les choses plus clairement, et {hi} demander au lieu de deviner.",
+      both: "Vous captez tous les deux très vite l'humeur de l'autre : attention à ne pas vous transmettre vos inquiétudes.",
+      none: "Vous avez tous les deux besoin qu'on vous dise les choses : dites-les clairement."
+    }
+  ],
+  questions: [
+    { d: "sens", q: "Les bruits forts ou soudains me font sursauter plus que les autres." },
+    { d: "emotion", q: "Un film, une musique ou un paysage peut me bouleverser." },
+    { d: "saturation", q: "Quand j'ai trop de choses à faire en même temps, je perds mes moyens." },
+    { d: "empathie", q: "Je sens l'ambiance d'une pièce dès que j'y entre." },
+
+    { d: "sens", q: "Je remarque tout de suite une odeur, une lumière ou une température qui change." },
+    { d: "emotion", q: "Je pleure facilement." },
+    { d: "saturation", q: "Après une journée chargée, j'ai besoin de m'isoler au calme." },
+    { d: "empathie", q: "L'humeur des autres déteint sur moi." },
+
+    { d: "sens", q: "Les vêtements qui grattent ou qui serrent me sont insupportables." },
+    { d: "emotion", q: "Une critique me touche longtemps." },
+    { d: "saturation", q: "Les changements me secouent, même quand ils sont positifs." },
+    { d: "empathie", q: "Je devine ce dont quelqu'un a besoin sans qu'il le dise." },
+
+    { d: "sens", q: "La caféine, la faim ou le manque de sommeil me perturbent fortement." },
+    { d: "emotion", q: "Je ressens les joies et les peines plus fort que mon entourage." },
+    { d: "saturation", q: "Qu'on me regarde faire quelque chose me fait perdre mes moyens." },
+    { d: "empathie", q: "Les scènes violentes à l'écran me sont pénibles." }
+  ],
+  summary: function (pa, pb, N, h) {
+    var ga = h.global(pa), gb = h.global(pb), diff = Math.abs(ga - gb), hi = ga >= gb ? N.a : N.b;
+    var verdict = diff < 10 ? "Vos sensibilités sont d'une intensité comparable."
+      : diff < 25 ? hi + " a une sensibilité un peu plus marquée."
+      : hi + " a une sensibilité nettement plus marquée.";
+    return [{
+      title: "Aussi sensibles l'un que l'autre ?",
+      html: "<p>" + verdict + "</p>" +
+        "<p><b>" + N.a + "</b> : " + ga + " sur 100 (" + h.level(this, ga).toLowerCase() + "). <b>" + N.b + "</b> : " + gb + " sur 100 (" + h.level(this, gb).toLowerCase() + ").</p>"
+    }];
+  }
+});
+</script>
+<script>
+/* Entre Nous : moteur des tests à deux.
+   Les questionnaires sont dans tests/*.js (window.TESTS). Ce fichier gère le
+   parcours (accueil, questions, passage de main, rapport), le calcul des
+   comparaisons et les graphiques. Aucune donnée ne quitte le navigateur. */
+(function () {
+  "use strict";
+
+  const TESTS = window.TESTS || [];
+  const BY_ID = {};
+  TESTS.forEach((t) => { BY_ID[t.id] = t; });
+
+  const GROUPS = [
+    { id: "commencer", name: "Pour commencer" },
+    { id: "couple", name: "Notre couple" },
+    { id: "quotidien", name: "Notre quotidien" },
+    { id: "projets", name: "Nos projets" },
+    { id: "liens", name: "Ce qui nous lie" },
+    { id: "cerveau", name: "Nos fonctionnements" }
+  ];
+  const MIRROR = ["Moi, nettement", "Plutôt moi", "Moitié-moitié", "Plutôt {p}", "{p}, nettement"];
+  const ST = {
+    ok: { g: "=", one: "accord", many: "accords" },
+    near: { g: "≈", one: "réponse proche", many: "réponses proches" },
+    gap: { g: "≠", one: "écart", many: "écarts" }
+  };
+  const DIM_ST = { ok: "Très proches", near: "Assez proches", gap: "À discuter" };
+  const NUMBERS = ["Zéro", "Un", "Deux", "Trois", "Quatre", "Cinq", "Six", "Sept", "Huit", "Neuf", "Dix", "Onze", "Douze",
+    "Treize", "Quatorze", "Quinze", "Seize", "Dix-sept", "Dix-huit", "Dix-neuf", "Vingt"];
+
+  const app = document.getElementById("app");
+
+  /* ---------- Stockage local (toujours optionnel) ---------- */
+  const mem = {};
+  const store = {
+    get(k, d) {
+      try {
+        const v = localStorage.getItem("en:" + k);
+        if (v != null) return JSON.parse(v);
+      } catch (e) { /* stockage indisponible */ }
+      return k in mem ? mem[k] : d;
+    },
+    set(k, v) {
+      mem[k] = v;
+      try { localStorage.setItem("en:" + k, JSON.stringify(v)); } catch (e) { /* idem */ }
+    },
+    del(k) {
+      delete mem[k];
+      try { localStorage.removeItem("en:" + k); } catch (e) { /* idem */ }
+    }
+  };
+
+  /* ---------- État ---------- */
+  let names = store.get("names", null) || { a: "", b: "" };
+  let results = store.get("results", null) || {};
+  let session = store.get("session", null);
+  let invite = store.get("invite", null);
+  const ui = { codeOpen: false, codeErr: "" };
+  let route = "";
+  let busy = false;
+
+  let framed = false;
+  try { framed = window.self !== window.top; } catch (e) { framed = true; }
+  const canLink = !framed && /^https?:$/.test(location.protocol);
+
+  /* ---------- Outils ---------- */
+  const esc = (s) => String(s)
+    .replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]))
+    .replace(/ ([?!:;%»])/g, "\u00a0$1").replace(/« /g, "«\u00a0"); /* espaces insécables à la française */
+  const avg = (xs) => xs.reduce((s, x) => s + x, 0) / xs.length;
+  const other = (w) => (w === "a" ? "b" : "a");
+  const nm = (w) => (names[w] || "").trim() || (w === "a" ? "Partenaire 1" : "Partenaire 2");
+  const de = (n) => (/^[aeiouyhàâäéèêëîïôöùûü]/i.test(n) ? "d'" : "de ") + n;
+  const que = (n) => (/^[aeiouyhàâäéèêëîïôöùûü]/i.test(n) ? "qu'" : "que ") + n;
+  const pl = (n, one, many) => n + " " + (n >= 2 ? many : one);
+  /* Mot d'état au singulier ou au pluriel ; un test peut fournir les siens (t.words). */
+  const word = (t, k, n) => {
+    const w = t.words && t.words[k];
+    return w ? w[n >= 2 ? 1 : 0] : n >= 2 ? ST[k].many : ST[k].one;
+  };
+  const fill = (tpl, map) => tpl.replace(/\{(\w+)\}/g, (m, k) => (k in map ? map[k] : m));
+  const longDate = (iso) => new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  const shortDate = (iso) => new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "short" });
+  const blank = (n) => Array.from({ length: n }, () => null);
+
+  function baseOpts(t, q) { return q.t === "mir" ? (q.o || t.mirror || MIRROR) : (q.o || t.scale); }
+  function nOpts(t, q) { return baseOpts(t, q).length; }
+  function optsFor(t, q, who) {
+    const base = baseOpts(t, q);
+    return q.t === "mir" ? base.map((s) => s.replace("{p}", nm(other(who)))) : base;
+  }
+  /* Libellé d'une réponse dans le rapport. Pour une question miroir, la réponse
+     est traduite en désignation absolue (« Plutôt Tom ») quel que soit l'auteur. */
+  function ansLabel(t, q, who, v) {
+    if (v == null) return "Question passée";
+    const base = baseOpts(t, q);
+    if (q.t !== "mir") return base[v];
+    const n = base.length, k = who === "a" ? v : n - 1 - v, mid = (n - 1) / 2;
+    if (k === mid) return base[k];
+    return k < mid ? base[n - 1 - k].replace("{p}", nm("a")) : base[k].replace("{p}", nm("b"));
+  }
+  function dimOf(t, id) { return t.dims.find((d) => d.id === id); }
+
+  /* ---------- Calculs ---------- */
+  function cmp(t, q, a, b) {
+    if (a == null || b == null) return null;
+    if (q.t === "nom") return a === b ? { steps: 0, sim: 1, st: "ok" } : { steps: 2, sim: 0, st: "gap" };
+    const n = nOpts(t, q);
+    const steps = Math.abs(a - (q.t === "mir" ? n - 1 - b : b));
+    return { steps, sim: 1 - steps / (n - 1), st: steps === 0 ? "ok" : steps === 1 ? "near" : "gap" };
+  }
+
+  /* Jeu de devinettes : les questions vont par paires (ma réponse, mon intuition
+     sur l'autre). On compare l'intuition de chacun à la vraie réponse de l'autre. */
+  function analyseGuess(t, A, B) {
+    const pairs = [];
+    for (let i = 0; i + 1 < t.questions.length; i += 2) {
+      const q = t.questions[i];
+      pairs.push({
+        q, g: t.questions[i + 1],
+        onA: { real: A[i], guess: B[i + 1], c: cmp(t, q, A[i], B[i + 1]) },
+        onB: { real: B[i], guess: A[i + 1], c: cmp(t, q, B[i], A[i + 1]) }
+      });
+    }
+    const all = [];
+    pairs.forEach((p) => { if (p.onA.c) all.push(p.onA.c); if (p.onB.c) all.push(p.onB.c); });
+    const score = (key) => {
+      const v = pairs.map((p) => p[key].c).filter(Boolean);
+      return v.length ? Math.round(100 * avg(v.map((c) => c.sim))) : null;
+    };
+    const count = (st) => all.filter((c) => c.st === st).length;
+    return {
+      pairs, items: [], dims: [], n: all.length, heavy: 0,
+      align: all.length ? Math.round(100 * avg(all.map((c) => c.sim))) : 0,
+      ok: count("ok"), near: count("near"), gap: count("gap"),
+      knowB: score("onB"), /* ce que A devine de B */
+      knowA: score("onA")  /* ce que B devine de A */
+    };
+  }
+
+  function analyse(t, A, B) {
+    if (t.kind === "devine") return analyseGuess(t, A, B);
+    const items = t.questions.map((q, i) => ({ q, i, a: A[i], b: B[i], c: cmp(t, q, A[i], B[i]) }));
+    const valid = items.filter((x) => x.c);
+    const count = (list, st) => list.filter((x) => x.c.st === st).length;
+    const dims = t.dims.map((d) => {
+      const all = items.filter((x) => x.q.d === d.id);
+      const v = all.filter((x) => x.c);
+      return {
+        d, all, n: v.length,
+        align: v.length ? Math.round(100 * avg(v.map((x) => x.c.sim))) : null,
+        ok: count(v, "ok"), near: count(v, "near"), gap: count(v, "gap")
+      };
+    });
+    return {
+      items, dims, n: valid.length,
+      align: valid.length ? Math.round(100 * avg(valid.map((x) => x.c.sim))) : 0,
+      ok: count(valid, "ok"), near: count(valid, "near"), gap: count(valid, "gap"),
+      heavy: valid.filter((x) => x.c.st === "gap" && (x.q.w || 1) > 1).length
+    };
+  }
+
+  /* Score de 0 à 100 par dimension pour une personne (tests de profil). */
+  function profile(t, ans) {
+    const acc = {};
+    t.questions.forEach((q, i) => {
+      const v = ans[i];
+      if (v == null) return;
+      let x = v / (nOpts(t, q) - 1);
+      if (q.r) x = 1 - x;
+      (acc[q.d] = acc[q.d] || []).push(x);
+    });
+    const out = {};
+    t.dims.forEach((d) => { out[d.id] = acc[d.id] ? Math.round(100 * avg(acc[d.id])) : null; });
+    return out;
+  }
+
+  /* Climat : les réponses sont classées du mieux (0) au moins bien. */
+  function moodScore(t, ans, dimId) {
+    const xs = [];
+    t.questions.forEach((q, i) => {
+      if (q.d === dimId && ans[i] != null) xs.push(1 - ans[i] / (nOpts(t, q) - 1));
+    });
+    return xs.length ? Math.round(100 * avg(xs)) : null;
+  }
+
+  function pickTalks(an) {
+    const cand = an.items
+      .filter((x) => x.c && x.c.st !== "ok")
+      .map((x) => ({ x, s: (1 - x.c.sim) * (x.q.w || 1) + (x.c.st === "gap" ? 1 : 0) }))
+      .sort((p, q) => q.s - p.s);
+    const out = [], seen = {};
+    cand.forEach((c) => { if (out.length < 4 && !seen[c.x.q.d]) { seen[c.x.q.d] = 1; out.push(c.x); } });
+    cand.forEach((c) => { if (out.length < 4 && out.indexOf(c.x) < 0) out.push(c.x); });
+    return out;
+  }
+
+  const dimStatus = (p) => (p >= 80 ? "ok" : p >= 60 ? "near" : "gap");
+
+  const H = {
+    top(t, p, n) {
+      return t.dims.filter((d) => p[d.id] != null).sort((x, y) => p[y.id] - p[x.id]).slice(0, n);
+    },
+    global(p) {
+      const xs = Object.keys(p).map((k) => p[k]).filter((v) => v != null);
+      return xs.length ? Math.round(avg(xs)) : 0;
+    },
+    level(t, s) { return t.levels[s < 35 ? 0 : s <= 65 ? 1 : 2]; }
+  };
+
+  function headline(p, isProfile) {
+    if (isProfile) {
+      return p >= 85 ? "Vous fonctionnez de façon très proche."
+        : p >= 70 ? "Des profils proches, avec quelques nuances."
+        : p >= 55 ? "Deux profils différents sur plusieurs points."
+        : "Deux fonctionnements bien distincts.";
+    }
+    return p >= 85 ? "Vous regardez dans la même direction."
+      : p >= 70 ? "Beaucoup d'accords, et quelques sujets à ouvrir."
+      : p >= 55 ? "Des bases communes et de vraies différences."
+      : "Vous voyez beaucoup de choses différemment.";
+  }
+
+  /* ---------- Codes d'échange entre deux appareils ---------- */
+  const pack = (a) => a.map((v) => (v == null ? "-" : String(v))).join("");
+  function unpack(t, s) {
+    if (typeof s !== "string" || s.length !== t.questions.length) return null;
+    const out = [];
+    for (let i = 0; i < s.length; i++) {
+      if (s[i] === "-") { out.push(null); continue; }
+      const v = parseInt(s[i], 10);
+      if (isNaN(v) || v >= nOpts(t, t.questions[i])) return null;
+      out.push(v);
+    }
+    return out;
+  }
+  function encode(obj) {
+    const bytes = new TextEncoder().encode(JSON.stringify(obj));
+    let bin = "";
+    bytes.forEach((b) => { bin += String.fromCharCode(b); });
+    return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+  function decode(raw) {
+    let code = String(raw).trim();
+    const m = code.match(/#c=([\w-]+)/);
+    if (m) code = m[1];
+    code = code.replace(/\s+/g, "").replace(/-/g, "+").replace(/_/g, "/");
+    code += "=".repeat((4 - (code.length % 4)) % 4);
+    const bin = atob(code);
+    const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
+    return JSON.parse(new TextDecoder().decode(bytes));
+  }
+  function codeFor(t, r) {
+    const o = { v: t.v, t: t.id, n: [names.a || "", names.b || ""], a: pack(r.a) };
+    if (r.b) { o.b = pack(r.b); o.d = r.at; }
+    return encode(o);
+  }
+
+  function importCode(raw) {
+    const fail = (msg) => {
+      ui.codeErr = msg;
+      ui.codeOpen = true;
+      if (/^(rapport|test)-/.test(route)) render(true); else go("accueil");
+    };
+    if (!String(raw || "").trim()) return fail("Colle d'abord le code ou le lien que tu as reçu.");
+    let o;
+    try { o = decode(raw); } catch (e) { return fail("Ce code est illisible. Vérifie qu'il a été copié en entier."); }
+    const t = o && BY_ID[o.t];
+    if (!t) return fail("Ce code ne correspond à aucun test de cette page.");
+    if (o.v !== t.v) return fail("Ce code vient d'une ancienne version du test. Il faut le refaire.");
+    const A = unpack(t, o.a);
+    const B = o.b ? unpack(t, o.b) : null;
+    if (!A || (o.b && !B)) return fail("Ce code est incomplet. Vérifie qu'il a été copié en entier.");
+    if (Array.isArray(o.n)) {
+      names = { a: String(o.n[0] || "").slice(0, 20), b: String(o.n[1] || "").slice(0, 20) };
+      store.set("names", names);
+    }
+    ui.codeErr = "";
+    ui.codeOpen = false;
+    if (B) {
+      results[t.id] = { v: t.v, at: o.d || new Date().toISOString(), a: A, b: B, from: "code" };
+      store.set("results", results);
+      go("rapport-" + t.id);
+    } else {
+      invite = { t: t.id, a: A };
+      store.set("invite", invite);
+      if (session && session.t === t.id) dropSession();
+      go("test-" + t.id);
+    }
+  }
+
+  /* ---------- Session de réponses ---------- */
+  function saveSession() { store.set("session", session); }
+  function dropSession() { session = null; store.del("session"); }
+
+  function readNames() {
+    ["a", "b"].forEach((k) => {
+      const el = document.getElementById("name-" + k);
+      if (el) names[k] = el.value.trim().slice(0, 20);
+    });
+    store.set("names", names);
+  }
+
+  function start(t, mode) {
+    if (mode === "guest" && !(invite && invite.t === t.id)) return;
+    if (mode !== "guest") readNames();
+    const n = t.questions.length;
+    session = {
+      t: t.id, mode, who: mode === "guest" ? "b" : "a", i: 0, phase: "quiz",
+      ans: { a: mode === "guest" ? invite.a : blank(n), b: blank(n) }
+    };
+    saveSession();
+    render();
+  }
+
+  function pick(k) {
+    const s = session;
+    if (!s || s.phase !== "quiz" || busy) return;
+    const t = BY_ID[s.t];
+    if (k < 0 || k >= nOpts(t, t.questions[s.i])) return;
+    s.ans[s.who][s.i] = k;
+    saveSession();
+    app.querySelectorAll(".opt").forEach((b, i) => {
+      b.classList.toggle("on", i === k);
+      b.setAttribute("aria-pressed", i === k ? "true" : "false");
+    });
+    busy = true;
+    setTimeout(() => { busy = false; step(1); }, 170);
+  }
+
+  function step(d) {
+    const s = session;
+    if (!s) return;
+    const t = BY_ID[s.t];
+    if (d > 0 && s.i >= t.questions.length - 1) return finish();
+    s.i = Math.max(0, s.i + d);
+    saveSession();
+    render();
+  }
+
+  function finish() {
+    const s = session, t = BY_ID[s.t];
+    if (s.mode === "same" && s.who === "a") {
+      s.who = "b"; s.i = 0; s.phase = "handoff";
+      saveSession();
+      render();
+      return;
+    }
+    results[t.id] = { v: t.v, at: new Date().toISOString(), a: s.ans.a, b: s.mode === "solo" ? null : s.ans.b, from: s.mode };
+    store.set("results", results);
+    if (s.mode === "guest") { invite = null; store.del("invite"); }
+    dropSession();
+    go("rapport-" + t.id);
+  }
+
+  /* ---------- Dessins ---------- */
+  const LOGO = '<svg class="logo inks" viewBox="0 0 40 28" aria-hidden="true"><circle class="ink-a" cx="14" cy="14" r="11"/><circle class="ink-b" cx="26" cy="14" r="11"/></svg>';
+  const GLYPHS = {
+    bilan: '<circle class="ink-a" cx="18" cy="24" r="13"/><circle class="ink-b" cx="30" cy="24" r="13"/>',
+    quidenous: '<path class="ink-a" d="M22 8a16 16 0 0 0 0 32z"/><path class="ink-b" d="M26 8a16 16 0 0 1 0 32z"/>',
+    valeurs: '<rect class="ink-a" x="7" y="7" width="22" height="22" rx="4"/><rect class="ink-b" x="19" y="19" width="22" height="22" rx="4"/>',
+    amour: '<circle class="ink-a" cx="24" cy="24" r="17"/><circle class="ink-b" cx="24" cy="24" r="8"/>',
+    attachement: '<circle class="ring-a" cx="18" cy="24" r="10.5"/><circle class="ring-b" cx="30" cy="24" r="10.5"/>',
+    autisme: [12, 24, 36].map((y, r) => [12, 24, 36].map((x, c) => '<circle class="ink-' + ((r + c) % 2 ? "b" : "a") + '" cx="' + x + '" cy="' + y + '" r="4.6"/>').join("")).join(""),
+    tdah: '<path class="ring-a" d="M6 31 15 15l9 18 9-20 9 17"/><circle class="ink-b" cx="24" cy="24" r="6"/>',
+    general: '<rect class="ink-a" x="6" y="6" width="17" height="17" rx="4"/><rect class="ink-b" x="25" y="6" width="17" height="17" rx="4"/><rect class="ink-b" x="6" y="25" width="17" height="17" rx="4"/><rect class="ink-a" x="25" y="25" width="17" height="17" rx="4"/>',
+    connais: '<path class="ink-a" d="M3 24Q24 4 45 24Q24 44 3 24z"/><circle class="ink-b" cx="24" cy="24" r="8"/>',
+    desir: '<ellipse class="ink-a" cx="19" cy="24" rx="9" ry="17" transform="rotate(-22 19 24)"/><ellipse class="ink-b" cx="29" cy="24" rx="9" ry="17" transform="rotate(22 29 24)"/>',
+    argent: '<rect class="ink-a" x="11" y="8" width="28" height="9" rx="4.5"/><rect class="ink-b" x="7" y="19.5" width="28" height="9" rx="4.5"/><rect class="ink-a" x="13" y="31" width="28" height="9" rx="4.5"/>',
+    parents: '<circle class="ink-a" cx="20" cy="21" r="14"/><circle class="ink-b" cx="34" cy="34" r="8"/>',
+    conflits: '<path class="ink-a" d="M5 9 29 24 5 39z"/><path class="ink-b" d="M43 9 19 24 43 39z"/>',
+    charge: '<rect class="ink-a" x="8" y="7" width="14" height="34" rx="4"/><rect class="ink-b" x="26" y="23" width="14" height="18" rx="4"/>',
+    perso: '<path class="ring-a" d="M24 6 41 18.5 34.5 39h-21L7 18.5z"/><circle class="ink-b" cx="24" cy="24" r="6"/>',
+    sensible: '<circle class="ring-a" cx="24" cy="24" r="17"/><circle class="ring-b" cx="24" cy="24" r="8.5"/>',
+    rythme: '<path class="ring-a" d="M4 18q5-10 10 0t10 0 10 0 10 0"/><path class="ring-b" d="M4 31q5 10 10 0t10 0 10 0 10 0"/>',
+    voyages: '<path class="ink-a" d="M3 41 19 11l16 30z"/><circle class="ink-b" cx="34" cy="15" r="9"/>'
+  };
+  const glyph = (t) => '<svg class="inks" viewBox="0 0 48 48" aria-hidden="true">' + (GLYPHS[t.id] || GLYPHS.bilan) + "</svg>";
+
+  /* Deux cercles qui se recouvrent d'autant plus que les réponses concordent. */
+  function venn(p) {
+    const r = 62, d = 2 * r * (0.92 - 0.74 * (p / 100)), cx = 150, cy = 70;
+    return '<svg class="venn inks" viewBox="0 0 300 140" role="img" aria-label="Deux cercles qui se recouvrent à ' + p + ' %">' +
+      '<circle class="ink-a" cx="' + (cx - d / 2).toFixed(1) + '" cy="' + cy + '" r="' + r + '"/>' +
+      '<circle class="ink-b" cx="' + (cx + d / 2).toFixed(1) + '" cy="' + cy + '" r="' + r + '"/></svg>';
+  }
+
+  /* Radar : axes = [{label, full}], series = [{k, vals, st?, name?}]. */
+  function radar(axes, series, aria) {
+    const W = 440, Hh = 350, cx = W / 2, cy = Hh / 2 + 2, R = 116, n = axes.length;
+    const ang = (i) => -Math.PI / 2 + (i * 2 * Math.PI) / n;
+    const pt = (i, v) => [cx + (R * v / 100) * Math.cos(ang(i)), cy + (R * v / 100) * Math.sin(ang(i))];
+    const f = (p) => p[0].toFixed(1) + "," + p[1].toFixed(1);
+    let s = '<svg class="radar" viewBox="0 0 ' + W + " " + Hh + '" role="img" aria-label="' + esc(aria) + '">';
+    [25, 50, 75, 100].forEach((v) => { s += '<polygon class="grid" points="' + axes.map((_, i) => f(pt(i, v))).join(" ") + '"/>'; });
+    axes.forEach((_, i) => { const p = pt(i, 100); s += '<line class="grid" x1="' + cx + '" y1="' + cy + '" x2="' + p[0].toFixed(1) + '" y2="' + p[1].toFixed(1) + '"/>'; });
+    s += '<text class="tick" x="' + (cx + 5) + '" y="' + (cy - R / 2 + 12) + '">50</text>';
+    axes.forEach((a, i) => {
+      const c = Math.cos(ang(i)), sn = Math.sin(ang(i));
+      const x = cx + (R + 16) * c, y = cy + (R + 16) * sn;
+      const anchor = c > 0.25 ? "start" : c < -0.25 ? "end" : "middle";
+      const dy = sn > 0.5 ? "0.85em" : sn < -0.5 ? "-0.15em" : "0.35em";
+      s += '<text class="axis" x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" text-anchor="' + anchor + '" dy="' + dy + '">' + esc(a.label) + "</text>";
+    });
+    series.forEach((se) => { s += '<polygon class="shape ' + se.k + '" points="' + se.vals.map((v, i) => f(pt(i, v))).join(" ") + '"/>'; });
+    series.forEach((se) => {
+      se.vals.forEach((v, i) => {
+        const p = pt(i, v), x = p[0].toFixed(1), y = p[1].toFixed(1);
+        const tip = "<title>" + esc(axes[i].full + " : " + v + (se.st ? " % (" + DIM_ST[se.st[i]].toLowerCase() + ")" : " sur 100, " + se.name)) + "</title>";
+        if (se.st) {
+          s += '<g class="mark ' + se.st[i] + '"><circle cx="' + x + '" cy="' + y + '" r="8.5"/><text x="' + x + '" y="' + y + '" dy="0.36em" text-anchor="middle">' + ST[se.st[i]].g + "</text>" + tip + "</g>";
+        } else if (se.k === "b") {
+          s += '<rect class="pt b" x="' + (p[0] - 4.5).toFixed(1) + '" y="' + (p[1] - 4.5).toFixed(1) + '" width="9" height="9" rx="1.5">' + tip + "</rect>";
+        } else {
+          s += '<circle class="pt a" cx="' + x + '" cy="' + y + '" r="5">' + tip + "</circle>";
+        }
+      });
+    });
+    return s + "</svg>";
+  }
+
+  /* Plan à deux axes pour les styles d'attachement. */
+  function quadrant(t, pa, pb) {
+    const q = t.quad, S = 330, m0 = 42, m1 = 14, L = S - m0 - m1;
+    const X = (v) => m0 + (L * v) / 100, Y = (v) => m1 + L * (1 - v / 100);
+    const zone = (label, x, y) => '<text class="zone" x="' + X(x) + '" y="' + Y(y) + '" text-anchor="middle">' + esc(label) + "</text>";
+    let s = '<svg class="quad" viewBox="0 0 ' + S + " " + S + '" role="img" aria-label="Position de chacun selon ' + esc(q.xl.toLowerCase()) + " et " + esc(q.yl.toLowerCase()) + '">';
+    s += '<rect class="plot" x="' + m0 + '" y="' + m1 + '" width="' + L + '" height="' + L + '" rx="8"/>';
+    s += '<line class="grid" x1="' + X(50) + '" y1="' + m1 + '" x2="' + X(50) + '" y2="' + (m1 + L) + '"/><line class="grid" x1="' + m0 + '" y1="' + Y(50) + '" x2="' + (m0 + L) + '" y2="' + Y(50) + '"/>';
+    s += zone(q.ul, 25, 93) + zone(q.ur, 75, 93) + zone(q.ll, 25, 4) + zone(q.lr, 75, 4);
+    s += '<text class="axis" x="' + X(50) + '" y="' + (S - 8) + '" text-anchor="middle">' + esc(q.xl) + " →</text>";
+    s += '<text class="axis" transform="rotate(-90 15 ' + Y(50) + ')" x="15" y="' + Y(50) + '" text-anchor="middle">' + esc(q.yl) + " →</text>";
+    const place = (k, p, up) => {
+      const vx = p[q.x], vy = p[q.y];
+      if (vx == null || vy == null) return "";
+      const x = X(vx), y = Y(vy), anchor = vx < 18 ? "start" : vx > 82 ? "end" : "middle";
+      const mark = k === "a"
+        ? '<circle class="pt a" cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="7"/>'
+        : '<rect class="pt b" x="' + (x - 6.5).toFixed(1) + '" y="' + (y - 6.5).toFixed(1) + '" width="13" height="13" rx="2"/>';
+      return "<g>" + mark + '<text class="who" x="' + x.toFixed(1) + '" y="' + (up ? y - 13 : y + 23).toFixed(1) + '" text-anchor="' + anchor + '">' + esc(nm(k)) + "</text><title>" +
+        esc(nm(k) + " : " + q.xl.toLowerCase() + " " + vx + ", " + q.yl.toLowerCase() + " " + vy) + "</title></g>";
+    };
+    const aUp = pa[q.y] == null || pb[q.y] == null || pa[q.y] >= pb[q.y];
+    return s + place("a", pa, aUp) + place("b", pb, !aUp) + "</svg>";
+  }
+
+  /* ---------- Morceaux d'interface ---------- */
+  function topbar(home) {
+    return '<header class="top"><a class="brand" href="#accueil">' + LOGO + "<span>Entre Nous</span></a>" +
+      (home
+        ? '<button class="link" type="button" data-act="toggle-code" aria-expanded="' + ui.codeOpen + '">J\'ai reçu un code</button>'
+        : '<a class="link" href="#accueil">Tous les tests</a>') +
+      "</header>";
+  }
+
+  function namesForm(la, lb) {
+    const field = (k, label) => '<label class="name ' + k + '"><span><i class="sw ' + k + '"></i>' + label + '</span><input id="name-' + k + '" data-name="' + k +
+      '" type="text" autocomplete="off" maxlength="20" placeholder="Prénom" value="' + esc(names[k] || "") + '"></label>';
+    return '<form class="names" data-form="names">' + field("a", la) + field("b", lb) + "</form>";
+  }
+
+  function codeForm(id, label) {
+    return '<form class="code-form" data-form="code"><label for="' + id + '">' + label + '</label><textarea id="' + id + '" rows="3" spellcheck="false" autocomplete="off"></textarea>' +
+      (ui.codeErr ? '<p class="err" role="alert">' + esc(ui.codeErr) + "</p>" : "") +
+      '<button class="btn small" type="submit">Ouvrir</button></form>';
+  }
+
+  function shareBox(code, label) {
+    const val = canLink ? location.origin + location.pathname + "#c=" + code : code;
+    return '<div class="share"><label for="share-val">' + label + '</label><textarea id="share-val" readonly rows="' + (canLink ? 3 : 4) + '" spellcheck="false">' + esc(val) +
+      '</textarea><div class="share-row"><button class="btn small" type="button" data-act="copy">Copier</button><span class="share-msg" role="status"></span></div></div>';
+  }
+
+  const stChip = (st, text) => '<span class="st ' + st + '"><i aria-hidden="true">' + ST[st].g + "</i>" + text + "</span>";
+  const legendStatus = () => '<ul class="legend">' + ["ok", "near", "gap"].map((k) => "<li>" + stChip(k, ST[k].many.charAt(0).toUpperCase() + ST[k].many.slice(1)) + "</li>").join("") + "</ul>";
+  const legendPeople = () => '<ul class="legend"><li><i class="sw a"></i>' + esc(nm("a")) + '</li><li><i class="sw b"></i>' + esc(nm("b")) + "</li></ul>";
+
+  function answers(t, x) {
+    const cell = (k) => '<div class="ans"><span class="ans-who"><i class="sw ' + k + '"></i>' + esc(nm(k)) + '</span><span class="ans-val">' + esc(ansLabel(t, x.q, k, x[k])) + "</span></div>";
+    return '<div class="answers">' + cell("a") + cell("b") + "</div>";
+  }
+
+  function qRow(t, x) {
+    const st = x.c ? x.c.st : null;
+    return '<li class="qrow">' + (st ? stChip(st, ST[st].one.charAt(0).toUpperCase() + ST[st].one.slice(1)) : '<span class="st skip">Non comparée</span>') +
+      '<p class="qtext">' + esc(x.q.q) + "</p>" + answers(t, x) + "</li>";
+  }
+
+  /* ---------- Vues ---------- */
+  function card(t) {
+    const r = results[t.id];
+    let state = "";
+    if (r && !r.b) {
+      state = '<a class="card-state" href="#rapport-' + t.id + '">En attente ' + esc(de(nm("b"))) + " · reprendre</a>";
+    } else if (r) {
+      state = '<a class="card-state" href="#rapport-' + t.id + '"><b>' + analyse(t, r.a, r.b).align + "\u00a0%</b> " + esc(t.simLabel) + " · " + shortDate(r.at) + " · voir le rapport</a>";
+    }
+    return '<article class="card"><div class="glyph">' + glyph(t) + '</div><div class="card-body"><p class="eyebrow">' + esc(t.title) + '</p><h3><a class="card-link" href="#test-' + t.id + '">' + esc(t.hook) +
+      '</a></h3><p class="blurb">' + esc(t.blurb) + '</p><p class="meta">' + t.questions.length + " questions · " + t.minutes + " min chacun</p>" + state + "</div></article>";
+  }
+
+  function vHome() {
+    const groups = GROUPS.map((g) => {
+      const ts = TESTS.filter((t) => t.group === g.id);
+      return ts.length ? '<section class="group"><h2 class="group-title">' + esc(g.name) + '</h2><div class="cards">' + ts.map(card).join("") + "</div></section>" : "";
+    }).join("");
+    let banner = "";
+    if (session) {
+      const t = BY_ID[session.t];
+      banner = '<aside class="banner"><p><b>' + esc(t.title) + "</b> est en cours : " + esc(nm(session.who)) + " en est à la question " + (session.i + 1) + " sur " + t.questions.length +
+        '.</p><div class="banner-actions"><a class="btn small" href="#test-' + t.id + '">Reprendre</a><button class="link" type="button" data-act="drop">Abandonner</button></div></aside>';
+    }
+    const done = TESTS.filter((t) => results[t.id] && results[t.id].b);
+    const dash = done.length >= 2 ? '<section class="group"><h2 class="group-title">Vos résultats</h2><ul class="res">' + done.map((t) => {
+      const p = analyse(t, results[t.id].a, results[t.id].b).align;
+      return '<li><a href="#rapport-' + t.id + '">' + esc(t.title) + '</a><span class="track m" title="' + esc(t.title + " : " + p + " % " + t.simLabel) + '"><span class="bar" style="width:' + Math.max(p, 2) +
+        '%"></span></span><span class="num">' + p + " %</span></li>";
+    }).join("") + "</ul></section>" : "";
+    const count = NUMBERS[TESTS.length] || String(TESTS.length);
+    return topbar(true) + '<main class="wrap">' +
+      (ui.codeOpen ? '<section class="panel">' + codeForm("code-in", "Colle ici le code ou le lien que tu as reçu") + "</section>" : "") +
+      '<section class="hero"><h1>Faites le point à deux.</h1><p class="sub">' + count +
+      " tests à passer chacun de son côté, puis un rapport qui compare vos réponses. Gratuit, sans compte, et vos réponses restent sur votre appareil.</p>" +
+      namesForm("Premier prénom", "Second prénom") + "</section>" + banner + dash + groups +
+      '<footer class="foot"><p>Vos réponses sont enregistrées dans ce navigateur uniquement : rien n\'est envoyé sur un serveur.</p><p>Ces tests servent à ouvrir la discussion. Ils ne remplacent ni un diagnostic, ni une thérapie de couple.</p></footer></main>';
+  }
+
+  function vIntro(t) {
+    const r = results[t.id], guest = invite && invite.t === t.id;
+    const units = t.units || [t.dims.length, t.kind === "accord" ? "domaines" : "dimensions"];
+    const facts = '<ul class="facts"><li><b>' + t.questions.length + "</b> questions</li><li><b>" + t.minutes + " min</b> chacun</li><li><b>" + units[0] + "</b> " + units[1] + "</li></ul>";
+    let startHtml;
+    if (guest) {
+      startHtml = '<div class="invite"><p><b>' + esc(nm("a")) + "</b> a déjà répondu et t'invite à faire ce test. Vos réponses seront comparées dès que tu auras terminé.</p></div>" +
+        '<div class="actions"><button class="btn" type="button" data-act="start" data-mode="guest">Je suis ' + esc(nm("b")) + ", je commence</button></div>" +
+        '<p class="hint"><button class="link" type="button" data-act="decline">Ignorer cette invitation</button></p>';
+    } else {
+      startHtml = namesForm("Qui répond en premier ?", "Et ensuite ?") +
+        '<div class="actions"><button class="btn" type="button" data-act="start" data-mode="same">Sur cet appareil, chacun son tour</button>' +
+        '<button class="btn alt" type="button" data-act="start" data-mode="solo">Chacun sur son appareil</button></div>' +
+        '<p class="hint">Chacun sur son appareil : tu réponds ici, puis tu envoies ' + (canLink ? "un lien" : "un code") + " à l'autre, qui répond de son côté.</p>";
+    }
+    let prev = "";
+    if (r && r.b) prev = '<p class="prev">Vous avez déjà fait ce test le ' + longDate(r.at) + '. <a href="#rapport-' + t.id + '">Revoir le rapport</a>. Le refaire remplacera ce résultat.</p>';
+    else if (r) prev = '<p class="prev">Des réponses attendent déjà celles ' + esc(de(nm("b"))) + '. <a href="#rapport-' + t.id + '">Retrouver le code à envoyer</a>.</p>';
+    return topbar(false) + '<main class="wrap narrow intro"><div class="glyph big">' + glyph(t) + '</div><p class="eyebrow">' + esc(t.title) + "</p><h1>" + esc(t.hook) + "</h1>" +
+      t.intro.map((p) => "<p>" + esc(p) + "</p>").join("") + facts + startHtml + prev + (t.note ? '<p class="note">' + esc(t.note) + "</p>" : "") + "</main>";
+  }
+
+  function vQuiz(t) {
+    const s = session, q = t.questions[s.i], total = t.questions.length;
+    const cur = s.ans[s.who][s.i], opts = optsFor(t, q, s.who);
+    const pct = Math.round((100 * s.i) / total);
+    const partner = nm(other(s.who));
+    const qText = q.guess ? fill(q.q, { p: partner, de_p: de(partner) }) : q.q;
+    const eyebrow = t.kind === "devine" ? (q.guess ? "Devine la réponse " + de(partner) : "Ta réponse")
+      : t.kind === "accord" ? dimOf(t, q.d).name + (t.lead ? " · " + t.lead : "")
+      : t.lead;
+    return '<main class="wrap narrow quiz" data-who="' + s.who + '"><header class="quiz-top"><a class="link" href="#accueil">Quitter</a><span class="chip"><i class="sw ' + s.who + '"></i>' + esc(nm(s.who)) +
+      ' répond</span><span class="count">' + (s.i + 1) + " / " + total + '</span></header><div class="progress" role="progressbar" aria-label="Avancement" aria-valuemin="0" aria-valuemax="' + total + '" aria-valuenow="' + s.i +
+      '"><span style="width:' + pct + '%"></span></div><p class="eyebrow">' + esc(eyebrow) + '</p><h1 class="question" tabindex="-1" data-focus>' + esc(qText) +
+      '</h1><div class="options">' + opts.map((o, k) => '<button class="opt' + (cur === k ? " on" : "") + '" type="button" data-act="pick" data-k="' + k + '" aria-pressed="' + (cur === k) + '"><kbd>' + (k + 1) + "</kbd><span>" + esc(o) + "</span></button>").join("") +
+      '</div><footer class="quiz-nav"><button class="btn alt small" type="button" data-act="prev"' + (s.i === 0 ? " disabled" : "") + '>Précédente</button><button class="link" type="button" data-act="skip">Passer cette question</button>' +
+      (cur != null ? '<button class="btn alt small" type="button" data-act="next">Suivante</button>' : "") + "</footer></main>";
+  }
+
+  function vHandoff(t) {
+    return '<main class="wrap narrow handoff" data-who="b"><div class="glyph big">' + glyph(t) + '</div><p class="eyebrow">' + esc(t.title) + "</p><h1>Merci " + esc(nm("a")) + ". Au tour " + esc(de(nm("b"))) +
+      ".</h1><p>Passe l'appareil. Les réponses " + esc(de(nm("a"))) + ' restent cachées jusqu\'au rapport.</p><div class="actions"><button class="btn" type="button" data-act="resume">Je suis ' + esc(nm("b")) + ", je commence</button></div></main>";
+  }
+
+  function profileBars(t, pa, pb, withText) {
+    return '<div class="pairs">' + t.dims.map((d) => {
+      const row = (k, v) => v == null ? "" : '<span class="bar-who"><i class="sw ' + k + '"></i>' + esc(nm(k)) + '</span><span class="track ' + k + '" title="' + esc(nm(k) + " : " + v + " sur 100") + '"><span class="bar" style="width:' + Math.max(v, 2) +
+        '%"></span></span><span class="num">' + v + '</span><span class="lvl">' + esc(H.level(t, v)) + "</span>";
+      let text = "";
+      if (withText && pa[d.id] != null && pb && pb[d.id] != null) {
+        const sa = pa[d.id], sb = pb[d.id], hi = sa >= sb ? "a" : "b", lo = other(hi);
+        const map = { a: nm("a"), b: nm("b"), hi: nm(hi), lo: nm(lo), de_hi: de(nm(hi)), de_lo: de(nm(lo)), de_a: de(nm("a")), de_b: de(nm("b")) };
+        const tpl = Math.abs(sa - sb) >= 20 && d.gap ? d.gap : sa >= 60 && sb >= 60 && d.both ? d.both : sa < 40 && sb < 40 && d.none ? d.none : "Vous êtes proches sur ce point.";
+        text = '<p class="pair-text">' + esc(fill(tpl, map)) + "</p>";
+      }
+      return '<div class="pair"><h3>' + esc(d.name) + '</h3><p class="pair-desc">' + esc(d.desc || "") + '</p><div class="bars">' + row("a", pa[d.id]) + (pb ? row("b", pb[d.id]) : "") + "</div>" + text + "</div>";
+    }).join("") + "</div>";
+  }
+
+  function vWait(t, r) {
+    const B = esc(nm("b"));
+    const how = canLink
+      ? B + " ouvre le lien, répond aux mêmes questions, puis voit le rapport."
+      : B + " ouvre cette page, touche « J'ai reçu un code », colle le code, puis répond aux mêmes questions.";
+    return topbar(false) + '<main class="wrap narrow wait"><p class="eyebrow">' + esc(t.title) + "</p><h1>Tes réponses sont enregistrées.</h1><p>Il manque celles " + esc(de(nm("b"))) + ". " + how + "</p>" +
+      shareBox(codeFor(t, r), canLink ? "Lien à envoyer à " + B : "Code à envoyer à " + B) +
+      "<h2>Quand " + B + " a terminé</h2><p>" + B + " peut te renvoyer " + (canLink ? "un lien" : "un code") + " depuis son rapport. Ouvre-le ou colle-le ici pour voir le rapport sur cet appareil.</p>" +
+      codeForm("code-back", "Code ou lien reçu en retour") +
+      (t.kind === "profil" ? "<h2>Ton profil en attendant</h2>" + profileBars(t, profile(t, r.a), null, false) : "") +
+      '<p class="prev"><a href="#test-' + t.id + '">Recommencer ce test</a></p></main>';
+  }
+
+  function verdictBlock(t, an) {
+    const A = [], B = [], E = [], D = [];
+    an.items.forEach((x) => {
+      if (!x.c || x.q.t !== "mir") return;
+      const n = nOpts(t, x.q), m = (x.a + (n - 1 - x.b)) / 2, mid = (n - 1) / 2;
+      (x.c.st === "gap" ? D : m < mid ? A : m > mid ? B : E).push(x);
+    });
+    const col = (title, list, sw) => '<div class="vcol"><h3>' + (sw ? '<i class="sw ' + sw + '"></i>' : "") + title + ' <span class="vcount">' + list.length + "</span></h3>" +
+      (list.length ? "<ul>" + list.map((x) => "<li>" + esc(x.q.q) + "</li>").join("") + "</ul>" : '<p class="muted">Aucune question.</p>') + "</div>";
+    return '<section class="sec"><h2>Le verdict</h2><p class="sec-sub">Ce que vos deux versions désignent, question par question.</p><div class="verdict">' +
+      col("C'est " + esc(nm("a")), A, "a") + col("C'est " + esc(nm("b")), B, "b") + col("Égalité", E) + col("Versions opposées", D) + "</div></section>";
+  }
+
+  /* Rapport du jeu « Tu me connais ? » : les intuitions de chacun face aux vraies réponses de l'autre. */
+  function guessReport(t, an) {
+    const lvl = (v) => (v >= 80 ? "Par cœur" : v >= 60 ? "Bien" : v >= 40 ? "Avec des surprises" : "À redécouvrir");
+    const row = (k, v) => v == null ? "" : '<span class="bar-who"><i class="sw ' + k + '"></i>' + esc(nm(k)) + '</span><span class="track ' + k + '" title="' + esc(nm(k) + " : " + v + " sur 100") +
+      '"><span class="bar" style="width:' + Math.max(v, 2) + '%"></span></span><span class="num">' + v + '</span><span class="lvl">' + lvl(v) + "</span>";
+    const order = { gap: 0, near: 1, ok: 2 };
+    let h = '<section class="sec"><h2>Qui connaît le mieux l\'autre ?</h2><p class="sec-sub">La justesse des intuitions de chacun sur les réponses de l\'autre, sur 100.</p><div class="bars">' +
+      row("a", an.knowB) + row("b", an.knowA) + "</div></section>";
+    ["a", "b"].forEach((k) => {
+      const o = other(k), key = k === "a" ? "onB" : "onA";
+      const rows = an.pairs.filter((p) => p[key].c).sort((x, y) => order[x[key].c.st] - order[y[key].c.st]);
+      if (!rows.length) return;
+      h += '<section class="sec"><h2>Ce ' + esc(que(nm(k))) + " pense " + esc(de(nm(o))) + '</h2><p class="sec-sub">Les surprises d\'abord.</p><ul class="qlist">' + rows.map((p) => {
+        const x = p[key], w = word(t, x.c.st, 1);
+        return '<li class="qrow">' + stChip(x.c.st, w.charAt(0).toUpperCase() + w.slice(1)) + '<p class="qtext">' + esc(fill(p.g.q, { p: nm(o), de_p: de(nm(o)) })) + '</p><div class="answers">' +
+          '<div class="ans"><span class="ans-who"><i class="sw ' + o + '"></i>Réponse ' + esc(de(nm(o))) + '</span><span class="ans-val">' + esc(ansLabel(t, p.q, o, x.real)) + "</span></div>" +
+          '<div class="ans"><span class="ans-who"><i class="sw ' + k + '"></i>Intuition ' + esc(de(nm(k))) + '</span><span class="ans-val">' + esc(ansLabel(t, p.q, k, x.guess)) + "</span></div></div></li>";
+      }).join("") + "</ul></section>";
+    });
+    return h;
+  }
+
+  /* Part des tâches portée par chacun, selon l'un puis selon l'autre (questions miroir). */
+  function shareBlock(t, r) {
+    const part = (ans, who) => {
+      const xs = [];
+      t.questions.forEach((q, i) => {
+        if (q.t !== "mir" || ans[i] == null) return;
+        const v = ans[i] / (nOpts(t, q) - 1);
+        xs.push(who === "a" ? 1 - v : v);
+      });
+      return xs.length ? Math.round(100 * avg(xs)) : null;
+    };
+    const sa = part(r.a, "a"), sb = part(r.b, "b");
+    if (sa == null || sb == null) return "";
+    const A = esc(nm("a")), B = esc(nm("b"));
+    const bar = (label, pa) => '<div class="split-row"><span class="split-lab">' + label + '</span><div class="split" role="img" aria-label="' + label + " : " + A + " " + pa + " %, " + B + " " + (100 - pa) + ' %">' +
+      (pa > 0 ? '<span class="a" style="flex-grow:' + pa + '">' + (pa >= 18 ? pa + " %" : "") + "</span>" : "") +
+      (pa < 100 ? '<span class="b" style="flex-grow:' + (100 - pa) + '">' + (100 - pa >= 18 ? (100 - pa) + " %" : "") + "</span>" : "") + "</div></div>";
+    let text;
+    if (sa - sb >= 10) text = "Chacun a le sentiment d'en porter plus que l'autre ne le voit. C'est très courant : on remarque mieux ses propres efforts que ceux de l'autre.";
+    else if (sb - sa >= 10) text = "Chacun attribue à l'autre une part plus grande que celle que l'autre se reconnaît : vous voyez les efforts de l'autre, et c'est bon signe.";
+    else text = "Vous évaluez la répartition de la même façon.";
+    const mean = (sa + sb) / 2;
+    if (mean >= 62 || mean <= 38) text += " D'après vos deux versions, " + (mean >= 62 ? A : B) + " porte la plus grande part : est-ce que cette répartition vous convient à tous les deux ?";
+    return '<section class="sec"><h2>La répartition vue par chacun</h2><p class="sec-sub">La part des tâches portée par chacun, d\'après les réponses de l\'un puis de l\'autre.</p>' + legendPeople() +
+      '<div class="splits">' + bar("Selon " + A, sa) + bar("Selon " + B, sb) + '</div><p class="pair-text">' + text + "</p></section>";
+  }
+
+  /* Tests conseillés après le test général : ceux des domaines les moins alignés. */
+  function moreBlock(dimsOk) {
+    const picks = [];
+    dimsOk.slice().sort((x, y) => x.align - y.align).forEach((dm) => {
+      const m = dm.d.more && BY_ID[dm.d.more];
+      if (m && picks.length < 3 && picks.indexOf(m) < 0) picks.push(m);
+    });
+    if (!picks.length) return "";
+    return '<section class="sec"><h2>Les tests à faire ensuite</h2><p class="sec-sub">Vos domaines les moins alignés ont chacun un test qui va plus loin.</p><div class="cards">' + picks.map(card).join("") + "</div></section>";
+  }
+
+  function vReport(t, r) {
+    const an = analyse(t, r.a, r.b), isP = t.kind === "profil", isG = t.kind === "devine";
+    const pa = profile(t, r.a), pb = profile(t, r.b);
+    const N = { a: esc(nm("a")), b: esc(nm("b")) };
+    const head = t.headline ? t.headline(an.align, pa, pb) : headline(an.align, isP);
+    let h = topbar(false) + '<main class="wrap report">';
+
+    h += '<header class="rep-head"><p class="eyebrow">' + esc(t.title) + " · " + longDate(r.at) + '</p><h1><span><i class="sw a"></i>' + N.a + '</span> <span class="amp">et</span> <span><i class="sw b"></i>' + N.b + "</span></h1></header>";
+
+    if (!an.n) {
+      return h + '<p>Aucune question n\'a reçu de réponse des deux côtés : il n\'y a rien à comparer.</p><p class="prev"><a href="#test-' + t.id + '">Refaire ce test</a></p></main>';
+    }
+
+    if (r.from === "guest") {
+      h += '<section class="panel"><p><b>Dernière étape :</b> renvoie ce ' + (canLink ? "lien" : "code") + " à " + N.a + " pour que le rapport s'ouvre aussi de son côté.</p>" +
+        shareBox(codeFor(t, r), (canLink ? "Lien" : "Code") + " du rapport") + "</section>";
+    }
+
+    h += '<section class="hero-block"><div class="hero-fig"><div class="venn-box">' + venn(an.align) + '</div><div class="hero-txt"><p class="hero-num">' + an.align + '<span>\u00a0%</span></p><p class="hero-lab">' + esc(t.simLabel) +
+      '</p><p class="hero-head">' + esc(head) + "</p></div></div>";
+    h += '<ul class="counts">' + ["ok", "near", "gap"].map((k) => '<li><span class="st ' + k + '"><i aria-hidden="true">' + ST[k].g + "</i></span><b>" + an[k] + "</b> " + word(t, k, an[k]) + "</li>").join("") + "</ul>";
+    h += '<p class="hero-note">' + (isG
+      ? "Une intuition juste compte pour un point. Les surprises ne sont pas des fautes\u00a0: ce sont les meilleurs sujets de discussion."
+      : isP
+      ? "Le pourcentage mesure à quel point vos réponses se ressemblent, phrase par phrase. Se ressembler n'est ni mieux ni moins bien\u00a0: l'important est de savoir où vous différez."
+      : (an.heavy ? "Dont " + pl(an.heavy, "écart", "écarts") + " sur des sujets décisifs, ceux qui pèsent le plus dans un couple. " : "") + "Un écart n'est pas une mauvaise note\u00a0: c'est un sujet dont il vaut mieux parler à froid.") + "</p></section>";
+
+    if (isG) {
+      h += guessReport(t, an);
+    } else if (isP) {
+      if (t.summary) {
+        try {
+          t.summary(pa, pb, N, H).forEach((b) => { h += '<section class="sec summary"><h2>' + esc(b.title) + "</h2>" + b.html + "</section>"; });
+        } catch (e) { /* résumé indisponible si des dimensions entières ont été passées */ }
+      }
+      const dimsOk = t.dims.filter((d) => pa[d.id] != null && pb[d.id] != null);
+      h += '<section class="sec"><h2>Vos deux profils</h2><p class="sec-sub">Un score de 0 à 100 par dimension, calculé à partir des réponses de chacun.</p>' + legendPeople();
+      if (t.quad) {
+        h += '<div class="chart">' + quadrant(t, pa, pb) + "</div>";
+      } else if (dimsOk.length >= 5) {
+        h += '<div class="chart">' + radar(dimsOk.map((d) => ({ label: d.short, full: d.name })), [
+          { k: "a", name: nm("a"), vals: dimsOk.map((d) => pa[d.id]) },
+          { k: "b", name: nm("b"), vals: dimsOk.map((d) => pb[d.id]) }
+        ], "Profils de " + nm("a") + " et " + nm("b") + " par dimension") + '<p class="chart-cap">Du centre (0) au bord (100).</p></div>';
+      }
+      h += profileBars(t, pa, pb, true) + "</section>";
+
+      const far = an.items.filter((x) => x.c && x.c.st === "gap").sort((x, y) => y.c.steps - x.c.steps).slice(0, 5);
+      if (far.length) {
+        h += '<section class="sec"><h2>Vos réponses les plus éloignées</h2><p class="sec-sub">Les phrases où vous avez répondu le plus différemment.</p><ul class="qlist">' + far.map((x) => qRow(t, x)).join("") + "</ul></section>";
+      }
+    } else {
+      const dimsOk = an.dims.filter((dm) => dm.align != null);
+      if (dimsOk.length >= 5) {
+        h += '<section class="sec"><h2>Vos domaines d\'un coup d\'œil</h2>' + legendStatus() + '<div class="chart">' +
+          radar(dimsOk.map((dm) => ({ label: dm.d.short, full: dm.d.name })), [{ k: "m", vals: dimsOk.map((dm) => dm.align), st: dimsOk.map((dm) => dimStatus(dm.align)) }], "Alignement par domaine") +
+          '<p class="chart-cap">Alignement par domaine, du centre (0\u00a0%) au bord (100\u00a0%).</p></div></section>';
+      }
+      h += '<section class="sec"><h2>La carte de vos domaines</h2><p class="sec-sub">Pour chaque domaine, la part d\'accords, de réponses proches et d\'écarts.</p>' + (dimsOk.length >= 5 ? "" : legendStatus()) + '<ul class="doms">' +
+        dimsOk.map((dm) => {
+          const st = dimStatus(dm.align);
+          const tip = pl(dm.ok, ST.ok.one, ST.ok.many) + ", " + pl(dm.near, ST.near.one, ST.near.many) + ", " + pl(dm.gap, ST.gap.one, ST.gap.many);
+          return '<li class="dom" title="' + esc(tip) + '"><span class="dom-name">' + esc(dm.d.name) + '</span><span class="seg" role="img" aria-label="' + esc(tip) + '">' +
+            ["ok", "near", "gap"].map((k) => (dm[k] ? '<i class="' + k + '" style="flex-grow:' + dm[k] + '"></i>' : "")).join("") +
+            '</span><span class="num">' + dm.align + '\u00a0%</span><span class="dom-st">' + stChip(st, DIM_ST[st]) + "</span></li>";
+        }).join("") + "</ul></section>";
+
+      const talks = pickTalks(an);
+      if (talks.length) {
+        const used = {};
+        h += '<section class="sec"><h2>Vos prochaines conversations</h2><p class="sec-sub">Les sujets par lesquels commencer, avec une question pour lancer la discussion.</p><ol class="talks">' +
+          talks.map((x) => {
+            const d = dimOf(t, x.q.d), k = used[d.id] || 0;
+            used[d.id] = k + 1;
+            const prompt = x.q.talk || (d.talk && d.talk[k % d.talk.length]);
+            return '<li class="talk"><p class="eyebrow">' + esc(d.name) + ((x.q.w || 1) > 1 ? " · sujet décisif" : "") + '</p><p class="qtext">' + esc(x.q.q) + "</p>" + answers(t, x) +
+              (prompt ? '<p class="prompt"><span>Pour en parler</span>' + esc(prompt) + "</p>" : "") + "</li>";
+          }).join("") + "</ol></section>";
+      }
+
+      t.dims.filter((d) => d.mood).forEach((d) => {
+        const ma = moodScore(t, r.a, d.id), mb = moodScore(t, r.b, d.id);
+        if (ma == null || mb == null) return;
+        const word = (v) => (v >= 80 ? "Très bien" : v >= 60 ? "Plutôt bien" : v >= 40 ? "Mitigé" : "En difficulté");
+        const row = (k, v) => '<span class="bar-who"><i class="sw ' + k + '"></i>' + esc(nm(k)) + '</span><span class="track ' + k + '" title="' + esc(nm(k) + " : " + v + " sur 100") + '"><span class="bar" style="width:' + Math.max(v, 2) +
+          '%"></span></span><span class="num">' + v + '</span><span class="lvl">' + word(v) + "</span>";
+        h += '<section class="sec"><h2>Le climat de votre couple</h2><p class="sec-sub">Comment chacun se sent dans la relation en ce moment, sur 100, d\'après ses propres réponses.</p><div class="bars">' + row("a", ma) + row("b", mb) + "</div>" +
+          (Math.abs(ma - mb) >= 20 ? '<p class="pair-text">' + esc(nm(ma < mb ? "a" : "b")) + " vit la relation moins bien en ce moment. C'est le premier sujet à ouvrir, avant tous les autres.</p>" : "") +
+          (Math.min(ma, mb) < 40 ? '<p class="note">Quand l\'un des deux va mal dans la relation, en parler avec un conseiller conjugal ou un thérapeute de couple aide souvent à débloquer la situation.</p>' : "") + "</section>";
+      });
+
+      if (t.share) h += shareBlock(t, r);
+      if (t.verdict) h += verdictBlock(t, an);
+      h += moreBlock(dimsOk);
+    }
+
+    const order = { gap: 0, near: 1, ok: 2 };
+    if (!isG) h += '<section class="sec"><h2>Toutes vos réponses</h2><p class="sec-sub">' + (isP ? "Dimension par dimension" : "Domaine par domaine") + ", les différences d'abord.</p><div class=\"dets\">" +
+      an.dims.map((dm) => {
+        const rows = dm.all.slice().sort((x, y) => (x.c ? order[x.c.st] : 3) - (y.c ? order[y.c.st] : 3));
+        return '<details class="det"><summary><span class="det-name">' + esc(dm.d.name) + '</span><span class="det-counts">' +
+          ["ok", "near", "gap"].map((k) => '<span class="st ' + k + '"><i aria-hidden="true">' + ST[k].g + "</i>" + dm[k] + '<span class="sr"> ' + ST[k].many + "</span></span>").join("") +
+          '</span></summary><ul class="qlist">' + rows.map((x) => qRow(t, x)).join("") + "</ul></details>";
+      }).join("") + "</div></section>";
+
+    h += '<section class="sec end">';
+    if (r.from !== "guest") {
+      h += "<h2>Garder ce rapport</h2><p class=\"sec-sub\">Ce " + (canLink ? "lien" : "code") + " contient vos deux séries de réponses. " +
+        (canLink ? "Ouvert sur un autre appareil, il affiche le même rapport." : "Collé dans « J'ai reçu un code » sur un autre appareil, il rouvre le même rapport.") + "</p>" +
+        shareBox(codeFor(t, r), (canLink ? "Lien" : "Code") + " du rapport");
+    }
+    h += '<p class="prev"><a href="#test-' + t.id + '">Refaire ce test</a> · <a href="#accueil">Choisir un autre test</a></p></section>';
+    return h + "</main>";
+  }
+
+  /* ---------- Navigation ---------- */
+  function render(keepScroll) {
+    const m = /^(test|rapport)-([a-z0-9]+)$/.exec(route);
+    const t = m && BY_ID[m[2]];
+    let html;
+    if (t && m[1] === "test") {
+      html = session && session.t === t.id ? (session.phase === "handoff" ? vHandoff(t) : vQuiz(t)) : vIntro(t);
+    } else if (t && m[1] === "rapport") {
+      const r = results[t.id];
+      html = !r ? vIntro(t) : r.b ? vReport(t, r) : vWait(t, r);
+    } else {
+      html = vHome();
+    }
+    app.innerHTML = html;
+    if (!keepScroll) window.scrollTo(0, 0);
+    const f = app.querySelector("[data-focus]");
+    if (f) { try { f.focus({ preventScroll: true }); } catch (e) { /* sans importance */ } }
+  }
+
+  function go(h) {
+    route = h;
+    try { if (location.hash !== "#" + h) location.hash = h; } catch (e) { /* cadre sans accès au hash */ }
+    render();
+  }
+
+  function boot() {
+    let h = location.hash.slice(1);
+    try { h = decodeURIComponent(h); } catch (e) { /* hash laissé tel quel */ }
+    if (h.indexOf("c=") === 0) { importCode(h.slice(2)); return; }
+    route = h;
+    render();
+  }
+
+  /* Nettoyage d'un état enregistré par une version précédente des tests. */
+  (function sanitize() {
+    Object.keys(results).forEach((id) => {
+      const t = BY_ID[id], r = results[id];
+      const ok = t && r && r.v === t.v && Array.isArray(r.a) && r.a.length === t.questions.length && (!r.b || r.b.length === t.questions.length);
+      if (!ok) delete results[id];
+    });
+    if (session && !(BY_ID[session.t] && session.ans && session.ans.a && session.ans.a.length === BY_ID[session.t].questions.length)) dropSession();
+    if (invite && !(BY_ID[invite.t] && Array.isArray(invite.a) && invite.a.length === BY_ID[invite.t].questions.length)) { invite = null; store.del("invite"); }
+  })();
+
+  /* ---------- Événements ---------- */
+  app.addEventListener("click", (e) => {
+    const el = e.target.closest("[data-act]");
+    if (!el) return;
+    const act = el.getAttribute("data-act");
+    const m = /^(?:test|rapport)-([a-z0-9]+)$/.exec(route);
+    const t = m && BY_ID[m[1]];
+    if (act === "toggle-code") { ui.codeOpen = !ui.codeOpen; ui.codeErr = ""; render(true); const i = document.getElementById("code-in"); if (i) i.focus(); }
+    else if (act === "drop") { dropSession(); render(true); }
+    else if (act === "decline") { invite = null; store.del("invite"); render(); }
+    else if (act === "start" && t) start(t, el.getAttribute("data-mode"));
+    else if (act === "pick") pick(parseInt(el.getAttribute("data-k"), 10));
+    else if (act === "prev") step(-1);
+    else if (act === "next") step(1);
+    else if (act === "skip" && session) { session.ans[session.who][session.i] = null; step(1); }
+    else if (act === "resume" && session) { session.phase = "quiz"; saveSession(); render(); }
+    else if (act === "copy") {
+      const box = el.closest(".share"), ta = box.querySelector("textarea"), msg = box.querySelector(".share-msg");
+      const done = () => { msg.textContent = "Copié."; };
+      const manual = () => { ta.focus(); ta.select(); msg.textContent = "Sélectionné : copie-le avec Ctrl ou Cmd + C."; };
+      try { navigator.clipboard.writeText(ta.value).then(done, manual); } catch (err) { manual(); }
+    }
+  });
+
+  app.addEventListener("input", (e) => {
+    const k = e.target.getAttribute && e.target.getAttribute("data-name");
+    if (k) { names[k] = e.target.value.slice(0, 20); store.set("names", names); }
+  });
+
+  app.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (e.target.getAttribute("data-form") === "code") importCode(e.target.querySelector("textarea").value);
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (!session || session.phase !== "quiz" || !/^test-/.test(route)) return;
+    if (e.metaKey || e.ctrlKey || e.altKey || /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
+    if (/^[1-9]$/.test(e.key)) pick(parseInt(e.key, 10) - 1);
+    else if (e.key === "ArrowLeft") step(-1);
+  });
+
+  window.addEventListener("hashchange", () => {
+    let h = location.hash.slice(1);
+    try { h = decodeURIComponent(h); } catch (e) { /* idem */ }
+    if (h !== route) boot();
+  });
+
+  boot();
+})();
+</script>
