@@ -61,6 +61,10 @@
   let framed = false;
   try { framed = window.self !== window.top; } catch (e) { framed = true; }
   const canLink = !framed && /^https?:$/.test(location.protocol);
+  /* Mode « en même temps » : il faut un vrai site, le chiffrement du navigateur et le réseau. */
+  const canRoom = canLink && !!(window.crypto && window.crypto.subtle) && typeof fetch === "function";
+  const RELAY = "https://ntfy.sh/";
+  const hasQr = () => typeof window.qrcode === "function";
 
   /* ---------- Outils ---------- */
   const esc = (s) => String(s)
@@ -249,43 +253,200 @@
     const bytes = Uint8Array.from(bin, (c) => c.charCodeAt(0));
     return JSON.parse(new TextDecoder().decode(bytes));
   }
+  const full = (r) => !!(r && r.a && r.b);
+  /* Code d'échange. Avec une seule série de réponses, l'expéditeur est toujours présenté en
+     premier : les réponses étant relatives à leur auteur, les deux rôles sont interchangeables. */
   function codeFor(t, r) {
-    const o = { v: t.v, t: t.id, n: [names.a || "", names.b || ""], a: pack(r.a) };
-    if (r.b) { o.b = pack(r.b); o.d = r.at; }
-    return encode(o);
+    if (full(r)) return encode({ v: t.v, t: t.id, n: [names.a || "", names.b || ""], a: pack(r.a), b: pack(r.b), d: r.at });
+    const me = r.me || "a";
+    return encode({ v: t.v, t: t.id, n: [names[me] || "", names[other(me)] || ""], a: pack(r[me]) });
+  }
+  const codeUrl = (code) => location.origin + location.pathname + "#c=" + code;
+  const joinUrl = (t, room) => location.origin + location.pathname + "#j=" +
+    encode({ v: t.v, t: t.id, n: [names.a || "", names.b || ""], r: room.r, k: room.k });
+
+  function failCode(msg) {
+    ui.codeErr = msg;
+    ui.codeOpen = true;
+    if (/^(rapport|test)-/.test(route)) render(true); else go("accueil");
+  }
+  function setNames(n) {
+    if (!Array.isArray(n)) return;
+    names = { a: String(n[0] || "").slice(0, 20), b: String(n[1] || "").slice(0, 20) };
+    store.set("names", names);
   }
 
   function importCode(raw) {
-    const fail = (msg) => {
-      ui.codeErr = msg;
-      ui.codeOpen = true;
-      if (/^(rapport|test)-/.test(route)) render(true); else go("accueil");
-    };
-    if (!String(raw || "").trim()) return fail("Colle d'abord le code ou le lien que tu as reçu.");
+    const txt = String(raw || "").trim();
+    if (!txt) return failCode("Colle d'abord le code ou le lien que tu as reçu.");
+    const mj = txt.match(/#j=([\w-]+)/);
+    if (mj) return importJoin(mj[1]);
     let o;
-    try { o = decode(raw); } catch (e) { return fail("Ce code est illisible. Vérifie qu'il a été copié en entier."); }
+    try { o = decode(txt); } catch (e) { return failCode("Ce code est illisible. Vérifie qu'il a été copié en entier."); }
     const t = o && BY_ID[o.t];
-    if (!t) return fail("Ce code ne correspond à aucun test de cette page.");
-    if (o.v !== t.v) return fail("Ce code vient d'une ancienne version du test. Il faut le refaire.");
+    if (!t) return failCode("Ce code ne correspond à aucun test de cette page.");
+    if (o.v !== t.v) return failCode("Ce code vient d'une ancienne version du test. Il faut le refaire.");
     const A = unpack(t, o.a);
     const B = o.b ? unpack(t, o.b) : null;
-    if (!A || (o.b && !B)) return fail("Ce code est incomplet. Vérifie qu'il a été copié en entier.");
-    if (Array.isArray(o.n)) {
-      names = { a: String(o.n[0] || "").slice(0, 20), b: String(o.n[1] || "").slice(0, 20) };
-      store.set("names", names);
-    }
+    if (!A || (o.b && !B)) return failCode("Ce code est incomplet. Vérifie qu'il a été copié en entier.");
     ui.codeErr = "";
     ui.codeOpen = false;
     if (B) {
+      setNames(o.n);
       results[t.id] = { v: t.v, at: o.d || new Date().toISOString(), a: A, b: B, from: "code" };
       store.set("results", results);
-      go("rapport-" + t.id);
-    } else {
-      invite = { t: t.id, a: A };
-      store.set("invite", invite);
-      if (session && session.t === t.id) dropSession();
-      go("test-" + t.id);
+      return go("rapport-" + t.id);
     }
+    /* Une seule série : ce sont les réponses de l'autre. */
+    const cur = results[t.id];
+    const mine = cur && !full(cur) ? cur[cur.me || "a"] : null;
+    if (mine && pack(mine) === o.a) return go("rapport-" + t.id); /* c'est mon propre lien */
+    setNames(o.n);
+    if (mine) {
+      /* J'ai déjà répondu de mon côté : on réunit les deux séries. */
+      results[t.id] = { v: t.v, at: new Date().toISOString(), a: A, b: mine, from: "guest" };
+      store.set("results", results);
+      return go("rapport-" + t.id);
+    }
+    if (session && session.t === t.id && (session.mode === "solo" || session.mode === "room")) {
+      /* Je suis en train de répondre : je continue, le rapport s'ouvrira à la fin. */
+      session.ans = { a: A, b: session.ans[session.who] };
+      session.who = "b";
+      session.mode = "guest";
+      session.phase = "quiz";
+      delete session.room;
+      delete session.me;
+      saveSession();
+      invite = null;
+      store.del("invite");
+      return go("test-" + t.id);
+    }
+    invite = { t: t.id, a: A };
+    store.set("invite", invite);
+    if (session && session.t === t.id) dropSession();
+    go("test-" + t.id);
+  }
+
+  /* Lien d'invitation partagé au début : même test, même salon, chacun sur son téléphone. */
+  function importJoin(raw) {
+    let o;
+    try { o = decode(raw); } catch (e) { return failCode("Ce lien d'invitation est illisible. Demande à l'autre de te le renvoyer."); }
+    const t = o && BY_ID[o.t];
+    if (!t || !o.r || !o.k) return failCode("Ce lien d'invitation ne correspond à aucun test de cette page.");
+    if (o.v !== t.v) return failCode("Ce lien vient d'une ancienne version du test. Il faut relancer le test.");
+    ui.codeErr = "";
+    ui.codeOpen = false;
+    const cur = results[t.id];
+    if (session && session.t === t.id && session.room && session.room.r === o.r) return go("test-" + t.id);
+    if (cur && cur.room && cur.room.r === o.r) return go("rapport-" + t.id);
+    setNames(o.n);
+    invite = { t: t.id, room: { r: o.r, k: o.k } };
+    store.set("invite", invite);
+    if (session && session.t === t.id) dropSession();
+    go("test-" + t.id);
+  }
+
+  /* ---------- Salon chiffré : les réponses se rejoignent toutes seules ----------
+     Chaque téléphone dépose ses réponses, chiffrées avec une clé qui ne voyage que dans le
+     lien d'invitation, sur un relais public. Le relais ne voit que du texte illisible. */
+  const b64u = (bytes) => {
+    let bin = "";
+    bytes.forEach((b) => { bin += String.fromCharCode(b); });
+    return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  };
+  const unb64u = (str) => {
+    let c = str.replace(/-/g, "+").replace(/_/g, "/");
+    c += "=".repeat((4 - (c.length % 4)) % 4);
+    return Uint8Array.from(atob(c), (ch) => ch.charCodeAt(0));
+  };
+  function newRoom() {
+    const rnd = (n) => crypto.getRandomValues(new Uint8Array(n));
+    return { r: Array.from(rnd(16), (b) => b.toString(16).padStart(2, "0")).join(""), k: b64u(rnd(32)) };
+  }
+  const roomKey = (room) => crypto.subtle.importKey("raw", unb64u(room.k), "AES-GCM", false, ["encrypt", "decrypt"]);
+  async function seal(room, obj) {
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, await roomKey(room), new TextEncoder().encode(JSON.stringify(obj))));
+    const out = new Uint8Array(12 + ct.length);
+    out.set(iv);
+    out.set(ct, 12);
+    return b64u(out);
+  }
+  async function unseal(room, msg) {
+    const raw = unb64u(msg);
+    const pt = await crypto.subtle.decrypt({ name: "AES-GCM", iv: raw.slice(0, 12) }, await roomKey(room), raw.slice(12));
+    return JSON.parse(new TextDecoder().decode(pt));
+  }
+
+  /* Un passage : lit le salon, y dépose mes réponses si elles n'y sont pas, récupère celles
+     de l'autre. Renvoie true quand les deux séries sont réunies. */
+  async function syncRoom(t) {
+    const r = results[t.id];
+    if (!r || !r.room || full(r)) return full(r);
+    const me = r.me, oth = other(me), url = RELAY + "entrenous-" + r.room.r;
+    const res = await fetch(url + "/json?poll=1&since=all", { cache: "no-store" });
+    if (!res.ok) throw new Error("relais " + res.status);
+    let mineThere = false, theirs = null;
+    for (const line of (await res.text()).split("\n")) {
+      let o = null;
+      try {
+        const m = JSON.parse(line);
+        if (m.event === "message") o = await unseal(r.room, m.message);
+      } catch (e) { o = null; }
+      if (!o || o.t !== t.id || o.v !== t.v) continue;
+      if (o.w === me) mineThere = true;
+      else if (o.w === oth) theirs = unpack(t, o.a) || theirs;
+    }
+    if (!mineThere) {
+      const put = await fetch(url, { method: "POST", body: await seal(r.room, { v: t.v, t: t.id, w: me, a: pack(r[me]) }) });
+      if (!put.ok) throw new Error("relais " + put.status);
+    }
+    const cur = results[t.id];
+    if (theirs && cur && cur.room && cur.room.r === r.room.r && !full(cur)) {
+      cur[oth] = theirs;
+      cur.at = new Date().toISOString();
+      store.set("results", results);
+    }
+    return full(results[t.id]);
+  }
+
+  /* Tant que la page d'attente est affichée, on repasse toutes les huit secondes. */
+  let syncRun = 0, syncTimer = null;
+  function setSync(text, err) {
+    const el = app.querySelector("[data-sync]");
+    if (el) { el.textContent = text; el.classList.toggle("is-err", !!err); }
+  }
+  function watch() {
+    clearTimeout(syncTimer);
+    const run = ++syncRun;
+    const m = /^rapport-([a-z0-9]+)$/.exec(route), t = m && BY_ID[m[1]], r = t && results[t.id];
+    if (!canRoom || !r || !r.room || full(r)) return;
+    const oth = nm(other(r.me));
+    const again = (ms) => { syncTimer = setTimeout(tick, ms); };
+    const tick = () => {
+      if (run !== syncRun) return;
+      if (document.hidden) return again(8000);
+      syncRoom(t).then((done) => {
+        if (run !== syncRun) return;
+        if (done) return render();
+        setSync("En attente des réponses " + de(oth) + ". Cette page se met à jour toute seule.");
+        again(8000);
+      }, () => {
+        if (run !== syncRun) return;
+        setSync("Connexion impossible pour l'instant. Nouvel essai dans quelques secondes.", true);
+        again(12000);
+      });
+    };
+    tick();
+  }
+  /* À l'ouverture du site : un passage pour chaque test resté en attente. */
+  function syncAll() {
+    if (!canRoom) return;
+    TESTS.forEach((t) => {
+      const r = results[t.id];
+      if (!r || !r.room || full(r) || route === "rapport-" + t.id) return;
+      syncRoom(t).then((done) => { if (done && (route === "" || route === "accueil")) render(true); }, () => {});
+    });
   }
 
   /* ---------- Session de réponses ---------- */
@@ -301,13 +462,21 @@
   }
 
   function start(t, mode) {
-    if (mode === "guest" && !(invite && invite.t === t.id)) return;
-    if (mode !== "guest") readNames();
     const n = t.questions.length;
-    session = {
-      t: t.id, mode, who: mode === "guest" ? "b" : "a", i: 0, phase: "quiz",
-      ans: { a: mode === "guest" ? invite.a : blank(n), b: blank(n) }
-    };
+    const inv = invite && invite.t === t.id ? invite : null;
+    if (mode === "guest" && !(inv && inv.a)) return;
+    if (mode === "join" && !(inv && inv.room)) return;
+    if (mode !== "guest" && mode !== "join") readNames();
+    if (mode === "room") {
+      /* Je lance le test : je crée le salon et j'invite l'autre avant de répondre. */
+      session = { t: t.id, mode: "room", me: "a", who: "a", i: 0, phase: "invite", room: newRoom(), ans: { a: blank(n), b: blank(n) } };
+    } else if (mode === "join") {
+      session = { t: t.id, mode: "room", me: "b", who: "b", i: 0, phase: "quiz", room: inv.room, ans: { a: blank(n), b: blank(n) } };
+      invite = null;
+      store.del("invite");
+    } else {
+      session = { t: t.id, mode, who: mode === "guest" ? "b" : "a", i: 0, phase: "quiz", ans: { a: mode === "guest" ? inv.a : blank(n), b: blank(n) } };
+    }
     saveSession();
     render();
   }
@@ -345,7 +514,14 @@
       render();
       return;
     }
-    results[t.id] = { v: t.v, at: new Date().toISOString(), a: s.ans.a, b: s.mode === "solo" ? null : s.ans.b, from: s.mode };
+    if (s.mode === "room") {
+      const r = { v: t.v, at: new Date().toISOString(), a: null, b: null, me: s.me, room: s.room, from: "room" };
+      r[s.me] = s.ans[s.me];
+      results[t.id] = r;
+    } else {
+      results[t.id] = { v: t.v, at: new Date().toISOString(), a: s.ans.a, b: s.mode === "solo" ? null : s.ans.b, from: s.mode };
+      if (s.mode === "solo") results[t.id].me = "a";
+    }
     store.set("results", results);
     if (s.mode === "guest") { invite = null; store.del("invite"); }
     dropSession();
@@ -464,10 +640,44 @@
       '<button class="btn small" type="submit">Ouvrir</button></form>';
   }
 
-  function shareBox(code, label) {
-    const val = canLink ? location.origin + location.pathname + "#c=" + code : code;
-    return '<div class="share"><label for="share-val">' + label + '</label><textarea id="share-val" readonly rows="' + (canLink ? 3 : 4) + '" spellcheck="false">' + esc(val) +
-      '</textarea><div class="share-row"><button class="btn small" type="button" data-act="copy">Copier</button><span class="share-msg" role="status"></span></div></div>';
+  function qrSvg(text) {
+    if (!hasQr()) return "";
+    try {
+      const qr = window.qrcode(0, "L");
+      qr.addData(text);
+      qr.make();
+      const n = qr.getModuleCount(), m = 4, size = n + 2 * m;
+      let d = "";
+      for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (qr.isDark(r, c)) d += "M" + (c + m) + " " + (r + m) + "h1v1h-1z";
+      return '<svg class="qr" viewBox="0 0 ' + size + " " + size + '" role="img" aria-label="QR code à scanner avec l\'appareil photo" shape-rendering="crispEdges"><rect class="qr-bg" width="' + size +
+        '" height="' + size + '"/><path class="qr-fg" d="' + d + '"/></svg>';
+    } catch (e) { return ""; }
+  }
+
+  /* Boîte de partage. o = { url | code, label, how, text }. Un lien se partage par QR code,
+     par la feuille de partage du téléphone ou par copie ; un code (page intégrée) se copie. */
+  function shareBox(o) {
+    if (!o.url) {
+      return '<div class="share"><p class="share-label">' + o.label + '</p><textarea readonly rows="4" spellcheck="false" aria-label="Code à copier">' + esc(o.code) +
+        '</textarea><div class="share-row"><button class="btn small" type="button" data-act="copy">Copier le code</button><span class="share-msg" role="status"></span></div></div>';
+    }
+    const qr = qrSvg(o.url), canShare = typeof navigator.share === "function";
+    return '<div class="share" data-url="' + esc(o.url) + '" data-text="' + esc(o.text || "") + '"><div class="share-main">' + (qr ? '<div class="qr-box">' + qr + "</div>" : "") +
+      '<div class="share-side"><p class="share-label">' + o.label + "</p>" + (o.how ? "<p>" + o.how + "</p>" : "") + '<div class="actions">' +
+      (canShare ? '<button class="btn small" type="button" data-act="share">Envoyer le lien</button>' : "") +
+      '<button class="btn small' + (canShare ? " alt" : "") + '" type="button" data-act="copy">Copier le lien</button></div><span class="share-msg" role="status"></span></div></div>' +
+      '<details class="share-raw"><summary>Voir le lien en entier</summary><textarea readonly rows="4" spellcheck="false" aria-label="Lien à copier">' + esc(o.url) + "</textarea></details></div>";
+  }
+
+  /* Invitation à rejoindre le test, partagée avant de répondre. */
+  function inviteBox(t, room) {
+    const B = esc(nm("b"));
+    return shareBox({
+      url: joinUrl(t, room),
+      label: "Le lien du test pour " + B,
+      how: hasQr() ? "Fais scanner ce QR code avec l'appareil photo de son téléphone, ou envoie le lien par message." : "Envoie ce lien par message.",
+      text: nm("a") + " t'invite à faire le test « " + t.title + " » en même temps"
+    });
   }
 
   const stChip = (st, text) => '<span class="st ' + st + '"><i aria-hidden="true">' + ST[st].g + "</i>" + text + "</span>";
@@ -489,8 +699,8 @@
   function card(t) {
     const r = results[t.id];
     let state = "";
-    if (r && !r.b) {
-      state = '<a class="card-state" href="#rapport-' + t.id + '">En attente ' + esc(de(nm("b"))) + " · reprendre</a>";
+    if (r && !full(r)) {
+      state = '<a class="card-state" href="#rapport-' + t.id + '">En attente ' + esc(de(nm(other(r.me || "a")))) + " · reprendre</a>";
     } else if (r) {
       state = '<a class="card-state" href="#rapport-' + t.id + '"><b>' + analyse(t, r.a, r.b).align + "\u00a0%</b> " + esc(t.simLabel) + " · " + shortDate(r.at) + " · voir le rapport</a>";
     }
@@ -509,7 +719,7 @@
       banner = '<aside class="banner"><p><b>' + esc(t.title) + "</b> est en cours : " + esc(nm(session.who)) + " en est à la question " + (session.i + 1) + " sur " + t.questions.length +
         '.</p><div class="banner-actions"><a class="btn small" href="#test-' + t.id + '">Reprendre</a><button class="link" type="button" data-act="drop">Abandonner</button></div></aside>';
     }
-    const done = TESTS.filter((t) => results[t.id] && results[t.id].b);
+    const done = TESTS.filter((t) => full(results[t.id]));
     const dash = done.length >= 2 ? '<section class="group"><h2 class="group-title">Vos résultats</h2><ul class="res">' + done.map((t) => {
       const p = analyse(t, results[t.id].a, results[t.id].b).align;
       return '<li><a href="#rapport-' + t.id + '">' + esc(t.title) + '</a><span class="track m" title="' + esc(t.title + " : " + p + " % " + t.simLabel) + '"><span class="bar" style="width:' + Math.max(p, 2) +
@@ -519,9 +729,11 @@
     return topbar(true) + '<main class="wrap">' +
       (ui.codeOpen ? '<section class="panel">' + codeForm("code-in", "Colle ici le code ou le lien que tu as reçu") + "</section>" : "") +
       '<section class="hero"><h1>Faites le point à deux.</h1><p class="sub">' + count +
-      " tests à passer chacun de son côté, puis un rapport qui compare vos réponses. Gratuit, sans compte, et vos réponses restent sur votre appareil.</p>" +
+      " tests à passer chacun de son côté, en même temps si vous voulez, puis un rapport qui compare vos réponses. Gratuit et sans compte.</p>" +
       namesForm("Premier prénom", "Second prénom") + "</section>" + banner + dash + groups +
-      '<footer class="foot"><p>Vos réponses sont enregistrées dans ce navigateur uniquement : rien n\'est envoyé sur un serveur.</p><p>Ces tests servent à ouvrir la discussion. Ils ne remplacent ni un diagnostic, ni une thérapie de couple.</p></footer></main>';
+      '<footer class="foot"><p>Vos réponses sont enregistrées dans ce navigateur. ' + (canRoom
+        ? "En mode « chacun sur son téléphone », elles passent, chiffrées, par un relais (ntfy.sh) qui ne peut pas les lire et qui les efface au bout de douze heures."
+        : "Rien n'est envoyé sur un serveur.") + '</p><p>Ces tests servent à ouvrir la discussion. Ils ne remplacent ni un diagnostic, ni une thérapie de couple.</p></footer></main>';
   }
 
   function vIntro(t) {
@@ -529,19 +741,25 @@
     const units = t.units || [t.dims.length, t.kind === "accord" ? "domaines" : "dimensions"];
     const facts = '<ul class="facts"><li><b>' + t.questions.length + "</b> questions</li><li><b>" + t.minutes + " min</b> chacun</li><li><b>" + units[0] + "</b> " + units[1] + "</li></ul>";
     let startHtml;
-    if (guest) {
+    if (guest && invite.room) {
+      startHtml = '<div class="invite"><p><b>' + esc(nm("a")) + "</b> t'invite à faire ce test en même temps, chacun sur son téléphone. Le rapport s'ouvrira tout seul quand vous aurez terminé tous les deux.</p></div>" +
+        '<div class="actions"><button class="btn" type="button" data-act="start" data-mode="join">Je suis ' + esc(nm("b")) + ", je commence</button></div>" +
+        '<p class="hint"><button class="link" type="button" data-act="decline">Ignorer cette invitation</button></p>';
+    } else if (guest) {
       startHtml = '<div class="invite"><p><b>' + esc(nm("a")) + "</b> a déjà répondu et t'invite à faire ce test. Vos réponses seront comparées dès que tu auras terminé.</p></div>" +
         '<div class="actions"><button class="btn" type="button" data-act="start" data-mode="guest">Je suis ' + esc(nm("b")) + ", je commence</button></div>" +
         '<p class="hint"><button class="link" type="button" data-act="decline">Ignorer cette invitation</button></p>';
     } else {
-      startHtml = namesForm("Qui répond en premier ?", "Et ensuite ?") +
-        '<div class="actions"><button class="btn" type="button" data-act="start" data-mode="same">Sur cet appareil, chacun son tour</button>' +
-        '<button class="btn alt" type="button" data-act="start" data-mode="solo">Chacun sur son appareil</button></div>' +
-        '<p class="hint">Chacun sur son appareil : tu réponds ici, puis tu envoies ' + (canLink ? "un lien" : "un code") + " à l'autre, qui répond de son côté.</p>";
+      startHtml = namesForm("Ton prénom", "Le prénom de l'autre") +
+        '<div class="actions"><button class="btn" type="button" data-act="start" data-mode="' + (canRoom ? "room" : "solo") + '">' + (canRoom ? "Chacun sur son téléphone, en même temps" : "Chacun sur son appareil") + "</button>" +
+        '<button class="btn alt" type="button" data-act="start" data-mode="same">Sur cet appareil, chacun son tour</button></div>' +
+        '<p class="hint">' + (canRoom
+          ? "Chacun sur son téléphone : tu obtiens tout de suite un lien et un QR code à partager. Vous répondez en même temps, et le rapport s'ouvre chez vous deux quand tout le monde a terminé. Vos réponses transitent chiffrées par un relais qui ne peut pas les lire."
+          : "Chacun sur son appareil : tu réponds ici, puis tu envoies " + (canLink ? "un lien" : "un code") + " à l'autre, qui répond de son côté.") + "</p>";
     }
     let prev = "";
-    if (r && r.b) prev = '<p class="prev">Vous avez déjà fait ce test le ' + longDate(r.at) + '. <a href="#rapport-' + t.id + '">Revoir le rapport</a>. Le refaire remplacera ce résultat.</p>';
-    else if (r) prev = '<p class="prev">Des réponses attendent déjà celles ' + esc(de(nm("b"))) + '. <a href="#rapport-' + t.id + '">Retrouver le code à envoyer</a>.</p>';
+    if (full(r)) prev = '<p class="prev">Vous avez déjà fait ce test le ' + longDate(r.at) + '. <a href="#rapport-' + t.id + '">Revoir le rapport</a>. Le refaire remplacera ce résultat.</p>';
+    else if (r) prev = '<p class="prev">Des réponses attendent déjà celles ' + esc(de(nm(other(r.me || "a")))) + '. <a href="#rapport-' + t.id + '">Retrouver la page d\'attente</a>.</p>';
     return topbar(false) + '<main class="wrap narrow intro"><div class="glyph big">' + glyph(t) + '</div><p class="eyebrow">' + esc(t.title) + "</p><h1>" + esc(t.hook) + "</h1>" +
       t.intro.map((p) => "<p>" + esc(p) + "</p>").join("") + facts + startHtml + prev + (t.note ? '<p class="note">' + esc(t.note) + "</p>" : "") + "</main>";
   }
@@ -568,7 +786,15 @@
       ".</h1><p>Passe l'appareil. Les réponses " + esc(de(nm("a"))) + ' restent cachées jusqu\'au rapport.</p><div class="actions"><button class="btn" type="button" data-act="resume">Je suis ' + esc(nm("b")) + ", je commence</button></div></main>";
   }
 
-  function profileBars(t, pa, pb, withText) {
+  function vInvite(t) {
+    const B = esc(nm("b"));
+    return topbar(false) + '<main class="wrap narrow intro"><div class="glyph big">' + glyph(t) + '</div><p class="eyebrow">' + esc(t.title) + "</p><h1>Invite " + B + " à répondre en même temps.</h1><p>" + B +
+      " ouvre ce lien sur son téléphone et répond de son côté. Le rapport s'ouvrira tout seul, chez vous deux, quand vous aurez terminé l'un et l'autre.</p>" + inviteBox(t, session.room) +
+      '<div class="actions"><button class="btn" type="button" data-act="resume">Commencer mes réponses</button></div><p class="hint">Tu peux commencer sans attendre : ' + B +
+      " peut rejoindre le test à tout moment.</p></main>";
+  }
+
+  function profileBars(t, pa, pb, withText, solo) {
     return '<div class="pairs">' + t.dims.map((d) => {
       const row = (k, v) => v == null ? "" : '<span class="bar-who"><i class="sw ' + k + '"></i>' + esc(nm(k)) + '</span><span class="track ' + k + '" title="' + esc(nm(k) + " : " + v + " sur 100") + '"><span class="bar" style="width:' + Math.max(v, 2) +
         '%"></span></span><span class="num">' + v + '</span><span class="lvl">' + esc(H.level(t, v)) + "</span>";
@@ -579,21 +805,33 @@
         const tpl = Math.abs(sa - sb) >= 20 && d.gap ? d.gap : sa >= 60 && sb >= 60 && d.both ? d.both : sa < 40 && sb < 40 && d.none ? d.none : "Vous êtes proches sur ce point.";
         text = '<p class="pair-text">' + esc(fill(tpl, map)) + "</p>";
       }
-      return '<div class="pair"><h3>' + esc(d.name) + '</h3><p class="pair-desc">' + esc(d.desc || "") + '</p><div class="bars">' + row("a", pa[d.id]) + (pb ? row("b", pb[d.id]) : "") + "</div>" + text + "</div>";
+      return '<div class="pair"><h3>' + esc(d.name) + '</h3><p class="pair-desc">' + esc(d.desc || "") + '</p><div class="bars">' + (pb ? row("a", pa[d.id]) + row("b", pb[d.id]) : row(solo || "a", pa[d.id])) + "</div>" + text + "</div>";
     }).join("") + "</div>";
   }
 
   function vWait(t, r) {
-    const B = esc(nm("b"));
-    const how = canLink
-      ? B + " ouvre le lien, répond aux mêmes questions, puis voit le rapport."
-      : B + " ouvre cette page, touche « J'ai reçu un code », colle le code, puis répond aux mêmes questions.";
-    return topbar(false) + '<main class="wrap narrow wait"><p class="eyebrow">' + esc(t.title) + "</p><h1>Tes réponses sont enregistrées.</h1><p>Il manque celles " + esc(de(nm("b"))) + ". " + how + "</p>" +
-      shareBox(codeFor(t, r), canLink ? "Lien à envoyer à " + B : "Code à envoyer à " + B) +
-      "<h2>Quand " + B + " a terminé</h2><p>" + B + " peut te renvoyer " + (canLink ? "un lien" : "un code") + " depuis son rapport. Ouvre-le ou colle-le ici pour voir le rapport sur cet appareil.</p>" +
-      codeForm("code-back", "Code ou lien reçu en retour") +
-      (t.kind === "profil" ? "<h2>Ton profil en attendant</h2>" + profileBars(t, profile(t, r.a), null, false) : "") +
+    const me = r.me || "a", oth = other(me), O = esc(nm(oth));
+    const head = topbar(false) + '<main class="wrap narrow wait"><p class="eyebrow">' + esc(t.title) + "</p><h1>Tes réponses sont enregistrées.</h1>";
+    const tail = (t.kind === "profil" ? "<h2>Ton profil en attendant</h2>" + profileBars(t, profile(t, r[me]), null, false, me) : "") +
       '<p class="prev"><a href="#test-' + t.id + '">Recommencer ce test</a></p></main>';
+    const manual = shareBox(canLink
+      ? {
+        url: codeUrl(codeFor(t, r)),
+        label: "Tes réponses, pour " + O,
+        how: (hasQr() ? O + " scanne ce QR code ou ouvre le lien" : O + " ouvre ce lien") + " : s'il lui reste à répondre, le test s'ouvre ; sinon le rapport s'affiche, avec un lien à te renvoyer.",
+        text: nm(me) + " t'envoie ses réponses au test « " + t.title + " »"
+      }
+      : { code: codeFor(t, r), label: "Code à envoyer à " + O });
+    const back = codeForm("code-back", (canLink ? "Lien" : "Code") + " reçu en retour");
+    if (r.room && canRoom) {
+      return head + "<p>Le rapport s'ouvrira tout seul, ici et chez " + O + ", dès que " + O + " aura terminé. Tu peux laisser cette page ouverte ou y revenir plus tard.</p>" +
+        '<p class="sync" role="status" data-sync>Recherche des réponses ' + esc(de(nm(oth))) + "…</p>" +
+        (me === "a" ? '<details class="more"><summary>' + O + " n'a pas encore le lien du test ?</summary>" + inviteBox(t, r.room) + "</details>" : "") +
+        '<details class="more"><summary>Le rapport ne s\'ouvre pas ?</summary><p>Vous pouvez réunir vos réponses à la main.</p>' + manual + back + "</details>" + tail;
+    }
+    return head + "<p>Il manque celles " + esc(de(nm(oth))) + ". " +
+      (canLink ? "" : O + " ouvre cette page, touche « J'ai reçu un code », colle le code, puis répond aux mêmes questions.") + "</p>" + manual +
+      "<h2>Quand " + O + " a terminé</h2><p>" + O + " te renvoie " + (canLink ? "un lien" : "un code") + " depuis son rapport. Ouvre-le sur cet appareil, ou colle-le ici.</p>" + back + tail;
   }
 
   function verdictBlock(t, an) {
@@ -683,8 +921,14 @@
     }
 
     if (r.from === "guest") {
-      h += '<section class="panel"><p><b>Dernière étape :</b> renvoie ce ' + (canLink ? "lien" : "code") + " à " + N.a + " pour que le rapport s'ouvre aussi de son côté.</p>" +
-        shareBox(codeFor(t, r), (canLink ? "Lien" : "Code") + " du rapport") + "</section>";
+      h += '<section class="panel">' + shareBox(canLink
+        ? {
+          url: codeUrl(codeFor(t, r)),
+          label: "Dernière étape : le rapport pour " + N.a,
+          how: (hasQr() ? N.a + " scanne ce QR code ou ouvre le lien" : "Renvoie ce lien à " + N.a) + ", et le rapport s'affiche aussi de son côté.",
+          text: "Notre rapport « " + t.title + " » est prêt"
+        }
+        : { code: codeFor(t, r), label: "Dernière étape : renvoie ce code à " + N.a + " pour que le rapport s'ouvre aussi de son côté" }) + "</section>";
     }
 
     h += '<section class="hero-block"><div class="hero-fig"><div class="venn-box">' + venn(an.align) + '</div><div class="hero-txt"><p class="hero-num">' + an.align + '<span>\u00a0%</span></p><p class="hero-lab">' + esc(t.simLabel) +
@@ -778,7 +1022,7 @@
     if (r.from !== "guest") {
       h += "<h2>Garder ce rapport</h2><p class=\"sec-sub\">Ce " + (canLink ? "lien" : "code") + " contient vos deux séries de réponses. " +
         (canLink ? "Ouvert sur un autre appareil, il affiche le même rapport." : "Collé dans « J'ai reçu un code » sur un autre appareil, il rouvre le même rapport.") + "</p>" +
-        shareBox(codeFor(t, r), (canLink ? "Lien" : "Code") + " du rapport");
+        shareBox(canLink ? { url: codeUrl(codeFor(t, r)), label: "Lien du rapport", text: "Notre rapport « " + t.title + " »" } : { code: codeFor(t, r), label: "Code du rapport" });
     }
     h += '<p class="prev"><a href="#test-' + t.id + '">Refaire ce test</a> · <a href="#accueil">Choisir un autre test</a></p></section>';
     return h + "</main>";
@@ -790,10 +1034,10 @@
     const t = m && BY_ID[m[2]];
     let html;
     if (t && m[1] === "test") {
-      html = session && session.t === t.id ? (session.phase === "handoff" ? vHandoff(t) : vQuiz(t)) : vIntro(t);
+      html = session && session.t === t.id ? (session.phase === "handoff" ? vHandoff(t) : session.phase === "invite" ? vInvite(t) : vQuiz(t)) : vIntro(t);
     } else if (t && m[1] === "rapport") {
       const r = results[t.id];
-      html = !r ? vIntro(t) : r.b ? vReport(t, r) : vWait(t, r);
+      html = !r ? vIntro(t) : full(r) ? vReport(t, r) : vWait(t, r);
     } else {
       html = vHome();
     }
@@ -801,6 +1045,7 @@
     if (!keepScroll) window.scrollTo(0, 0);
     const f = app.querySelector("[data-focus]");
     if (f) { try { f.focus({ preventScroll: true }); } catch (e) { /* sans importance */ } }
+    watch();
   }
 
   function go(h) {
@@ -812,6 +1057,7 @@
   function boot() {
     let h = location.hash.slice(1);
     try { h = decodeURIComponent(h); } catch (e) { /* hash laissé tel quel */ }
+    if (h.indexOf("j=") === 0) { importJoin(h.slice(2)); return; }
     if (h.indexOf("c=") === 0) { importCode(h.slice(2)); return; }
     route = h;
     render();
@@ -821,11 +1067,12 @@
   (function sanitize() {
     Object.keys(results).forEach((id) => {
       const t = BY_ID[id], r = results[id];
-      const ok = t && r && r.v === t.v && Array.isArray(r.a) && r.a.length === t.questions.length && (!r.b || r.b.length === t.questions.length);
+      const arr = (x) => x == null || (Array.isArray(x) && x.length === t.questions.length);
+      const ok = t && r && r.v === t.v && (r.a || r.b) && arr(r.a) && arr(r.b);
       if (!ok) delete results[id];
     });
     if (session && !(BY_ID[session.t] && session.ans && session.ans.a && session.ans.a.length === BY_ID[session.t].questions.length)) dropSession();
-    if (invite && !(BY_ID[invite.t] && Array.isArray(invite.a) && invite.a.length === BY_ID[invite.t].questions.length)) { invite = null; store.del("invite"); }
+    if (invite && !(BY_ID[invite.t] && ((invite.room && invite.room.r && invite.room.k) || (Array.isArray(invite.a) && invite.a.length === BY_ID[invite.t].questions.length)))) { invite = null; store.del("invite"); }
   })();
 
   /* ---------- Événements ---------- */
@@ -846,9 +1093,29 @@
     else if (act === "resume" && session) { session.phase = "quiz"; saveSession(); render(); }
     else if (act === "copy") {
       const box = el.closest(".share"), ta = box.querySelector("textarea"), msg = box.querySelector(".share-msg");
-      const done = () => { msg.textContent = "Copié."; };
-      const manual = () => { ta.focus(); ta.select(); msg.textContent = "Sélectionné : copie-le avec Ctrl ou Cmd + C."; };
+      const what = box.hasAttribute("data-url") ? "lien" : "code";
+      const done = () => { msg.textContent = "Copié : colle-le dans un message."; };
+      const manual = () => {
+        const det = ta.closest("details");
+        if (det) det.open = true;
+        ta.focus();
+        try { ta.setSelectionRange(0, ta.value.length); } catch (err) { ta.select(); }
+        let ok = false;
+        try { ok = document.execCommand("copy"); } catch (err) { ok = false; }
+        if (ok) return done();
+        msg.textContent = window.matchMedia && window.matchMedia("(pointer: coarse)").matches
+          ? "Le " + what + " est affiché juste en dessous : appuie longuement dessus, puis choisis Copier."
+          : "Le " + what + " est sélectionné : copie-le avec Ctrl ou Cmd + C.";
+      };
       try { navigator.clipboard.writeText(ta.value).then(done, manual); } catch (err) { manual(); }
+    }
+    else if (act === "share") {
+      const box = el.closest(".share");
+      const fallback = () => { const c = box.querySelector('[data-act="copy"]'); if (c) c.click(); };
+      try {
+        navigator.share({ title: "Entre Nous", text: box.getAttribute("data-text") || "", url: box.getAttribute("data-url") })
+          .catch((err) => { if (!err || err.name !== "AbortError") fallback(); });
+      } catch (err) { fallback(); }
     }
   });
 
@@ -875,5 +1142,8 @@
     if (h !== route) boot();
   });
 
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) watch(); });
+
   boot();
+  syncAll();
 })();
