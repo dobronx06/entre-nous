@@ -1,0 +1,62 @@
+/* Le blind test du couple. */
+.chanson { flex: 1 1 auto; display: flex; flex-direction: column; gap: 1rem; }
+/* Un titre ou un prénom sans espace passe à la ligne au lieu de faire défiler la page de côté. */
+.chanson .g-title, .chanson .g-lead, .chanson .hint, .chanson .eyebrow, .chanson .sync, .chanson-q, .chanson-guess, .chanson-hint, .chanson-title { overflow-wrap: anywhere; }
+.chanson-top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.2rem 1rem; }
+.chanson-step { font: 600 0.78rem var(--body); letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+.chanson-score { font-size: 0.9rem; color: var(--ink-2); }
+.chanson-score b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.chanson-who { display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; color: var(--ink-2); }
+.chanson .g-who { background: var(--who-soft); }
+.chanson-q { font-size: 0.95rem; color: var(--ink-2); }
+
+/* Saisie : trois champs étiquetés, puis la rangée de boutons. */
+.chanson-form { flex: 1 1 auto; display: flex; flex-direction: column; gap: 0.8rem; }
+.chanson-label { display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.9rem; font-weight: 600; color: var(--ink); }
+.chanson-label i { font-style: normal; font-weight: 400; color: var(--muted); }
+.chanson .g-field { font-size: max(16px, 1.05rem); }
+.chanson .g-field::placeholder { color: var(--muted); opacity: 1; }
+.chanson-chat { margin-top: -0.4rem; }
+
+/* La carte de l'indice, puis de la chanson révélée. */
+.chanson-card { min-height: 0; gap: 0.5rem; padding: 1.1rem 1.2rem; }
+.chanson-card .g-who { padding: 0; background: none; }
+.chanson-card .eyebrow { color: var(--ink-2); }
+.chanson-artist { font-weight: 600; color: var(--ink-2); }
+.chanson-hint { font-style: italic; color: var(--ink-2); }
+.chanson-guess { font-size: 1rem; color: var(--ink-2); }
+.chanson-verdict { font-size: clamp(1.55rem, 6vw, 2.4rem); }
+.chanson-ask { display: flex; flex-direction: column; align-items: flex-start; }
+@media (prefers-reduced-motion: no-preference) {
+  .chanson-reveal.is-new { animation: chanson-in 0.35s ease-out backwards; }
+  @keyframes chanson-in { from { opacity: 0.3; transform: translateY(8px) scale(0.98); } }
+}
+
+/* Fin de partie et « Nos playlists » */
+.chanson .g-big span { font-size: 0.42em; font-weight: 600; letter-spacing: 0; color: var(--muted); }
+.chanson-h2 { margin-top: 0.6rem; font: 700 1.3rem/1.2 var(--display); letter-spacing: -0.015em; color: var(--ink); }
+.chanson-list { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+.chanson-list > li { display: flex; flex-direction: column; gap: 0.7rem; padding-block: 0.9rem; border-top: 1px solid var(--line); }
+.chanson-song { display: flex; flex-direction: column; align-items: flex-start; gap: 0.2rem; min-width: 0; }
+.chanson-song .g-who { margin-bottom: 0.15rem; }
+.chanson-keep .g-who.a { background: var(--a-soft); }
+.chanson-keep .g-who.b { background: var(--b-soft); }
+.chanson-title { font-weight: 650; color: var(--ink); }
+.chanson-title .chanson-artist { font-weight: 500; }
+.chanson-song .chanson-hint { font-size: 0.92rem; }
+.chanson-links { display: flex; flex-wrap: wrap; gap: 0 1.2rem; }
+.chanson-links a { color: var(--ink-2); font-size: 0.9rem; font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+.chanson-links a:hover { color: var(--ink); }
+.chanson-copy { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.9rem; }
+.chanson-copy .btn { min-height: 44px; }
+.chanson-msg { font-size: 0.9rem; color: var(--ink-2); }
+.chanson-text { flex: 1 1 100%; min-height: 9rem; font-size: 16px; resize: vertical; }
+.chanson-old { padding-block: 0.6rem; border-top: 1px solid var(--line); }
+.chanson-old > summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; font-weight: 600; color: var(--ink); }
+.chanson-old > * + * { margin-top: 0.6rem; }
+/* Écran court : on resserre, pour que le champ de réponse reste au-dessus de la rangée de boutons. */
+@media (max-height: 620px) {
+  .game > .chanson { gap: 0.7rem; }
+  .chanson-card .g-card-text { font-size: 1.2rem; }
+  .chanson .g-title { font-size: 1.55rem; }
+}
