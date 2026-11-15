@@ -1,0 +1,69 @@
+/* Les cartes à piocher. */
+/* Une colonne plus étroite que la page : sur un grand écran, la carte garde des proportions de carte.
+   Chaque écran du jeu descend jusqu'au bas de l'écran (4rem : l'en-tête du jeu et la marge du haut, à un ou deux
+   pixels près, en trop plutôt qu'en moins) : la rangée de boutons reste collée en bas, au même endroit d'une carte
+   à l'autre et d'un écran à l'autre, et « Arrêter la partie » passe en dessous, hors de portée d'un toucher de trop. */
+.cartes { flex: 1 1 auto; display: flex; flex-direction: column; gap: 1rem; width: 100%; max-width: 30rem; min-height: calc(100vh - 4rem); min-height: calc(100dvh - 4rem); margin-inline: auto; }
+.cartes-step { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; font: 600 0.78rem var(--body); letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+.cartes-count { flex: none; font-variant-numeric: tabular-nums; }
+/* « changer » garde l'allure de la ligne. Sa zone de toucher de 44 px déborde autour du mot sans le grossir,
+   pour que le contour du focus reste au bord du mot. */
+.cartes-step .link { position: relative; padding: 0; font-size: inherit; letter-spacing: inherit; text-transform: inherit; color: inherit; }
+.cartes-step .link::after { content: ""; position: absolute; inset: -0.95rem -0.6rem; }
+/* En attendant l'autre : un prénom long et sans césure passe à la ligne au lieu d'élargir la page. */
+.cartes .g-wait { overflow-wrap: anywhere; }
+
+/* La pile : tant qu'il reste des cartes à piocher, deux d'entre elles dépassent sous celle du dessus, une par encre.
+   Elles ne se mélangent pas comme ailleurs : la carte qui glisse découvrirait un instant leur recouvrement, trop sombre ou trop clair. */
+.cartes-stack { position: relative; flex: 1 1 auto; display: flex; margin: 0.6rem; isolation: isolate; }
+.cartes-stack::before, .cartes-stack::after { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: 22px; }
+.cartes-stack::before { background: var(--a); transform: rotate(-2.2deg); }
+.cartes-stack::after { background: var(--b); transform: rotate(1.8deg); }
+.cartes-stack[data-left="0"]::before, .cartes-stack[data-left="0"]::after, .cartes-stack[data-left="1"]::after { content: none; }
+
+/* La carte du dessus : l'encre de la personne à qui elle s'adresse, neutre quand elle est pour les deux.
+   Sur deux téléphones, un liseré marque celles qui sont pour moi. Le navigateur garde le défilement
+   vertical et le zoom à deux doigts ; le glissement de côté revient au jeu. */
+.cartes-card { flex: 1 1 auto; justify-content: flex-start; min-width: 0; min-height: 0; padding: 1.3rem 1.4rem 2rem; touch-action: pan-y pinch-zoom; }
+.cartes-card.me { border-color: var(--who); box-shadow: inset 0 0 0 1px var(--who); }
+.cartes-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.6rem; }
+.cartes-for { display: inline-flex; align-items: baseline; gap: 0.5rem; min-width: 0; font-weight: 600; line-height: 1.35; color: var(--ink); overflow-wrap: anywhere; }
+.cartes-inks { flex: none; display: inline-flex; isolation: isolate; }
+.cartes-inks .sw { mix-blend-mode: var(--blend); }
+.cartes-inks .sw + .sw { margin-left: -0.25rem; }
+.cartes-card .g-tag { flex: none; margin-top: 0.05rem; background: var(--surface); }
+.cartes-card[data-t="d"] .g-tag { background: var(--btn); color: var(--btn-fg); }
+.cartes-card[data-t="2"] .g-tag { background: var(--wash); }
+.cartes-text { margin-block: auto; font-size: clamp(1.55rem, 7.4vw, 2.3rem); line-height: 1.14; }
+.cartes-text.long { font-size: clamp(1.3rem, 5.6vw, 1.75rem); line-height: 1.2; }
+/* La carte piochée glisse en place depuis le côté d'où elle vient, sans fondu : en transparence,
+   les cartes du dessous se verraient au travers. */
+@media (prefers-reduced-motion: no-preference) {
+  .cartes-card.next, .cartes-card.back { animation: cartes-in 0.26s cubic-bezier(0.2, 0.8, 0.3, 1); }
+  .cartes-card.back { --from: -1; }
+  @keyframes cartes-in { from { transform: translateX(calc(var(--from, 1) * 1.1rem)) rotate(calc(var(--from, 1) * 1.2deg)); } }
+}
+
+/* « Précédente » reste discrète : toute la largeur qui reste va à la carte suivante, sous le pouce. */
+.cartes .g-actions .btn { padding-inline: 1rem; }
+.cartes .g-actions .btn.alt { flex: 0 1 auto; }
+
+/* Choix d'un paquet (fin du paquet, changement en route) : une page comme les autres, sur toute la colonne. */
+.cartes-end { max-width: none; gap: 1.1rem; padding-top: 1rem; }
+.cartes-end .g-choice[aria-pressed="true"] .g-tag { background: var(--surface); }
+
+/* Écran moins haut : sur le choix d'un paquet, l'emblème laisse sa place aux paquets, qui tiennent ainsi au-dessus de la rangée du bas. */
+@media (max-height: 44rem) {
+  .cartes-end .glyph { display: none; }
+}
+/* Écran bas (petit téléphone, téléphone couché) : les marges se resserrent et le texte de la carte suit aussi la hauteur,
+   pour que la carte entière tienne au-dessus des boutons au lieu de passer dessous. */
+@media (max-height: 36rem) {
+  .cartes:not(.cartes-end) { gap: 0.5rem; max-width: 40rem; }
+  .cartes-stack { margin: 0.3rem 0.6rem; }
+  .cartes-card { gap: 0.4rem; padding: 0.7rem 1.2rem 0.9rem; }
+  .cartes-text { font-size: clamp(1.2rem, min(7.4vw, 7vh), 1.75rem); }
+  .cartes-text.long { font-size: clamp(1.1rem, min(6.5vw, 4vh), 1.4rem); }
+  .cartes .g-actions { padding-block: 0.4rem max(0.4rem, env(safe-area-inset-bottom, 0px)); }
+  .cartes-end { gap: 0.7rem; padding-top: 0.25rem; }
+}
