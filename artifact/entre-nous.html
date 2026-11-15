@@ -882,6 +882,66 @@ main[data-game="match"] { overflow-x: clip; }
 .quiest-chip.b { background: var(--b-soft); }
 .quiest-tag { white-space: normal; }
 .quiest .g-choice[aria-current="true"] { border-color: var(--ink); background: var(--wash); }
+
+/* L'histoire à quatre mains. */
+.histoire { flex: 1 1 auto; display: flex; flex-direction: column; gap: 1rem; }
+/* Une phrase sans espace (ou un prénom très long) passe à la ligne au lieu de faire défiler la page de côté. */
+.histoire .g-title, .histoire .g-lead, .histoire .hint, .histoire .sync, .histoire-start, .histoire-prev, .histoire-text, .histoire-old summary { overflow-wrap: anywhere; }
+.histoire-step { font: 600 0.78rem var(--body); letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+.histoire .progress { margin-top: -0.5rem; }
+.histoire-who { display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; color: var(--ink-2); }
+.histoire .g-who { background: var(--who-soft); }
+
+/* La phrase à continuer : une carte compacte, pour que le champ reste au-dessus du clavier. */
+.histoire-card { justify-content: flex-start; gap: 0.6rem; min-height: 0; padding: 1rem 1.1rem; }
+.histoire-card .g-card-text { font-size: clamp(1.15rem, 4.6vw, 1.45rem); line-height: 1.3; }
+.histoire-by { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; font-size: 0.88rem; font-weight: 600; color: var(--ink-2); }
+.histoire-by .g-who { padding: 0; background: none; }
+.histoire-start { font-size: 0.92rem; line-height: 1.45; color: var(--ink-2); }
+.histoire-start .eyebrow { display: block; margin-bottom: 0.15rem; }
+.histoire-form { flex: 1 1 auto; display: flex; flex-direction: column; gap: 0.6rem; }
+.histoire-field { min-height: 7.5rem; line-height: 1.4; resize: vertical; }
+.histoire-field::placeholder { color: var(--muted); opacity: 1; }
+.histoire-count { font-variant-numeric: tabular-nums; }
+/* Écran court (petit téléphone, barres du navigateur comprises) : on resserre pour que le champ reste visible. */
+@media (max-height: 620px) {
+  .game > .histoire { gap: 0.7rem; }
+  .histoire-start { font-size: 0.85rem; line-height: 1.35; }
+  .histoire-form .histoire-card, .histoire > .histoire-card { padding: 0.75rem 0.9rem; }
+  .histoire-card .g-card-text { font-size: 1.05rem; }
+  .histoire-field { min-height: 5rem; }
+}
+
+/* Lecture : la phrase d'avant, en retrait, puis la phrase du moment dans l'encre de qui l'a écrite. */
+.histoire-prev { font-size: 0.95rem; line-height: 1.45; color: var(--muted); font-style: italic; }
+.histoire-now { outline-offset: 4px; border-radius: 22px; }
+.histoire-now .histoire-card { min-height: 11rem; justify-content: center; padding: 1.4rem 1.3rem; }
+.histoire-now .g-card-text { font-size: clamp(1.3rem, 5.4vw, 1.75rem); }
+/* Un bouton inerte une demi-seconde (double toucher) : cela ne doit pas se voir. */
+.histoire .g-actions .btn:disabled, .histoire .g-pass .btn:disabled { opacity: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .histoire-now .histoire-card { animation: histoire-in 0.3s ease-out backwards; }
+  @keyframes histoire-in { from { opacity: 0.3; transform: translateY(8px); } }
+}
+
+/* L'histoire entière : chaque phrase surlignée de l'encre de son auteur. */
+.histoire-legend { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.histoire-legend .g-who.a { background: var(--a-soft); }
+.histoire-legend .g-who.b { background: var(--b-soft); }
+.histoire-text { font: 500 1.12rem/1.75 var(--body); color: var(--ink); }
+.histoire-s.as-a, .histoire-s.as-b { padding: 0.12em 0.2em; border-radius: 6px; background: var(--who-soft); -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.histoire-keep { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.9rem; }
+.histoire-keep .btn { min-height: 44px; }
+.histoire-msg { font-size: 0.9rem; color: var(--ink-2); }
+.histoire-msg:empty { display: none; }
+.histoire-raw { flex: 1 1 100%; font-size: 1rem; }
+.histoire .g-choice[aria-current="true"] { border-color: var(--ink); background: var(--wash); }
+
+/* « Nos histoires », sur la présentation */
+.histoire-kept .histoire-old { padding-block: 0.6rem; border-top: 1px solid var(--line); }
+.histoire-old summary { display: flex; align-items: center; min-height: 44px; cursor: pointer; font-weight: 600; color: var(--ink); }
+.histoire-old > * + * { margin-top: 0.7rem; }
+.histoire-old .histoire-text { font-size: 1rem; line-height: 1.7; }
 </style>
 <div id="app"></div>
 <script>
@@ -5194,6 +5254,355 @@ main[data-game="match"] { overflow-x: clip; }
       /* La question n'entre en glissant qu'à sa première apparition, pas quand l'autre téléphone écrit. */
       const key = g.gen + ":" + g.setup.seed + ":" + card.closest("[data-screen]").getAttribute("data-screen");
       if (key !== shownQ) { shownQ = key; card.classList.add("is-new"); }
+    }
+  });
+})();
+</script>
+<script>
+/* L'histoire à quatre mains : les premières phrases, une par histoire, tirée au hasard.
+   Dix par genre, dans l'ordre : aventure, romance, absurde, policier, conte, science-fiction.
+   Aucune ne parle des joueurs : ce sont eux qui écrivent la suite. */
+(window.GAME_DATA = window.GAME_DATA || {}).histoire = {
+  starts: [
+    /* Aventure */
+    "La carte ne montrait qu'une croix, un chiffre et le mot « marée ».",
+    "Au troisième jour de marche, la boussole se mit à indiquer le sud avec beaucoup d'insistance.",
+    "Le radeau tenait encore, mais plus personne ne savait de quel côté se trouvait la côte.",
+    "Tout en haut du phare abandonné, une lampe venait de s'allumer toute seule.",
+    "Le guide s'arrêta au bord du ravin et sortit de son sac une corde beaucoup trop courte.",
+    "Au milieu de la jungle, le sentier s'arrêtait devant une porte en bois, sans aucun mur autour.",
+    "La montgolfière avait quitté le sol avec une heure d'avance, et sans son pilote.",
+    "Sous le sable du désert, la pelle heurta quelque chose de creux qui sonna comme une cloche.",
+    "Le dernier train pour la vallée partit sans siffler, et les voyageurs comprirent vite qu'il n'allait pas dans la vallée.",
+    "La grotte respirait : un souffle tiède en sortait toutes les dix secondes.",
+
+    /* Romance */
+    "Chaque matin, au même arrêt de bus, deux inconnus s'échangeaient un livre sans jamais se parler.",
+    "Le message arriva à 2 h 14, avec une seule phrase : « Tu te souviens de la fête foraine ? »",
+    "La lettre avait mis quarante ans à traverser la ville.",
+    "Sur le banc du parc, quelqu'un avait gravé deux initiales et une date qui n'était pas encore arrivée.",
+    "Chaque vendredi, la commande de 18 heures contenait un petit mot plié en quatre, que personne ne réclamait.",
+    "Il pleuvait si fort que les deux personnes abritées sous le même porche finirent par se raconter leur vie.",
+    "Le jour du mariage, les alliances avaient disparu, et le chien avait l'air très content de lui.",
+    "Dans la librairie, un marque-page portait un numéro de téléphone et le mot « peut-être ».",
+    "On s'était promis de se retrouver en haut de la tour, dix ans plus tard, jour pour jour.",
+    "La danse devait durer trois minutes, mais l'orchestre décida de ne plus jamais s'arrêter.",
+
+    /* Absurde */
+    "Le lundi matin, toutes les chaussettes de la ville se réveillèrent dépareillées.",
+    "Le pigeon qui entra dans la banque demanda à parler au directeur.",
+    "Depuis mardi, le frigo ne s'ouvrait plus qu'à ceux qui connaissaient le mot de passe.",
+    "La mairie annonça que, pour des raisons de sécurité, la gravité serait coupée de 14 h à 16 h.",
+    "Ce matin-là, le parapluie refusa de s'ouvrir, au motif qu'il n'aimait pas la pluie.",
+    "La course d'escargots durait depuis trois semaines, et le suspense était insoutenable.",
+    "Le gâteau d'anniversaire avait sa propre opinion sur le nombre de bougies.",
+    "Chaque fois que quelqu'un éternuait dans le village, une note de piano sortait de la fontaine.",
+    "L'ascenseur s'arrêta entre deux étages et proposa poliment une partie de cartes.",
+    "Le nuage qui suivait la voiture depuis Lyon commençait à devenir collant.",
+
+    /* Policier */
+    "La seule pièce à conviction était un gâteau au chocolat, et il en manquait exactement la moitié.",
+    "Le détective remarqua tout de suite que l'horloge du salon tournait à l'envers.",
+    "Personne n'était descendu du train, et pourtant le contrôleur comptait un passager de moins.",
+    "La seule trace laissée par le cambrioleur était une tasse de thé encore tiède.",
+    "Au commissariat, le seul témoin était un perroquet, et il ne parlait qu'espagnol.",
+    "Le tableau volé fut rendu le lendemain, avec un petit mot : « Pas assez bleu. »",
+    "Chaque nuit à 3 h, une lumière s'allumait au troisième étage, dans un appartement vide depuis des années.",
+    "L'empreinte retrouvée dans la boue n'était ni humaine ni animale : c'était celle d'une pantoufle.",
+    "Sur le quai, une valise rouge attendait, étiquetée au nom de quelqu'un qui n'existait pas.",
+    "Le maître d'hôtel jurait n'avoir rien entendu, mais ses chaussures étaient trempées.",
+
+    /* Conte */
+    "Il était une fois un royaume où il était interdit de rire le mardi.",
+    "Au fond de la forêt vivait une sorcière qui ne savait préparer que des crêpes.",
+    "Le dragon du village avait peur du noir, ce qui posait de sérieux problèmes en hiver.",
+    "Un jour, la couronne du roi tomba dans une flaque, et la flaque refusa de la rendre.",
+    "Un matin, un petit renard trouva une clé dorée plantée dans le tronc d'un chêne.",
+    "Dans un château bien trop grand vivait un fantôme très timide, qui s'excusait à chaque courant d'air.",
+    "La fée avait accordé trois vœux, mais elle avait oublié de préciser qu'ils s'exauceraient à l'envers.",
+    "Tout en haut de la montagne, un géant cultivait des nuages dans son potager.",
+    "Le meunier découvrit que, la nuit, son moulin moulait des étoiles au lieu du blé.",
+    "Il était une fois un ours qui voulait apprendre à tricoter, et toute la forêt avait son avis là-dessus.",
+
+    /* Science-fiction */
+    "Le vaisseau se posa dans le jardin et demanda, très poliment, où se trouvaient les toilettes.",
+    "En 2147, la dernière boulangerie de la Terre ouvrit ses portes sur la Lune.",
+    "Le robot ménager venait de démissionner, en laissant une lettre de trois pages.",
+    "Le signal venait d'une étoile éteinte depuis mille ans, et il disait « Bonjour ».",
+    "Quand le téléporteur rendit enfin le chat, il était clair que l'animal avait visité d'autres planètes.",
+    "À bord de la station, quelqu'un avait arrosé la plante, et la plante avait grandi de trois mètres en une nuit.",
+    "Le jour où les machines à café prirent le pouvoir, tout le monde fut d'abord plutôt soulagé.",
+    "L'ordinateur de bord annonça calmement qu'il restait quatre minutes avant la fin de l'univers, à peu près.",
+    "Sur Mars, la première tempête de neige fit la une de tous les journaux de la Terre.",
+    "La machine à remonter le temps marchait parfaitement, sauf qu'elle ne remontait que de onze minutes."
+  ]
+};
+</script>
+<script>
+/* L'histoire à quatre mains : une première phrase tirée au sort, puis une phrase chacun, à tour de rôle.
+   Chacun ne voit que la dernière phrase de l'autre (et la première de l'histoire), jamais le reste.
+   Tranche d'un joueur : { s: [ses phrases, dans l'ordre], fin: 1 }. Chaque phrase part une seule fois, au
+   moment où elle est écrite. L'ordre de passage se déduit des deux comptes : qui commence dépend de la seed,
+   puis on alterne ; c'est à celui qui a le moins de phrases (à égalité, à celui qui a commencé).
+   fin : ce joueur a lu toute l'histoire. Sur deux téléphones, on ne relance que lorsque les deux l'ont lue.
+   Réglages : longueur (8, 12 ou 16 phrases), puis, après un « Rejouer », deck (la seed de la première partie)
+   et at (combien d'histoires déjà commencées), pour ne resservir une première phrase qu'une fois toutes passées.
+   Sur l'appareil : g.local.ok, le nombre de phrases au moment où le joueur suivant a pris le téléphone (un seul
+   téléphone) ; g.local.r, où en est la lecture. Les histoires finies sont gardées ici (« Nos histoires »). */
+(function () {
+  "use strict";
+
+  const DATA = (window.GAME_DATA && window.GAME_DATA.histoire) || {};
+  const STARTS = (Array.isArray(DATA.starts) ? DATA.starts : []).filter((s) => typeof s === "string" && s.trim());
+  const LENGTHS = ["8", "12", "16"], MAX = 200, KEEP = 10, LIST = "histoire:liste";
+  const int = (x, max) => (Number.isInteger(x) && x >= 0 && x <= max ? x : 0);
+  const seedOf = (g) => Number(g.setup.seed) >>> 0 || 1;
+  const token = (g) => g.gen + ":" + g.setup.seed;
+  const size = (g) => (LENGTHS.indexOf(String(g.setup.longueur)) >= 0 && typeof g.setup.longueur !== "object" ? Number(g.setup.longueur) : 12);
+  const first = (g) => (seedOf(g) % 2 ? "b" : "a");
+  const clean = (s) => s.replace(/\s+/g, " ").trim().slice(0, MAX);
+  /* Typographie française pour le texte brut (le partage) : esc() s'en charge pour l'écran. */
+  const typo = (s) => s.replace(/ ([?!:;»])/g, " $1").replace(/« /g, "« ");
+
+  /* La première phrase : chaque paquet garde le même ordre d'une partie à la suivante (deck), et « Rejouer »
+     passe à la suivante (at). */
+  function opening(g) {
+    if (!STARTS.length) return null;
+    const deck = Number(g.setup.deck) || seedOf(g);
+    return g.kit.shuffle(STARTS, deck)[int(g.setup.at, 1e6) % STARTS.length];
+  }
+  /* Les phrases d'un joueur, telles qu'elles sont arrivées (peut-être de l'autre téléphone) : bornées et en texte. */
+  const lines = (g, w) => (Array.isArray(g.S[w].s) ? g.S[w].s.slice(0, 16) : []).map((x) => (typeof x === "string" ? clean(x) : ""));
+
+  /* L'histoire telle qu'elle est : les phrases dans l'ordre, alternées, sans trou. Des comptes incohérents
+     (valeurs trafiquées) sont ramenés à ce qui peut s'enchaîner. */
+  function stage(g) {
+    const N = size(g), f = first(g), o = g.other(f), A = lines(g, f), B = lines(g, o);
+    const n = { [f]: Math.min(A.length, B.length + 1) };
+    n[o] = Math.min(B.length, n[f]);
+    const list = [];
+    for (let i = 0; i < N; i++) {
+      const w = i % 2 ? o : f;
+      if (i >> 1 >= n[w]) break;
+      list.push({ w, t: (w === f ? A : B)[i >> 1] });
+    }
+    const i = list.length, w = i < N ? (i % 2 ? o : f) : null;
+    return { N, list, i, w, n, start: opening(g) };
+  }
+  /* Ce joueur a lu toute l'histoire. */
+  const read = (g, st) => st.i >= st.N && int(g.local.r, 1e6) > st.N;
+  const ready = (g) => !g.duo || !!g.S[g.other(g.me)].fin;
+  /* La dernière phrase de l'autre, que le joueur w doit continuer : sinon, la première de l'histoire. */
+  const last = (st, w) => { for (let i = st.i - 1; i >= 0; i--) if (st.list[i].w !== w) return st.list[i]; return null; };
+
+  /* ---------- Histoires gardées sur l'appareil (et ce que l'autre y a écrit : même méfiance à la relecture) ---------- */
+  const two = (x) => Array.isArray(x) && typeof x[0] === "string" && typeof x[1] === "string";
+  function kept(k) {
+    const list = k.store.get(LIST, null);
+    return (Array.isArray(list) ? list : []).filter((h) => h && typeof h.k === "string" && typeof h.t === "string" && two(h.n) && Array.isArray(h.s) &&
+      h.s.every((x) => Array.isArray(x) && (x[0] === "a" || x[0] === "b") && typeof x[1] === "string")).slice(-KEEP);
+  }
+  function remember(g, st) {
+    const k = g.kit, list = kept(k), key = token(g);
+    if (list.some((h) => h.k === key)) return;
+    k.store.set(LIST, list.concat({ k: key, t: st.start, n: [k.nm("a").slice(0, 20), k.nm("b").slice(0, 20)], s: st.list.map((x) => [x.w, x.t]) }).slice(-KEEP));
+  }
+  const entry = (g, st) => ({ t: st.start, n: [g.kit.nm("a"), g.kit.nm("b")], s: st.list.map((x) => [x.w, x.t]) });
+
+  /* Le texte de l'histoire, chaque phrase dans l'encre de qui l'a écrite. */
+  function prose(k, h) {
+    const who = (w) => '<span class="g-who ' + w + '"><i class="sw ' + w + '"></i>' + k.esc(h.n[w === "b" ? 1 : 0].slice(0, 20)) + "</span>";
+    return '<p class="histoire-legend">' + who("a") + who("b") + '</p><p class="histoire-text"><span class="histoire-s">' + k.esc(h.t.slice(0, MAX)) + "</span> " +
+      h.s.slice(0, 16).map((x) => '<span class="histoire-s as-' + x[0] + '"><span class="sr">' + k.esc(h.n[x[0] === "b" ? 1 : 0].slice(0, 20) + " : ") + "</span>" + k.esc(x[1].slice(0, MAX) || "…") + "</span>").join(" ") + "</p>";
+  }
+  const plain = (h) => typo(h.t + " " + h.s.map((x) => x[1]).filter(Boolean).join(" ") + "\n\n— " + h.n[0] + " et " + h.n[1] + ", « L'histoire à quatre mains »");
+  const keepBtn = (i) => '<p class="histoire-keep"><button class="btn alt small" type="button" data-act="partager"' + (i != null ? ' data-i="' + i + '"' : "") +
+    ">Enregistrer le texte</button><span class=\"histoire-msg\" role=\"status\"></span></p>";
+
+  /* Feuille de partage du téléphone pour du texte ; sinon presse-papiers ; sinon le texte, sélectionné, à copier à la main.
+     Tout part dans le geste du joueur, sans attente : sinon le navigateur refuse le partage. */
+  function send(text, el) {
+    const box = el.parentNode, msg = box.querySelector(".histoire-msg"), say = (t) => { if (msg) msg.textContent = t; };
+    const manual = () => {
+      let ta = box.querySelector("textarea");
+      if (!ta) { ta = document.createElement("textarea"); ta.className = "g-field histoire-raw"; ta.readOnly = true; ta.rows = 6; ta.setAttribute("aria-label", "Le texte de l'histoire"); box.appendChild(ta); }
+      ta.value = text;
+      ta.focus();
+      try { ta.setSelectionRange(0, text.length); } catch (e) { ta.select(); }
+      say("Le texte est juste en dessous : copie-le pour le garder.");
+    };
+    const copy = () => {
+      try { navigator.clipboard.writeText(text).then(() => say("Texte copié : colle-le où tu veux."), manual); } catch (e) { manual(); }
+    };
+    if (typeof navigator.share === "function") {
+      try { navigator.share({ title: "L'histoire à quatre mains", text }).catch((e) => { if (!e || e.name !== "AbortError") copy(); }); } catch (e) { copy(); }
+    } else copy();
+  }
+
+  /* Deux touchers pour tout effacer, entre 0,45 et 4 secondes d'écart. */
+  let armed = 0;
+  const EMPTY = ["Tout effacer", "Toucher encore pour effacer"];
+
+  /* L'écran affiché et depuis quand : un bouton qui apparaît sous le doigt reste inerte une demi-seconde. */
+  let seen = { k: "", at: 0 };
+  const HOLD = '[data-act="moi"], [data-act="lire"], [data-act="suite"]';
+
+  /* ---------- Écrans ---------- */
+  const top = (g, label, n, of) => '<p class="histoire-step">' + (g.gen > 1 && !n && label.indexOf("Phrase") === 0 ? "Nouvelle histoire · " : "") + label +
+    '</p><div class="progress" role="progressbar" aria-label="Avancement" aria-valuemin="0" aria-valuemax="' + of + '" aria-valuenow="' + n + '"><span style="width:' + (100 * n) / of + '%"></span></div>';
+  const card = (k, x, label) => '<div class="g-card histoire-card' + (x.w ? " " + x.w : "") + '">' + (x.w ? '<p class="histoire-by">' + label + "</p>" : '<p class="g-tag">' + label + "</p>") +
+    '<p class="g-card-text">' + k.esc(x.t || "…") + "</p></div>";
+
+  function vWrite(g, st) {
+    const k = g.kit, w = st.w, o = g.other(w), O = k.nm(o), prev = last(st, w), end = st.i === st.N - 1;
+    return '<div class="histoire as-' + w + '" data-screen="ecrire-' + st.i + "-" + w + '">' + top(g, "Phrase " + (st.i + 1) + " sur " + st.N, st.i, st.N) +
+      '<p class="histoire-who">' + k.who(w) + ' écrit</p><h1 class="g-title" tabindex="-1" data-focus>' + (end ? "À toi de la finir." : !st.i ? "À toi de lancer l'histoire." : "À toi d'écrire la suite.") + "</h1>" +
+      (prev ? '<p class="histoire-start"><span class="eyebrow">La première phrase</span> ' + k.esc(st.start) + "</p>" + card(k, prev, "La dernière phrase " + k.esc(k.de(O)))
+        : card(k, { t: st.start }, "La première phrase")) +
+      '<form class="histoire-form"><textarea class="g-field histoire-field" name="phrase" rows="4" maxlength="' + MAX + '" data-keep="phrase-' + g.gen + "-" + seedOf(g) + "-" + st.i + "-" + w +
+      '" enterkeyhint="done" placeholder="Ta phrase" aria-label="' + k.esc(k.nm(w) + ", ta phrase " + (st.i + 1) + " sur " + st.N) + '" aria-describedby="histoire-aide"></textarea>' +
+      '<p class="hint" id="histoire-aide"><span class="histoire-count">' + MAX + " signes au plus.</span> " +
+      k.esc(end ? "C'est la dernière phrase : à toi de trouver la chute." : O + " ne verra que celle-ci, pas le reste de l'histoire.") + "</p>" +
+      '<div class="g-actions"><button class="btn" type="submit">' + (end ? "Finir l'histoire" : "Ajouter ma phrase") + "</button></div></form></div>";
+  }
+
+  function vWait(g, st) {
+    const k = g.kit, O = k.nm(st.w), mine = last(st, st.w);
+    return '<div class="histoire as-' + g.me + '" data-screen="attente-' + st.i + '">' + top(g, "Phrase " + (st.i + 1) + " sur " + st.N, st.i, st.N) +
+      '<h1 class="g-title" tabindex="-1" data-focus>Au tour ' + k.esc(k.de(O)) + ".</h1>" +
+      (mine ? '<p class="g-lead">Ta phrase est partie. ' + k.esc(O) + " ne verra qu'elle.</p>" + card(k, mine, "Ta dernière phrase")
+        : '<p class="g-lead">' + k.esc(O) + " lance l'histoire. Tu ne verras que sa phrase, pour écrire la suite.</p>") +
+      k.wait(g, O + " écrit la phrase " + (st.i + 1) + "…") + "</div>";
+  }
+
+  function vPass(g, st) {
+    const k = g.kit;
+    return '<div class="histoire" data-screen="passe-' + st.i + "-" + st.w + '">' + g.kit.pass(st.w, "moi") + '<p class="hint">' +
+      k.esc("Phrase " + (st.i + 1) + " sur " + st.N + ". " + (st.i ? "Tu ne verras que la dernière phrase " + k.de(k.nm(g.other(st.w))) + "." : "C'est toi qui lances l'histoire.")) + "</p></div>";
+  }
+
+  function vDone(g) {
+    return '<div class="histoire" data-screen="fin"><p class="eyebrow">Dernière phrase écrite</p><h1 class="g-title" tabindex="-1" data-focus>L\'histoire est complète.</h1><p class="g-lead">' +
+      (g.duo ? "Vous allez la découvrir phrase par phrase, chacun sur son téléphone." : "Posez le téléphone entre vous deux : vous allez la découvrir phrase par phrase.") +
+      '</p><div class="g-actions"><button class="btn" type="button" data-act="lire">Lire l\'histoire</button></div></div>';
+  }
+
+  function vRead(g, st, r) {
+    const k = g.kit, x = r ? st.list[r - 1] : { t: st.start }, prev = r > 1 ? st.list[r - 2].t : r === 1 ? st.start : "";
+    return '<div class="histoire" data-screen="lire-' + r + '">' + top(g, r ? "Phrase " + r + " sur " + st.N : "Lecture", r, st.N) +
+      (prev ? '<p class="histoire-prev">' + k.esc(prev || "…") + "</p>" : "") +
+      '<div class="histoire-now" tabindex="-1" data-focus>' + card(k, x, x.w ? k.who(x.w) : "La première phrase") + "</div>" +
+      '<div class="g-actions"><button class="btn" type="button" data-act="suite">' + (r < st.N ? "Suivante" : "Toute l'histoire") + "</button></div></div>";
+  }
+
+  function vAll(g, st) {
+    const k = g.kit, cur = String(size(g));
+    const choice = (n) => '<button class="g-choice" type="button" data-act="again" data-val="' + n + '"' + (cur === n ? ' aria-current="true"' : "") + "><b>" + n + " phrases</b></button>";
+    return '<div class="histoire" data-screen="histoire"><p class="eyebrow">Votre histoire</p><h1 class="g-title" tabindex="-1" data-focus>Voilà ce que vous avez écrit.</h1>' +
+      prose(k, entry(g, st)) + keepBtn(null) + '<p class="hint">Elle est aussi gardée sur cet appareil, dans « Nos histoires », sur la présentation du jeu.</p>' +
+      (ready(g) ? '<div class="g-opts"><p class="g-opts-label">Une autre histoire</p><div class="g-choices">' + LENGTHS.map(choice).join("") + "</div></div>"
+        : k.wait(g, "Vous pourrez recommencer dès " + k.que(k.nm(g.other(g.me))) + " aura lu l'histoire.")) + "</div>";
+  }
+
+  (window.GAMES = window.GAMES || []).push({
+    id: "histoire",
+    v: 1,
+    title: "L'histoire à quatre mains",
+    hook: "Et si on écrivait une histoire sans savoir où elle va ?",
+    blurb: "Une première phrase, puis une phrase chacun, en ne voyant que la dernière de l'autre. À la fin, vous lisez tout.",
+    meta: (STARTS.length ? STARTS.length + " débuts · " : "") + "10 min",
+    intro: [
+      "Une première phrase tombe : « Le pigeon qui entra dans la banque demanda à parler au directeur. » Chacun à son tour écrit la suivante, en ne voyant que la dernière phrase de l'autre, jamais le reste.",
+      "Quand toutes les phrases sont écrites, vous découvrez l'histoire entière, phrase par phrase. Elle a rarement le sens prévu, et c'est tout l'intérêt."
+    ],
+    glyph: '<rect class="ink-a" x="7" y="9" width="22" height="7" rx="3.5"/><rect class="ink-b" x="19" y="21" width="22" height="7" rx="3.5"/><rect class="ink-a" x="7" y="33" width="16" height="7" rx="3.5"/>',
+    live: true,
+    options: [{
+      id: "longueur", label: "Longueur", def: "12",
+      choices: [{ id: "8", name: "8 phrases", hint: "Une histoire courte." }, { id: "12", name: "12 phrases", hint: "Le bon compromis." }, { id: "16", name: "16 phrases", hint: "Pour s'égarer." }]
+    }],
+    view(g) {
+      const st = stage(g);
+      /* Le fichier des débuts n'est pas arrivé sur cet appareil : surtout pas d'histoire sans début. */
+      if (!st.start) return '<div class="histoire" data-screen="vide"><h1 class="g-title" tabindex="-1" data-focus>Les débuts d\'histoire ne sont pas arrivés.</h1><p class="g-lead">Recharge la page : la partie reprendra où elle en était.</p></div>';
+      if (st.w) {
+        if (g.duo) return st.w === g.me ? vWrite(g, st) : vWait(g, st);
+        return g.local.ok === st.i ? vWrite(g, st) : vPass(g, st);
+      }
+      const r = g.local.r;
+      if (!Number.isInteger(r) || r < 0) return vDone(g);
+      return r > st.N ? vAll(g, st) : vRead(g, st, r);
+    },
+    submit(g, form) {
+      const st = stage(g), w = st.w, field = form.querySelector("[name=phrase]");
+      if (!w || !field || !st.start || (g.duo ? w !== g.me : g.local.ok !== st.i)) return;
+      const text = clean(field.value);
+      if (!text) { field.focus(); return; }
+      g.set(w, { s: lines(g, w).slice(0, st.n[w]).concat(text) });
+    },
+    input(g, el) {
+      if (el.name !== "phrase") return;
+      const c = el.form && el.form.querySelector(".histoire-count");
+      if (c) c.textContent = (MAX - el.value.length) + " signes restants.";
+    },
+    act(g, name, el) {
+      const st = stage(g), r = g.local.r, calm = Date.now() - seen.at >= 450;
+      if (name === "moi" && st.w && !g.duo && g.local.ok !== st.i && calm) {
+        g.local.ok = st.i;
+        g.save();
+        g.render();
+      } else if (name === "lire" && !st.w && st.start && !Number.isInteger(r) && calm) {
+        g.local.r = 0;
+        g.save();
+        g.render();
+      } else if (name === "suite" && !st.w && Number.isInteger(r) && r >= 0 && r <= st.N && calm) {
+        g.local.r = r + 1;
+        g.save();
+        /* Dernière phrase lue sur deux téléphones : l'autre apprend que j'ai fini (un message, sur mon toucher). */
+        if (g.duo && r === st.N && !g.S[g.me].fin) g.set(g.me, { fin: 1 }); else g.render();
+      } else if (name === "partager" && read(g, st)) {
+        send(plain(entry(g, st)), el);
+      } else if (name === "again" && read(g, st) && ready(g)) {
+        const v = el.getAttribute("data-val");
+        g.newGame({ longueur: LENGTHS.indexOf(v) >= 0 ? v : "12", deck: Number(g.setup.deck) || seedOf(g), at: (int(g.setup.at, 1e6) + 1) % 1e6 });
+      }
+    },
+    over(g) { return read(g, stage(g)); },
+    mount(g, root) {
+      const st = stage(g), scr = root.querySelector("[data-screen]"), name = token(g) + ":" + (scr ? scr.getAttribute("data-screen") : ""), now = Date.now();
+      if (name !== seen.k) seen = { k: name, at: now };
+      /* Le bouton qui prend la place de celui qu'on vient de toucher ne répond pas tout de suite : un double
+         toucher sur « Ajouter ma phrase » ne doit pas faire passer le téléphone sans que personne l'ait pris. */
+      const wait = seen.at + 450 - now, held = wait > 0 ? root.querySelectorAll(HOLD) : [];
+      held.forEach((b) => { b.disabled = true; });
+      const timer = held.length && setTimeout(() => held.forEach((b) => { b.disabled = false; }), wait);
+      const field = root.querySelector(".histoire-field");
+      if (field) {
+        if (field.value) g.def.input(g, field);
+        if (document.activeElement !== field) { try { field.focus({ preventScroll: true }); } catch (e) { /* sans importance */ } }
+      }
+      /* L'histoire se garde dès qu'elle est complète, même si personne ne l'a encore lue. */
+      if (st.start && !st.w) remember(g, st);
+      return () => clearTimeout(timer);
+    },
+    extra(k) {
+      const list = kept(k);
+      return list.length ? '<details class="more histoire-kept"><summary>Nos histoires (' + list.length + ')</summary><p class="hint">Vos ' + KEEP +
+        " dernières histoires, gardées sur cet appareil seulement.</p>" + list.map((h, i) => '<details class="histoire-old"><summary>' + k.esc(h.n[0].slice(0, 20) + " et " + h.n[1].slice(0, 20) + " · " + (h.t.length > 60 ? h.t.slice(0, 58).replace(/\s+\S*$/, "") + "…" : h.t)) + "</summary>" + prose(k, h) + keepBtn(i) + "</details>").reverse().join("") +
+        '<p><button class="link g-link" type="button" data-act="vider">' + EMPTY[Date.now() - armed < 4000 ? 1 : 0] + "</button></p></details>" : "";
+    },
+    extraAct(k, name, el) {
+      if (name === "partager") {
+        const h = kept(k)[int(parseInt(el.getAttribute("data-i"), 10), KEEP)];
+        if (h) send(plain(h), el);
+      } else if (name === "vider") {
+        const dt = Date.now() - armed;
+        if (dt >= 450 && dt < 4000) { armed = 0; k.store.del(LIST); k.render(); return; }
+        if (dt < 450) return;
+        armed = Date.now();
+        el.textContent = EMPTY[1];
+        setTimeout(() => { if (Date.now() - armed >= 4000) document.querySelectorAll('[data-act="vider"]').forEach((b) => { b.textContent = EMPTY[0]; }); }, 4050);
+      }
     }
   });
 })();
