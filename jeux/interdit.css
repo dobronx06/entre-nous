@@ -1,0 +1,72 @@
+/* Le mot interdit. */
+/* Un prénom ou un mot de vingt lettres sans espace se coupe plutôt que de pousser la page en largeur. */
+.interdit { flex: 1 1 auto; display: flex; flex-direction: column; gap: 1rem; overflow-wrap: anywhere; }
+.interdit-top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.2rem 1rem; }
+.interdit-step { font: 600 0.78rem var(--body); letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+.interdit-total { font-size: 0.9rem; color: var(--ink-2); }
+.interdit-total b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.game .interdit .interdit-speaker { color: var(--who); }
+.interdit .g-who { background: var(--who-soft); }
+.interdit .g-pass { padding-top: 0.5rem; }
+
+/* Bilan d'un tour : les mots trouvés en clair, les mots passés en retrait */
+.interdit-recap { display: flex; flex-direction: column; gap: 0.6rem; }
+.interdit-got { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem 0.6rem; color: var(--ink); }
+.interdit-recap .g-who { background: var(--a-soft); }
+.interdit-recap .g-who.b { background: var(--b-soft); }
+.interdit-words { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.interdit-words li { padding: 0.3rem 0.7rem; border-radius: 999px; font-size: 0.92rem; }
+.interdit-words .ok { background: var(--wash); color: var(--ink); font-weight: 600; }
+.interdit-words .no { border: 1px dashed var(--line); color: var(--muted); text-decoration: line-through; }
+
+/* Qui fait deviner : le temps en haut, la carte au milieu, les deux boutons sous le pouce */
+.interdit-time { font-size: 0.95rem; color: var(--ink-2); }
+.interdit-time b { font: 700 1.5rem/1 var(--body); font-variant-numeric: tabular-nums; color: var(--who); }
+.interdit-bar { height: 6px; border-radius: 999px; background: var(--who-soft); overflow: hidden; }
+.interdit-bar span { display: block; height: 100%; border-radius: inherit; background: var(--who); }
+.interdit-card { gap: 0.7rem; min-height: 0; padding: 1.3rem 1.2rem; border-color: transparent; background: var(--who-soft); }
+.interdit-word { font: 700 clamp(2rem, 9vw, 3rem)/1.05 var(--display); letter-spacing: -0.025em; text-wrap: balance; -webkit-hyphens: auto; hyphens: auto; }
+.interdit-ban { margin-top: 0.3rem; font: 600 0.75rem var(--body); letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-2); }
+.interdit-x { display: flex; flex-direction: column; gap: 0.35rem; }
+.interdit-x li { display: flex; align-items: center; gap: 0.6rem; font-size: 1.2rem; font-weight: 600; color: var(--ink); }
+.interdit-x li::before { content: ""; flex: none; width: 0.9rem; height: 2px; border-radius: 2px; background: var(--crit); }
+.interdit-count { font-size: 0.95rem; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+/* « Passer » à gauche, plus étroit ; « Trouvé » à droite, le plus grand, sous le pouce. */
+.interdit .g-actions .btn { padding-inline: 0.9rem; }
+.interdit .g-actions [data-act="pass"] { flex: 1 1 6rem; }
+.interdit .g-actions [data-act="ok"] { flex: 2 1 9rem; min-height: 3.5rem; font-size: 1.15rem; }
+
+/* Qui devine : un grand chrono à lire de loin. L'anneau part du haut et s'efface dans le sens des aiguilles. */
+.interdit-clock { position: relative; align-self: center; width: min(100%, 17rem, 40vh); }
+.interdit-clock svg { display: block; width: 100%; height: auto; transform: scaleX(-1) rotate(-90deg); }
+.interdit-track, .interdit-ring { fill: none; stroke-width: 7; }
+.interdit-track { stroke: var(--who-soft); }
+.interdit-ring { stroke: var(--who); stroke-linecap: round; stroke-dasharray: 339.3; }
+.interdit-clock .interdit-num { position: absolute; inset: 0; display: grid; place-items: center; font-size: clamp(4rem, min(34vw, 20vh), 8.5rem); }
+.interdit-over { font-weight: 600; color: var(--ink); }
+
+/* Fin du temps : un éclair de l'encre de qui faisait deviner, par-dessus toute la page.
+   Sans animation, c'est un cadre qui apparaît puis disparaît. */
+.interdit-flash { position: fixed; inset: 0; z-index: 9; pointer-events: none; box-shadow: inset 0 0 0 0.7rem var(--who); }
+@media (prefers-reduced-motion: no-preference) {
+  .interdit-ring, .interdit-bar span { transition: stroke-dashoffset 0.2s linear, width 0.2s linear; }
+  .interdit-flash { background: var(--who); box-shadow: none; animation: interdit-flash 0.8s ease-out both; }
+  @keyframes interdit-flash { from { opacity: 0.7; } to { opacity: 0; } }
+  .interdit-card.is-new { animation: interdit-in 0.25s ease-out backwards; }
+  @keyframes interdit-in { from { opacity: 0.2; transform: translateX(14px); } }
+}
+/* Écran court : la carte et ses mots interdits restent au-dessus des boutons. */
+@media (max-height: 620px) {
+  .game > .interdit { gap: 0.7rem; }
+  .interdit-card { gap: 0.45rem; padding: 1rem; }
+  .interdit-word { font-size: clamp(1.8rem, 8vw, 2.4rem); }
+  .interdit-x li { font-size: 1.05rem; }
+}
+
+/* Résultat */
+.interdit .g-big span { font-size: 0.42em; font-weight: 600; letter-spacing: 0; color: var(--muted); }
+.interdit .g-score .g-who { padding: 0; background: none; }
+.interdit-turns { display: flex; flex-direction: column; }
+.interdit-turns li { display: flex; align-items: center; gap: 0.7rem; padding-block: 0.55rem; border-top: 1px solid var(--line); }
+.interdit-turns .g-who { background: none; padding: 0; }
+.interdit-turns b { margin-left: auto; font-variant-numeric: tabular-nums; color: var(--ink); }
