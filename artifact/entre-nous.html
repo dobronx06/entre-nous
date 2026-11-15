@@ -1078,6 +1078,56 @@ main[data-game="match"] { overflow-x: clip; }
   .chanson-card .g-card-text { font-size: 1.2rem; }
   .chanson .g-title { font-size: 1.55rem; }
 }
+
+/* Tu préfères ? */
+.prefere { flex: 1 1 auto; display: flex; flex-direction: column; gap: 1rem; }
+.prefere .g-title, .prefere .g-lead, .prefere .hint { overflow-wrap: anywhere; }
+.prefere-head { display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; color: var(--ink-2); }
+.prefere .g-who { background: var(--who-soft); }
+.prefere-count { flex: none; margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Les deux options : deux grandes cartes à toucher, l'une au-dessus de l'autre, à portée de pouce. */
+.prefere-opts { display: flex; flex-direction: column; gap: 0.5rem; padding-top: 0.4rem; }
+.prefere .hint b { color: var(--ink-2); font-weight: 600; }
+.prefere-opt { display: flex; align-items: center; min-height: 6.5rem; padding: 1.1rem 1.25rem; border: 1.5px solid var(--line); border-radius: 22px; background: var(--surface); color: var(--ink);
+  font: 650 clamp(1.15rem, 4.8vw, 1.45rem)/1.25 var(--display); letter-spacing: -0.01em; text-align: left; text-wrap: balance; overflow-wrap: anywhere; cursor: pointer; transition: border-color 0.12s, background 0.12s; }
+.prefere-opt:hover { border-color: var(--who); }
+.prefere-opt:active { background: var(--who-soft); }
+.prefere-opt:focus-visible { outline: 3px solid var(--who); outline-offset: 2px; }
+/* Pour deviner, les options prennent l'encre du joueur : on voit tout de suite que la question a changé. */
+.prefere.is-guess .prefere-opt { border-color: transparent; background: var(--who-soft); }
+.prefere.is-guess .prefere-opt:hover { border-color: var(--who); }
+.prefere-or { align-self: center; font: 600 0.78rem var(--body); letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+.prefere-more { display: flex; justify-content: center; margin-top: auto; }
+.prefere .g-actions .hint { flex: 1 0 100%; }
+/* Fond plein : la liste qui passe sous la rangée ne doit pas se lire à travers. */
+.prefere .g-actions { background: linear-gradient(to top, var(--bg) calc(100% - 0.8rem), transparent); }
+.g-actions .prefere-more { flex: 1 0 100%; margin: 0; }
+.prefere-more .link { display: inline-flex; align-items: center; min-height: 44px; }
+@media (prefers-reduced-motion: no-preference) {
+  .prefere-opt { animation: prefere-in 0.2s ease-out backwards; }
+  .prefere-opt.b { animation-delay: 0.06s; }
+  @keyframes prefere-in { from { opacity: 0; transform: translateY(6px); } }
+}
+@media (max-height: 620px) {
+  .game > .prefere { gap: 0.75rem; }
+  .prefere-opt { min-height: 5rem; padding-block: 0.8rem; }
+}
+
+/* Résultat */
+.prefere .g-score > div > span { font-size: 0.85rem; color: var(--ink-2); }
+.prefere .g-score b span { font-size: 0.5em; font-weight: 600; color: var(--muted); }
+.prefere .g-score .g-who { padding: 0; background: none; }
+.prefere-part { display: flex; flex-direction: column; gap: 0.35rem; }
+.prefere-part h2 { display: flex; align-items: center; gap: 0.5rem; font: 700 1.2rem/1.2 var(--display); }
+.prefere-list { display: flex; flex-direction: column; margin-top: 0.3rem; border-bottom: 1px solid var(--line); }
+.prefere-list li { display: flex; flex-direction: column; gap: 0.3rem; padding-block: 0.7rem; border-top: 1px solid var(--line); }
+.prefere-line { display: grid; grid-template-columns: 1.9rem minmax(0, 1fr); align-items: baseline; gap: 0.4rem; color: var(--ink); font-weight: 600; overflow-wrap: anywhere; }
+.prefere-line.is-off { color: var(--muted); font-weight: 400; }
+.prefere-dots { display: inline-flex; gap: 0.25rem; }
+.prefere-note { padding-left: 2.3rem; font-size: 0.85rem; color: var(--ink-2); }
+.prefere-part.is-miss .prefere-note::before { content: ""; display: inline-block; width: 0.45rem; height: 0.45rem; margin-right: 0.4rem; border-radius: 50%; background: var(--warn); vertical-align: 0.1em; }
+.prefere .g-choice[aria-current="true"] { border-color: var(--ink); background: var(--wash); }
 </style>
 <div id="app"></div>
 <script>
@@ -6693,6 +6743,366 @@ main[data-game="match"] { overflow-x: clip; }
         box.innerHTML = '<p class="hint" role="status" tabindex="-1">La liste est vide.</p>';
         box.firstChild.focus();
       }
+    }
+  });
+})();
+</script>
+<script>
+/* Tu préfères ? : trois paquets de dilemmes. Chaque option complète « Tu préfères… » et commence par
+   une minuscule ; les deux options d'un dilemme se valent, en tentant comme en terrible.
+   Le dernier paquet est réservé aux adultes, et n'entre pas dans le mélange. */
+(window.GAME_DATA = window.GAME_DATA || {}).prefere = {
+  packs: [
+    {
+      id: "absurde",
+      name: "Absurde",
+      hint: "Des choix impossibles, et parfaitement inutiles.",
+      items: [
+        { a: "ne plus jamais manger de fromage", b: "ne plus jamais manger de chocolat" },
+        { a: "parler uniquement en rimes", b: "chanter tout ce que tu dis" },
+        { a: "avoir un pigeon qui te suit partout", b: "avoir un canard qui commente tes choix" },
+        { a: "éternuer des confettis", b: "rire comme une trompette" },
+        { a: "vivre dans une cabane dans un arbre", b: "vivre sur une péniche, au fil d'un canal" },
+        { a: "pouvoir parler aux chats", b: "entendre ce que pensent les plantes" },
+        { a: "avoir un générique à chaque fois que tu entres quelque part", b: "avoir un public qui applaudit tes moindres gestes" },
+        { a: "avoir toujours les chaussettes un peu mouillées", b: "avoir toujours l'oreiller un peu tiède" },
+        { a: "ne te déplacer qu'en trottinette", b: "ne te déplacer qu'à dos de lama" },
+        { a: "avoir un frigo qui te parle", b: "avoir un miroir qui te donne des conseils" },
+        { a: "manger tous tes repas avec des baguettes", b: "manger tous tes repas avec une louche" },
+        { a: "remonter le temps de dix minutes, une fois par jour", b: "mettre le monde sur pause une heure par semaine" },
+        { a: "voler, mais à un mètre du sol seulement", b: "devenir invisible, mais quand personne ne regarde" },
+        { a: "que toutes les portes grincent", b: "que toutes les chaises couinent" },
+        { a: "avoir un dragon de la taille d'un hamster", b: "avoir un hamster de la taille d'un dragon" },
+        { a: "connaître la fin de tous les films", b: "oublier la fin de chaque film dès le générique" },
+        { a: "ne plus pouvoir dire « bonjour »", b: "ne plus pouvoir dire « merci »" },
+        { a: "habiter un château hanté, mais par des fantômes gentils", b: "habiter un phare au milieu de la mer" },
+        { a: "voir une minute de ta vie dans dix ans", b: "revivre une fois ta meilleure journée" },
+        { a: "que la pluie sente la vanille", b: "que la neige ait un goût de sucre" },
+        { a: "porter une cape tous les jours", b: "porter un chapeau de cow-boy tous les jours" },
+        { a: "avoir un bouton « retour » sur la vie", b: "avoir un bouton « avance rapide » pour l'ennui" },
+        { a: "ne manger que de la soupe pendant un mois", b: "ne manger que des crêpes pendant un mois" },
+        { a: "te téléporter, mais seulement dans des boulangeries", b: "te téléporter, mais seulement dans des bibliothèques" },
+        { a: "que les nuages prennent la forme de tes pensées", b: "que les oiseaux sifflent tes chansons préférées" },
+        { a: "faire une sieste de trois heures chaque jour", b: "ne plus jamais avoir sommeil" },
+        { a: "avoir un majordome fantôme", b: "avoir un robot qui fait des blagues nulles" },
+        { a: "que toutes les voitures klaxonnent en coin-coin", b: "que tous les téléphones sonnent comme un coq" },
+        { a: "parler toutes les langues du monde", b: "jouer de tous les instruments" },
+        { a: "trouver un caillou dans ta chaussure chaque lundi", b: "avoir une chanson de Noël dans la tête toute l'année" },
+        { a: "être un pingouin un jour par semaine", b: "être un écureuil une heure par jour" },
+        { a: "respirer sous l'eau", b: "ne plus jamais avoir froid" },
+        { a: "vivre dans un dessin animé", b: "vivre dans une comédie musicale" },
+        { a: "avoir une pièce secrète derrière une bibliothèque", b: "avoir un toboggan entre la chambre et la cuisine" },
+        { a: "avoir une ombre qui a sa propre humeur", b: "avoir un reflet qui a une seconde de retard" },
+        { a: "ne plus jamais perdre tes clés", b: "ne plus jamais attendre un bus" },
+        { a: "avoir un chat qui écrit tes messages", b: "avoir un chien qui choisit tes vêtements" },
+        { a: "ne boire que de l'eau pétillante", b: "ne boire que des boissons tièdes" },
+        { a: "que chaque escalier se change en toboggan", b: "que chaque trottoir devienne un tapis roulant" },
+        { a: "gagner tous les jeux de société", b: "ne jamais perdre un pari" }
+      ]
+    },
+    {
+      id: "nous",
+      name: "Vie à deux",
+      hint: "Des petits bonheurs à deux, et des choix plus durs qu'il n'y paraît.",
+      items: [
+        { a: "un week-end surprise au bord de la mer", b: "un week-end surprise à la montagne" },
+        { a: "recevoir une lettre d'amour écrite à la main", b: "recevoir une chanson composée pour toi" },
+        { a: "un dîner aux chandelles à la maison", b: "un pique-nique au coucher du soleil" },
+        { a: "revivre notre premier rendez-vous", b: "voir un instant notre vie dans dix ans" },
+        { a: "un câlin de dix minutes", b: "dix petits bisous dans la journée" },
+        { a: "danser ensemble dans la cuisine", b: "chanter ensemble à tue-tête en voiture" },
+        { a: "regarder une série en entier en un week-end", b: "voir un film au cinéma chaque semaine" },
+        { a: "un road trip sans destination", b: "un voyage où tout est prévu à la minute" },
+        { a: "un petit-déjeuner au lit", b: "un goûter improvisé dans un parc" },
+        { a: "avoir une chanson rien qu'à nous", b: "avoir un plat rien qu'à nous" },
+        { a: "qu'on se lance un petit défi chaque mois", b: "qu'on apprenne une chose nouvelle chaque année" },
+        { a: "un surnom ridicule mais affectueux", b: "un surnom chic mais un peu froid" },
+        { a: "retrouver une photo oubliée de nous deux", b: "retrouver un vieux message qu'on s'était envoyé" },
+        { a: "une journée entière en pyjama, ensemble", b: "une journée entière dehors, ensemble" },
+        { a: "cuisiner à deux un plat très compliqué", b: "commander ton plat préféré et le manger sur le canapé" },
+        { a: "un dimanche sans téléphone", b: "un dimanche sans rien de prévu" },
+        { a: "qu'on se raconte nos rêves chaque matin", b: "qu'on se dise un mot gentil chaque soir" },
+        { a: "un code secret pour quitter une soirée", b: "un geste secret qui veut dire « je t'aime »" },
+        { a: "une soirée jeux de société à deux", b: "une soirée karaoké à deux" },
+        { a: "vivre un an à l'étranger ensemble", b: "faire ensemble le tour de la France" },
+        { a: "dormir à deux sous les étoiles", b: "dormir à deux dans une cabane perchée" },
+        { a: "recevoir des fleurs sans raison", b: "trouver un petit mot caché dans ta poche" },
+        { a: "un album de nos souvenirs", b: "une boîte remplie de nos petits objets" },
+        { a: "rire ensemble d'une bêtise jusqu'aux larmes", b: "pleurer ensemble devant un beau film" },
+        { a: "une fête surprise pour ton anniversaire", b: "un anniversaire tranquille, rien qu'à deux" },
+        { a: "apprendre ensemble à danser le tango", b: "apprendre ensemble à faire du pain" },
+        { a: "une balade à deux sous la pluie", b: "un après-midi à deux sous la couette" },
+        { a: "lire dans les pensées de l'autre pendant une heure", b: "que l'autre lise dans les tiennes pendant une heure" },
+        { a: "un message vocal d'une minute", b: "un texto de trois mots bien choisis" },
+        { a: "un voyage en train de nuit", b: "un voyage en voilier" },
+        { a: "qu'on se déguise ensemble pour une fête", b: "qu'on assortisse nos tenues un jour au hasard" },
+        { a: "une soirée à refaire le monde", b: "une soirée sans rien dire, juste ensemble" },
+        { a: "un concert ensemble au premier rang", b: "un festival ensemble pendant trois jours" },
+        { a: "une sérénade sous ta fenêtre", b: "un poème glissé sous ton oreiller" },
+        { a: "revoir ensemble le lieu de notre rencontre", b: "découvrir ensemble une ville inconnue" },
+        { a: "inventer une tradition rien qu'à nous", b: "garder nos petites habitudes pour toujours" },
+        { a: "une journée où l'autre décide de tout", b: "une journée où c'est toi qui décides de tout" },
+        { a: "une cabane de couvertures dans le salon", b: "un pique-nique sur le tapis du salon" },
+        { a: "écrire à deux une lettre à ouvrir dans dix ans", b: "planter un arbre et le voir grandir ensemble" },
+        { a: "un fou rire au pire moment", b: "une déclaration au moment parfait" }
+      ]
+    },
+    {
+      id: "coquin",
+      name: "Coquin",
+      hint: "Pour pimenter la soirée, sans jamais rougir pour de vrai.",
+      adult: true,
+      items: [
+        { a: "un baiser langoureux sous la pluie", b: "un baiser volé dans un ascenseur" },
+        { a: "une soirée massage à la lueur des bougies", b: "un bain partagé aux chandelles" },
+        { a: "recevoir un message coquin en pleine journée", b: "trouver un mot coquin écrit sur le miroir" },
+        { a: "un réveil tout en caresses", b: "une nuit qui ne finit pas" },
+        { a: "une nuit à l'hôtel réservée sans prévenir", b: "un week-end entier sans sortir de la chambre" },
+        { a: "des regards complices pendant un dîner entre amis", b: "un jeu de pieds discret sous la table" },
+        { a: "un effeuillage maladroit mais sincère", b: "un slow qui finit ailleurs que sur la piste" },
+        { a: "une tenue qui laisse tout imaginer", b: "une tenue qui ne laisse rien à imaginer" },
+        { a: "qu'on joue à se rencontrer pour la première fois", b: "qu'on se séduise par messages toute la journée" },
+        { a: "avoir les yeux bandés", b: "guider l'autre, les yeux bandés" },
+        { a: "dire à voix haute tout ce que tu aimes", b: "tout faire deviner sans un mot" },
+        { a: "un câlin sous une douche bien chaude", b: "un câlin dans une cabane en pleine forêt" },
+        { a: "un baiser dans le cou", b: "un murmure au creux de l'oreille" },
+        { a: "faire durer le plaisir pendant des heures", b: "une étreinte rapide et passionnée" },
+        { a: "une soirée lumière tamisée, sans téléphone", b: "une soirée improvisée dans la cuisine" },
+        { a: "que l'autre prenne toutes les initiatives ce soir", b: "prendre toutes les initiatives ce soir" },
+        { a: "un mot coquin chuchoté en public", b: "un regard qui en dit long à travers la pièce" },
+        { a: "une nuit à la belle étoile, rien qu'à deux", b: "un bain chaud en plein air sous la neige" },
+        { a: "recevoir une photo suggestive", b: "recevoir un texte torride" },
+        { a: "un jeu de dés coquin", b: "un jeu de cartes coquin" },
+        { a: "faire l'amour dans un lieu insolite", b: "faire l'amour dans un grand lit d'hôtel de luxe" },
+        { a: "une musique très douce en fond", b: "un silence où l'on n'entend que nous deux" },
+        { a: "un baiser qui dure une minute entière", b: "mille petits baisers éparpillés" },
+        { a: "qu'on se séduise comme au premier jour", b: "qu'on se surprenne avec une nouveauté" },
+        { a: "jouer avec une plume", b: "jouer avec un glaçon" },
+        { a: "une soirée déguisée rien qu'à deux", b: "une soirée en sous-vêtements à la maison" },
+        { a: "un rendez-vous coquin donné par texto à midi", b: "une surprise coquine préparée pour le soir même" },
+        { a: "un bain moussant à deux", b: "une douche à deux qui s'éternise" },
+        { a: "que l'autre te déshabille lentement", b: "te déshabiller lentement pour l'autre" },
+        { a: "une nuit blanche passionnée", b: "une grasse matinée câline" },
+        { a: "un massage à l'huile chaude", b: "un massage du bout des doigts" },
+        { a: "une chambre d'hôtel réservée en douce", b: "un coin caché pour un pique-nique très coquin" },
+        { a: "entendre en détail ce que l'autre aime", b: "le découvrir en essayant" },
+        { a: "un mot doux qui fait rougir", b: "un geste qui fait frissonner" },
+        { a: "un dîner où le dessert, c'est l'autre", b: "un petit-déjeuner qui ne quitte pas le lit" },
+        { a: "une lumière tamisée", b: "la lumière éteinte" },
+        { a: "des préliminaires interminables", b: "une envie soudaine qui ne peut pas attendre" },
+        { a: "raconter un fantasme à l'autre", b: "en réaliser un tout petit ce soir" },
+        { a: "un appel coquin à voix basse", b: "un clin d'œil coquin pendant une soirée" },
+        { a: "un slow langoureux dans le salon", b: "une bataille d'oreillers qui dérape" }
+      ]
+    }
+  ]
+};
+</script>
+<script>
+/* Tu préfères ? : douze dilemmes. Pour chacun, on choisit pour soi, puis on devine ce que l'autre a choisi.
+   Tranche d'un joueur : { v: "0110…" }, 24 caractères envoyés en une seule fois quand il a fini :
+   pour le dilemme i, v[2i] est son choix (0 l'option a, 1 l'option b) et v[2i+1] ce qu'il devine de l'autre.
+   D'ici là, ses réponses restent un brouillon sur l'appareil (g.local.d, même forme) ; g.local.go note,
+   sur un seul téléphone, que le second joueur a repris l'appareil. L'état commun ne sert pas.
+   Réglages : pack ; après un « Rejouer », deck (la seed de la première partie) et at (où en est chaque
+   paquet), pour ne pas resservir les mêmes dilemmes, et prev, le résultat de la partie d'avant : le
+   téléphone dont le joueur ne l'a pas quitté lui-même le garde à l'écran jusqu'à ce qu'il passe à la suite.
+   Sur l'appareil : « prefere:vu », le dernier résultat quitté. */
+(function () {
+  "use strict";
+
+  const DATA = (window.GAME_DATA && window.GAME_DATA.prefere) || {};
+  const ok = (x) => typeof x === "string" && x.length > 0 && x.length <= 120;
+  const PACKS = (Array.isArray(DATA.packs) ? DATA.packs : []).filter((p) => p && /^[a-z0-9]+$/.test(p.id || "") && Array.isArray(p.items) && p.items.length &&
+    p.items.every((it) => it && ok(it.a) && ok(it.b)));
+  const N = 12, LEN = 2 * N, SEEN = "prefere:vu";
+  const MIX = [["absurde", 6], ["nous", 6]];
+  /* Un écran qui vient d'apparaître ignore les touchers une fraction de seconde : le doigt visait l'ancien. */
+  const LOCK = 350;
+  let screen = "", lock = 0;
+
+  const pack = (id) => PACKS.find((p) => p.id === id);
+  const int = (o, key) => { const n = o && typeof o === "object" ? o[key] : 0; return Number.isInteger(n) && n > 0 && n < 1e6 ? n : 0; };
+  const seedOf = (g) => Number(g.setup.seed) || 1;
+  const tok = (g) => (g.gen + ":" + g.setup.seed).slice(0, 40);
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+  /* Ce que la partie prend dans chaque paquet : le mélange ne puise jamais dans le paquet pour adultes. */
+  const plan = (g) => (pack(g.setup.pack) ? [[g.setup.pack, N]] : MIX);
+  /* Les douze dilemmes, [paquet, numéro], tirés pareil sur les deux téléphones. Chaque paquet garde le même
+     ordre d'une partie à l'autre (deck) et « Rejouer » y reprend où l'on s'était arrêté (at). */
+  function refs(g) {
+    const k = g.kit, deck = Number(g.setup.deck) || seedOf(g);
+    let list = [];
+    plan(g).forEach(([id, n]) => {
+      const p = pack(id), all = p ? k.shuffle(p.items.map((_, i) => i), deck + PACKS.indexOf(p)) : [];
+      for (let i = 0; i < Math.min(n, all.length); i++) list.push([id, all[(int(g.setup.at, id) + i) % all.length]]);
+    });
+    if (!pack(g.setup.pack)) list = k.shuffle(list, seedOf(g));
+    return list.length === N ? list : [];
+  }
+  const item = (r) => pack(r[0]).items[r[1]];
+
+  /* Des réponses ne comptent que complètes et bien formées : tout le reste veut dire « pas fini ». */
+  const good = (v) => typeof v === "string" && v.length === LEN && /^[01]+$/.test(v);
+  const vec = (g, w) => (good(g.S[w].v) ? g.S[w].v : null);
+  const draft = (g) => (typeof g.local.d === "string" && /^[01]*$/.test(g.local.d) ? g.local.d.slice(0, LEN) : "");
+  /* Sur un seul téléphone, qui commence change à chaque partie : l'appareil est chez qui vient de finir. */
+  const first = (g) => (g.gen % 2 ? "a" : "b");
+  function turn(g) {
+    if (g.duo) return vec(g, g.me) ? null : g.me;
+    const f = first(g);
+    return !vec(g, f) ? f : !vec(g, g.other(f)) ? g.other(f) : null;
+  }
+
+  /* Le résultat d'avant, joint par qui a relancé : vérifié comme tout ce qui vient de l'autre téléphone. */
+  function prev(g) {
+    const p = g.setup.prev;
+    if (!p || typeof p !== "object" || typeof p.k !== "string" || p.k.length > 40 || !good(p.a) || !good(p.b) || !Array.isArray(p.q) || p.q.length !== N) return null;
+    const list = p.q.map((x) => {
+      const m = typeof x === "string" ? /^([a-z0-9]{1,20})\.(\d{1,4})$/.exec(x) : null, pk = m && pack(m[1]);
+      return pk && +m[2] < pk.items.length ? [pk.id, +m[2]] : null;
+    });
+    return list.every(Boolean) ? { k: p.k, list, a: p.a, b: p.b } : null;
+  }
+  const past = (g) => { const p = prev(g); return p && g.kit.store.get(SEEN, "") !== p.k ? p : null; };
+
+  /* ---------- Écrans ---------- */
+  const head = (g, w, word, at, done) => '<p class="prefere-head">' + g.kit.who(w) + "<span>" + word + '</span><span class="prefere-count">' + at + " / " + N + "</span></p>" +
+    '<div class="progress" role="progressbar" aria-label="Avancement" aria-valuemin="0" aria-valuemax="' + N + '" aria-valuenow="' + done + '"><span style="width:' + (100 * done) / N + '%"></span></div>';
+
+  /* Un dilemme, en deux temps : mon choix, puis ce que je crois que l'autre a choisi. */
+  function vAsk(g, list, w, d) {
+    const k = g.kit, i = Math.floor(d.length / 2), guess = d.length % 2 === 1, it = item(list[i]), o = k.nm(g.other(w));
+    const btn = (x) => '<button class="prefere-opt' + (x ? " b" : "") + '" type="button" data-act="pick" data-k="' + x + '">' + k.esc(x ? it.b : it.a) + "</button>";
+    return '<div class="prefere as-' + w + (guess ? " is-guess" : "") + '" data-screen="q-' + w + "-" + i + "-" + (guess ? 1 : 0) + '">' + head(g, w, guess ? "devine" : "choisit", i + 1, i) +
+      '<h1 class="g-title" tabindex="-1" data-focus>' + (guess ? k.esc("Et " + o + " ?") : "Tu préfères…") + "</h1>" +
+      (guess ? '<p class="hint">Ton choix\u00a0: <b>' + k.esc(d[d.length - 1] === "1" ? it.b : it.a) + "</b>. " + k.esc("Devine celui " + k.de(o) + ".") + "</p>" : "") +
+      '<div class="prefere-opts">' + btn(0) + '<span class="prefere-or" aria-hidden="true">ou</span>' + btn(1) + "</div>" +
+      (d ? '<p class="prefere-more"><button class="link" type="button" data-act="undo">Revenir en arrière</button></p>' : "") + "</div>";
+  }
+
+  /* Avant l'envoi, un dernier écran : c'est le seul endroit d'où les réponses partent, et on peut encore en revenir. */
+  function vEnd(g, w) {
+    const k = g.kit, o = k.nm(g.other(w)), last = !g.duo && w !== first(g);
+    return '<div class="prefere as-' + w + '" data-screen="fin-' + w + '">' + head(g, w, "a fini", N, N) + '<h1 class="g-title" tabindex="-1" data-focus>C\'était le dernier.</h1><p class="g-lead">' +
+      k.esc(last ? "Valide, et découvrez le résultat ensemble." : g.duo ? "Valide pour envoyer tes réponses : " + o + " ne les verra qu'une fois les siennes données." : "Valide, puis passe le téléphone à " + o + " : tes réponses resteront cachées jusqu'au résultat.") +
+      '</p><div class="g-actions"><button class="btn" type="button" data-act="send">Valider mes réponses</button><p class="prefere-more"><button class="link" type="button" data-act="undo">Revenir au dernier choix</button></p></div></div>';
+  }
+
+  function vWait(g) {
+    const k = g.kit, o = k.nm(g.other(g.me));
+    return '<div class="prefere as-' + g.me + '" data-screen="attente"><h1 class="g-title" tabindex="-1" data-focus>C\'est noté.</h1><p class="g-lead">' +
+      k.esc("Le résultat s'ouvrira ici dès " + k.que(o) + " aura fini. Tu peux fermer la page et revenir plus tard : rien ne se perd.") + "</p>" +
+      k.wait(g, "En attente des réponses " + k.de(o) + "…") + "</div>";
+  }
+
+  /* Une ligne du récapitulatif : les deux options, chacune marquée de qui l'a choisie. */
+  function row(k, it, i, a, b) {
+    const ca = a[2 * i], cb = b[2 * i], missA = a[2 * i + 1] !== cb, missB = b[2 * i + 1] !== ca;
+    const line = (x) => {
+      const who = ["a", "b"].filter((w) => (w === "a" ? ca : cb) === x);
+      return '<p class="prefere-line' + (who.length ? "" : " is-off") + '"><span class="prefere-dots" aria-hidden="true">' + who.map((w) => '<i class="sw ' + w + '"></i>').join("") + "</span><span>" +
+        (who.length ? '<span class="sr">' + k.esc((who.length > 1 ? "Votre choix à tous les deux" : "Le choix " + k.de(k.nm(who[0]))) + " : ") + "</span>" : "") + k.esc(cap(x === "1" ? it.b : it.a)) + "</span></p>";
+    };
+    const note = missA || missB ? '<p class="prefere-note">' + k.esc(missA && missB ? "Surprise pour vous deux." : "Surprise pour " + k.nm(missA ? "a" : "b") + ".") + "</p>" : "";
+    return "<li>" + line("0") + line("1") + note + "</li>";
+  }
+
+  function vResult(g, list, a, b, old) {
+    const k = g.kit, A = k.nm("a"), B = k.nm("b"), idx = list.map((_, i) => i);
+    const hit = (v, u) => idx.filter((i) => v[2 * i + 1] === u[2 * i]).length;
+    const sa = hit(a, b), sb = hit(b, a), same = idx.filter((i) => a[2 * i] === b[2 * i]).length;
+    const miss = (i) => a[2 * i + 1] !== b[2 * i] || b[2 * i + 1] !== a[2 * i];
+    const title = sa === N && sb === N ? "Vous lisez dans vos pensées." : sa === sb ? "Égalité parfaite." : (sa > sb ? A : B) + " devine le mieux.";
+    const cell = (w, n) => '<div class="as-' + w + '">' + k.who(w) + "<b>" + n + "<span> / " + N + "</span></b><span>" + k.esc("choix " + k.de(w === "a" ? B : A) + " bien devinés") + "</span></div>";
+    const part = (cls, label, text, ids) => (ids.length ? '<section class="prefere-part ' + cls + '"><h2>' + label + ' <span class="g-tag">' + ids.length + '</span></h2><p class="hint">' + k.esc(text) +
+      '</p><ul class="prefere-list">' + ids.map((i) => row(k, item(list[i]), i, a, b)).join("") + "</ul></section>" : "");
+    const cur = pack(g.setup.pack) ? g.setup.pack : "melange";
+    const choice = (id, name, adult) => '<button class="g-choice" type="button" data-act="again" data-pack="' + k.esc(id) + '"' + (cur === id && !old ? ' aria-current="true"' : "") + "><b>" + k.esc(name) +
+      (adult ? ' <span class="g-tag">Adultes</span>' : "") + "</b></button>";
+    const end = old
+      ? '<div class="g-actions"><p class="hint">La partie suivante est déjà lancée.</p><button class="btn" type="button" data-act="ok">Passer à la partie suivante</button></div>'
+      : '<div class="g-opts"><p class="g-opts-label">Rejouer avec</p><div class="g-choices">' + choice("melange", "Mélange") + PACKS.map((p) => choice(p.id, p.name, p.adult === true)).join("") + "</div>" +
+        (g.duo ? '<p class="hint" role="status">' + k.esc("La nouvelle partie démarre aussi chez " + k.nm(g.other(g.me)) + ".") + "</p>" : "") + "</div>";
+    return '<div class="prefere" data-screen="resultat"><p class="eyebrow">' + (old ? "Partie précédente" : "Résultat") + '</p><h1 class="g-title" tabindex="-1" data-focus>' + k.esc(title) + '</h1><p class="g-lead">' +
+      k.esc(same === N ? "Vous avez fait le même choix à chaque fois." : same ? "Vous avez fait le même choix " + same + " fois sur " + N + "." : "Vous n'avez jamais fait le même choix. Les contraires s'attirent.") + '</p><div class="g-score">' + cell("a", sa) + cell("b", sb) + "</div>" +
+      part("is-miss", "Les surprises", "Les choix que l'autre n'avait pas vus venir.", idx.filter(miss)) +
+      part("is-same", "Vous êtes d'accord", "Le même choix, et vous le saviez.", idx.filter((i) => !miss(i) && a[2 * i] === b[2 * i])) +
+      part("is-apart", "Chacun son camp", "Pas le même choix, mais aucune surprise.", idx.filter((i) => !miss(i) && a[2 * i] !== b[2 * i])) + end + "</div>";
+  }
+
+  (window.GAMES = window.GAMES || []).push({
+    id: "prefere",
+    v: 1,
+    title: "Tu préfères ?",
+    hook: "Est-ce que tu sais ce que l'autre choisirait ?",
+    blurb: "Douze dilemmes impossibles. Chacun choisit pour soi, puis devine le choix de l'autre.",
+    meta: "12 dilemmes · 5 min",
+    intro: [
+      "« Tu préfères ne plus jamais manger de fromage, ou ne plus jamais manger de chocolat ? » Pour chaque dilemme, tu choisis pour toi, puis tu devines ce que l'autre a choisi.",
+      "À la fin, vous voyez qui a le mieux deviné l'autre, ce sur quoi vous êtes d'accord, et les surprises."
+    ],
+    glyph: '<rect class="ink-a" x="4" y="11" width="18" height="26" rx="5"/><rect class="ring-b" x="27" y="13.5" width="16" height="21" rx="4"/>',
+    live: false,
+    options: PACKS.length ? [{
+      id: "pack", label: "Dilemmes", def: "melange",
+      choices: [{ id: "melange", name: "Mélange", hint: "Absurde et vie à deux." }].concat(PACKS.map((p) => ({ id: p.id, name: p.name, hint: p.hint, adult: p.adult === true })))
+    }] : [],
+    view(g) {
+      const k = g.kit, list = refs(g);
+      if (!list.length) return '<div class="prefere" data-screen="vide"><h1 class="g-title" tabindex="-1" data-focus>Les dilemmes ne sont pas arrivés.</h1><p class="g-lead">Recharge la page, puis relance une partie.</p></div>';
+      const old = past(g);
+      if (old) return vResult(g, old.list, old.a, old.b, true);
+      const w = turn(g);
+      if (!w) return vec(g, "a") && vec(g, "b") ? vResult(g, list, vec(g, "a"), vec(g, "b"), false) : vWait(g);
+      if (!g.duo && w !== first(g) && !g.local.go) {
+        return '<div class="prefere" data-screen="passage">' + k.pass(w, "go") + '<p class="hint">' + k.esc("Les réponses " + k.de(k.nm(g.other(w))) + " restent cachées jusqu'au résultat.") + "</p></div>";
+      }
+      const d = draft(g);
+      return d.length >= LEN ? vEnd(g, w) : vAsk(g, list, w, d);
+    },
+    act(g, name, el) {
+      if (Date.now() < lock) return;
+      const k = g.kit, list = refs(g), w = list.length && !past(g) ? turn(g) : null, d = draft(g);
+      if (name === "pick" && w && d.length < LEN && /^[01]$/.test(el.getAttribute("data-k") || "")) {
+        g.local.d = d + el.getAttribute("data-k");
+        g.save();
+        g.render();
+      } else if (name === "undo" && w && d) {
+        g.local.d = d.slice(0, -1);
+        g.save();
+        g.render();
+      } else if (name === "send" && w && d.length === LEN) {
+        g.local.d = "";
+        g.set(w, { v: d });
+      } else if (name === "go" && w) {
+        g.local.go = 1;
+        g.save();
+        g.render();
+      } else if (name === "ok" && past(g)) {
+        k.store.set(SEEN, past(g).k);
+        g.render();
+      } else if (name === "again" && list.length && !past(g) && vec(g, "a") && vec(g, "b")) {
+        /* Sans liaison, l'autre a peut-être déjà relancé : deux relances de même rang se départagent au
+           profit d'une seule, et la partie de l'autre serait perdue. */
+        if (g.duo && g.online !== "ok") {
+          el.closest(".g-opts").querySelector(".hint").textContent = "La connexion est coupée pour le moment. Réessaie dans un instant : la partie doit démarrer sur vos deux téléphones.";
+          return;
+        }
+        const id = el.getAttribute("data-pack"), at = {};
+        PACKS.forEach((p) => { at[p.id] = int(g.setup.at, p.id); });
+        plan(g).forEach(([p, n]) => { if (pack(p)) at[p] = (at[p] + n) % pack(p).items.length; });
+        /* Quitter le résultat de soi-même, c'est l'avoir vu : il ne sera pas remontré d'office. */
+        k.store.set(SEEN, tok(g));
+        g.newGame({ pack: pack(id) ? id : "melange", deck: Number(g.setup.deck) || seedOf(g), at,
+          prev: { k: tok(g), q: list.map((r) => r[0] + "." + r[1]), a: vec(g, "a"), b: vec(g, "b") } });
+      }
+    },
+    over(g) { return !!(vec(g, "a") && vec(g, "b")); },
+    mount(g, root) {
+      const scr = root.querySelector(".prefere"), name = scr ? scr.getAttribute("data-screen") + "|" + tok(g) : "";
+      if (name !== screen) { screen = name; lock = Date.now() + LOCK; }
     }
   });
 })();

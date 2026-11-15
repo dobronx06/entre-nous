@@ -1,0 +1,49 @@
+/* Tu préfères ? */
+.prefere { flex: 1 1 auto; display: flex; flex-direction: column; gap: 1rem; }
+.prefere .g-title, .prefere .g-lead, .prefere .hint { overflow-wrap: anywhere; }
+.prefere-head { display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; color: var(--ink-2); }
+.prefere .g-who { background: var(--who-soft); }
+.prefere-count { flex: none; margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Les deux options : deux grandes cartes à toucher, l'une au-dessus de l'autre, à portée de pouce. */
+.prefere-opts { display: flex; flex-direction: column; gap: 0.5rem; padding-top: 0.4rem; }
+.prefere .hint b { color: var(--ink-2); font-weight: 600; }
+.prefere-opt { display: flex; align-items: center; min-height: 6.5rem; padding: 1.1rem 1.25rem; border: 1.5px solid var(--line); border-radius: 22px; background: var(--surface); color: var(--ink);
+  font: 650 clamp(1.15rem, 4.8vw, 1.45rem)/1.25 var(--display); letter-spacing: -0.01em; text-align: left; text-wrap: balance; overflow-wrap: anywhere; cursor: pointer; transition: border-color 0.12s, background 0.12s; }
+.prefere-opt:hover { border-color: var(--who); }
+.prefere-opt:active { background: var(--who-soft); }
+.prefere-opt:focus-visible { outline: 3px solid var(--who); outline-offset: 2px; }
+/* Pour deviner, les options prennent l'encre du joueur : on voit tout de suite que la question a changé. */
+.prefere.is-guess .prefere-opt { border-color: transparent; background: var(--who-soft); }
+.prefere.is-guess .prefere-opt:hover { border-color: var(--who); }
+.prefere-or { align-self: center; font: 600 0.78rem var(--body); letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+.prefere-more { display: flex; justify-content: center; margin-top: auto; }
+.prefere .g-actions .hint { flex: 1 0 100%; }
+/* Fond plein : la liste qui passe sous la rangée ne doit pas se lire à travers. */
+.prefere .g-actions { background: linear-gradient(to top, var(--bg) calc(100% - 0.8rem), transparent); }
+.g-actions .prefere-more { flex: 1 0 100%; margin: 0; }
+.prefere-more .link { display: inline-flex; align-items: center; min-height: 44px; }
+@media (prefers-reduced-motion: no-preference) {
+  .prefere-opt { animation: prefere-in 0.2s ease-out backwards; }
+  .prefere-opt.b { animation-delay: 0.06s; }
+  @keyframes prefere-in { from { opacity: 0; transform: translateY(6px); } }
+}
+@media (max-height: 620px) {
+  .game > .prefere { gap: 0.75rem; }
+  .prefere-opt { min-height: 5rem; padding-block: 0.8rem; }
+}
+
+/* Résultat */
+.prefere .g-score > div > span { font-size: 0.85rem; color: var(--ink-2); }
+.prefere .g-score b span { font-size: 0.5em; font-weight: 600; color: var(--muted); }
+.prefere .g-score .g-who { padding: 0; background: none; }
+.prefere-part { display: flex; flex-direction: column; gap: 0.35rem; }
+.prefere-part h2 { display: flex; align-items: center; gap: 0.5rem; font: 700 1.2rem/1.2 var(--display); }
+.prefere-list { display: flex; flex-direction: column; margin-top: 0.3rem; border-bottom: 1px solid var(--line); }
+.prefere-list li { display: flex; flex-direction: column; gap: 0.3rem; padding-block: 0.7rem; border-top: 1px solid var(--line); }
+.prefere-line { display: grid; grid-template-columns: 1.9rem minmax(0, 1fr); align-items: baseline; gap: 0.4rem; color: var(--ink); font-weight: 600; overflow-wrap: anywhere; }
+.prefere-line.is-off { color: var(--muted); font-weight: 400; }
+.prefere-dots { display: inline-flex; gap: 0.25rem; }
+.prefere-note { padding-left: 2.3rem; font-size: 0.85rem; color: var(--ink-2); }
+.prefere-part.is-miss .prefere-note::before { content: ""; display: inline-block; width: 0.45rem; height: 0.45rem; margin-right: 0.4rem; border-radius: 50%; background: var(--warn); vertical-align: 0.1em; }
+.prefere .g-choice[aria-current="true"] { border-color: var(--ink); background: var(--wash); }
