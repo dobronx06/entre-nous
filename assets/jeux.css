@@ -15,12 +15,18 @@
 .g-net { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; font-weight: 600; color: var(--ink-2); white-space: nowrap; }
 .g-net::before { content: ""; flex: none; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--good); }
 .g-net[data-net="wait"]::before { background: var(--warn); }
-.g-net[data-net="err"]::before { background: var(--crit); }
+.g-net[data-net="err"]::before, .g-net[data-net="full"]::before { background: var(--crit); }
 
 .game { gap: 1.1rem; min-height: calc(100vh - 4.5rem); min-height: calc(100dvh - 4.5rem); padding-block: 0.5rem 1.5rem; }
 .game button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 .g-foot { margin-top: auto; padding-top: 1.5rem; text-align: center; font-size: 0.85rem; }
-.g-foot .link { min-height: 44px; color: var(--muted); }
+.g-foot .link { color: var(--muted); }
+/* Lien qui sert de bouton : 44 px de haut, la taille d'un doigt. */
+.g-link { display: inline-flex; align-items: center; min-height: 44px; }
+.banner-actions .btn { min-height: 44px; }
+/* La racine de chaque écran de jeu (data-screen) reprend la colonne de l'écran. */
+.game > [data-screen] { flex: 1 1 auto; display: flex; flex-direction: column; gap: 1.1rem; }
+.g-gone { display: flex; flex-wrap: wrap; align-items: center; gap: 0 0.6rem; }
 
 .g-title { font: 700 clamp(1.7rem, 6vw, 2.4rem)/1.1 var(--display); letter-spacing: -0.025em; text-wrap: balance; }
 .g-lead { font-size: 1.05rem; color: var(--ink-2); }
@@ -59,7 +65,7 @@
 /* Passage du téléphone, attente de l'autre */
 .g-pass { display: flex; flex-direction: column; gap: 1.1rem; padding-top: 2.5rem; }
 .g-pass h1 { font: 700 clamp(1.9rem, 6.5vw, 2.75rem)/1.08 var(--display); letter-spacing: -0.025em; text-wrap: balance; color: var(--ink); }
-.g-pass .btn { border-color: var(--who); background: var(--who); color: var(--on-fill); }
+.g-pass .btn { gap: 0.55rem; }
 .g-wait { display: flex; flex-direction: column; gap: 0.6rem; }
 .sync.is-here::before { background: var(--good); animation: none; }
 
@@ -70,5 +76,6 @@
 .g-choice { display: flex; flex-direction: column; gap: 0.2rem; min-height: 3rem; padding: 0.65rem 0.85rem; border: 1.5px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); text-align: left; cursor: pointer; transition: border-color 0.12s, background 0.12s; }
 .g-choice:hover { border-color: var(--ink); }
 .g-choice[aria-pressed="true"] { border-color: var(--ink); background: var(--wash); }
+.g-choice[aria-pressed="true"] .g-tag { background: var(--surface); }
 .g-choice b { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; font-weight: 600; }
 .g-choice > span { font-size: 0.85rem; color: var(--ink-2); }

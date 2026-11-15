@@ -284,7 +284,7 @@
     const mj = txt.match(/#j=([\w-]+)/);
     if (mj) return importJoin(mj[1]);
     const mg = txt.match(/#g=([\w-]+)/);
-    if (mg && games) return games.join(mg[1]);
+    if (mg && games) { ui.codeErr = ""; ui.codeOpen = false; return games.join(mg[1]); }
     let o;
     try { o = decode(txt); } catch (e) { return failCode("Ce code est illisible. Vérifie qu'il a été copié en entier."); }
     const t = o && BY_ID[o.t];
@@ -1067,8 +1067,11 @@
   function boot() {
     let h = location.hash.slice(1);
     try { h = decodeURIComponent(h); } catch (e) { /* hash laissé tel quel */ }
+    /* Un lien reçu (invitation, réponses) contient une clé : on le retire de l'historique avant de
+       l'ouvrir, pour qu'il n'y reste pas et que le bouton Retour ne le rouvre pas en boucle. */
+    if (/^[jgc]=/.test(h)) { try { history.replaceState(null, "", location.pathname + location.search + "#accueil"); } catch (e) { /* cadre sans historique */ } }
     if (h.indexOf("j=") === 0) { importJoin(h.slice(2)); return; }
-    if (games && h.indexOf("g=") === 0) { games.join(h.slice(2)); return; }
+    if (games && h.indexOf("g=") === 0) { ui.codeErr = ""; ui.codeOpen = false; games.join(h.slice(2)); return; }
     if (h.indexOf("c=") === 0) { importCode(h.slice(2)); return; }
     route = h;
     render();

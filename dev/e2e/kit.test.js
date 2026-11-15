@@ -55,6 +55,9 @@ const token = (o) => Buffer.from(JSON.stringify(o)).toString("base64").replace(/
   await one.page.click('.g-foot [data-act="g-stop"]');
   check(await one.page.locator("main.game").count() === 1, "un seul toucher n'arrête pas la partie");
   await one.page.click('.g-foot [data-act="g-stop"]');
+  check(await one.page.locator("main.game").count() === 1, "un double toucher trop rapide non plus");
+  await sleep(450);
+  await one.page.click('.g-foot [data-act="g-stop"]');
   await one.page.waitForSelector("main.intro");
   check(await saved(one) === null, "deux touchers arrêtent la partie et l'effacent");
   await one.page.goto(env.base + "#accueil");
