@@ -80,7 +80,7 @@
 
   function vWrite(g, r, w, theme) {
     const k = g.kit, oth = k.nm(g.other(w));
-    return '<div class="onde as-' + w + '">' + head(g, r, w) + '<h1 class="g-title" tabindex="-1" data-focus>' + k.esc(theme) + "</h1>" +
+    return '<div class="onde as-' + w + '" data-screen="ecrire-' + r + "-" + w + '">' + head(g, r, w) + '<h1 class="g-title" tabindex="-1" data-focus>' + k.esc(theme) + "</h1>" +
       '<form class="onde-form"><input class="g-field" name="mot" data-keep="mot-' + g.gen + "-" + r + "-" + w + '" maxlength="40" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="Ton mot" aria-label="Ton mot pour ce thème">' +
       '<p class="hint">Un mot ou deux, sans rien dire à voix haute. ' + k.esc(oth) + " ne le verra qu'une fois le sien écrit." + (g.duo ? "" : " Ensuite, passe le téléphone.") + "</p>" +
       '<div class="g-actions"><button class="btn" type="submit">Valider</button></div></form></div>';
@@ -88,14 +88,14 @@
 
   function vWait(g, r, theme) {
     const k = g.kit, oth = g.other(g.me);
-    return '<div class="onde as-' + g.me + '">' + head(g, r) + '<h1 class="g-title">' + k.esc(theme) + '</h1><p class="g-lead">Tu as écrit : <b>' + k.esc(words(g, g.me)[r]) + "</b></p>" +
+    return '<div class="onde as-' + g.me + '" data-screen="attente-' + r + '">' + head(g, r) + '<h1 class="g-title">' + k.esc(theme) + '</h1><p class="g-lead">Tu as écrit : <b>' + k.esc(words(g, g.me)[r]) + "</b></p>" +
       k.wait(g, "En attente du mot " + k.de(k.nm(oth)) + "…") + "</div>";
   }
 
   function vReveal(g, r, theme) {
     const k = g.kit, x = result(g, r), last = r === ROUNDS - 1;
     const cell = (w) => '<div class="g-card ' + w + '">' + k.who(w) + '<p class="g-card-text">' + k.esc(x[w]) + "</p></div>";
-    return '<div class="onde">' + head(g, r) + '<p class="eyebrow">' + k.esc(theme) + '</p><div class="onde-pair">' + cell("a") + cell("b") + "</div>" +
+    return '<div class="onde" data-screen="revele-' + r + '">' + head(g, r) + '<p class="eyebrow">' + k.esc(theme) + '</p><div class="onde-pair">' + cell("a") + cell("b") + "</div>" +
       '<div class="onde-venn">' + k.venn(x.ok ? 100 : 0) + '</div><h1 class="g-title" tabindex="-1" data-focus>' + (x.ok ? "Même longueur d'onde." : "Pas cette fois.") + "</h1>" +
       (x.auto ? "" : '<p class="hint">' + (x.forced ? "Vous avez décidé que ça comptait. " : "Deux façons de dire la même chose ? ") +
         '<button class="link" type="button" data-act="force">' + (x.forced ? "Finalement non" : "On compte quand même") + "</button></p>") +
@@ -108,7 +108,7 @@
     const record = b.k === token || n > b.n ? "Nouveau record." : "Votre record : " + b.n + " sur " + ROUNDS + ".";
     const cur = pack(g.setup.pack) ? g.setup.pack : "melange";
     const choice = (id, name) => '<button class="g-choice" type="button" data-act="again" data-pack="' + id + '" aria-pressed="' + (cur === id) + '"><b>' + k.esc(name) + "</b></button>";
-    return '<div class="onde"><p class="eyebrow">Résultat</p><div class="onde-venn">' + k.venn(10 * n) + '</div><p class="g-big">' + n + "<span> / " + ROUNDS + '</span></p><h1 class="g-title" tabindex="-1" data-focus>' +
+    return '<div class="onde" data-screen="resultat"><p class="eyebrow">Résultat</p><div class="onde-venn">' + k.venn(10 * n) + '</div><p class="g-big">' + n + "<span> / " + ROUNDS + '</span></p><h1 class="g-title" tabindex="-1" data-focus>' +
       LEVELS.find((l) => n >= l[0])[1] + '</h1><p class="g-lead">' + record + '</p><ul class="onde-list">' + list.map((t, r) => {
         const x = result(g, r);
         return x ? '<li><span class="st ' + (x.ok ? "ok" : "gap") + '"><i aria-hidden="true">' + (x.ok ? "=" : "≠") + '</i><span class="sr">' + (x.ok ? "Pareil" : "Différent") + '</span></span><p class="onde-theme">' + k.esc(t) +
@@ -164,6 +164,7 @@
         g.newGame({ pack: el.getAttribute("data-pack") || "melange" });
       }
     },
+    over(g) { return round(g) >= ROUNDS; },
     mount(g, root) {
       const k = g.kit, field = root.querySelector(".onde-form .g-field");
       /* Le clavier s'ouvre tout seul quand c'est possible (le navigateur l'exige dans un geste). */

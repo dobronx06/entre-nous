@@ -27,8 +27,10 @@
        input(g, el, ev) {}, submit(g, form, ev) {}, key(g, ev) {},   // facultatifs (le submit est déjà neutralisé)
        mount(g, root) { return () => {}; },             // facultatif : après chaque rendu (root = le <main> du jeu) ; peut renvoyer
                                                         // un nettoyage, appelé avant le rendu suivant et en quittant la page
-       extra(kit) { return ""; }, extraAct(kit, name, el, ev) {}     // facultatifs : bloc en bas de la présentation quand aucune
+       extra(kit) { return ""; }, extraAct(kit, name, el, ev) {},    // facultatifs : bloc en bas de la présentation quand aucune
                                                                      // partie n'est en cours (liste gardée, galerie) et ses clics
+       over(g) { return false; }                        // facultatif : true quand la manche en cours est terminée ; l'accueil
+                                                        // ne propose alors plus de « reprendre » cette partie
      });
 
    LA POIGNÉE g
@@ -72,6 +74,8 @@
      - view() peut être rappelée à tout moment (l'autre téléphone vient d'écrire). Un champ de saisie garde
        sa valeur, le focus et le curseur s'il porte data-keep="clé" ; la clé doit changer quand le champ
        change de sens (autre manche, autre joueur), sinon le texte de l'un réapparaîtrait chez l'autre.
+     - Donne à l'élément racine de chaque écran un attribut data-screen="nom" (par exemple "ecrire-3", "resultat") :
+       quand ce nom change, le socle remonte en haut de la page. Sans cela, le défilement reste où il était.
      - Noms d'action réservés : ceux qui commencent par « g- », plus « copy » et « share ».
 
    LES OUTILS (g.kit)
@@ -170,7 +174,7 @@
     }
 
     /* ---------- Affichage ---------- */
-    let cleanup = null, keep = {}, shown = "", held = false, waiting = false;
+    let cleanup = null, keep = {}, shown = "", screen = "", held = false, waiting = false;
     const rerender = () => core.render(true);
     /* Ce qui arrive de l'autre téléphone ne doit pas casser un geste en cours. */
     function remote() { if (held) waiting = true; else rerender(); }
@@ -505,15 +509,20 @@
     };
 
     /* ---------- Écrans du socle ---------- */
-    function card(d) {
+    /* Partie à reprendre : il y en a une, et sa manche n'est pas terminée. */
+    function open(d) {
       const s = load(d.id);
+      return !!s && !(d.over && call(() => d.over(handle(s))));
+    }
+    function card(d) {
+      const s = open(d);
       return '<article class="card"><div class="glyph">' + glyph(d) + '</div><div class="card-body"><p class="eyebrow">' + esc(d.title) + '</p><h3><a class="card-link" href="#jeu-' + d.id + '">' + esc(d.hook) +
         '</a></h3><p class="blurb">' + esc(d.blurb) + '</p><p class="meta">' + esc(d.meta) + (core.canRoom ? " · 1 ou 2 téléphones" : "") + "</p>" +
         (s ? '<a class="card-state" href="#jeu-' + d.id + '">Partie en cours · reprendre</a>' : "") + "</div></article>";
     }
 
     function home() {
-      const banners = DEFS.filter((d) => load(d.id)).map((d) => '<aside class="banner"><p><b>' + esc(d.title) + "</b> : une partie est en cours.</p>" +
+      const banners = DEFS.filter(open).map((d) => '<aside class="banner"><p><b>' + esc(d.title) + "</b> : une partie est en cours.</p>" +
         '<div class="banner-actions"><a class="btn small" href="#jeu-' + d.id + '">Reprendre</a><button class="link" type="button" data-act="g-drop" data-id="' + d.id + '">Abandonner</button></div></aside>').join("");
       const group = DEFS.length ? '<section class="group"><h2 class="group-title">Pour jouer</h2><div class="cards">' + DEFS.map(card).join("") + "</div></section>" : "";
       return { banners, group, count: DEFS.length };
@@ -586,6 +595,10 @@
     function after(route) {
       const d = routeDef(route), s = d && load(d.id);
       if (s && s.duo && core.canRoom) connect(s); else disconnect();
+      /* Un nouvel écran du jeu commence en haut de page (le moteur, lui, garde le défilement entre deux rendus). */
+      const scr = d && app.querySelector("main.game [data-screen]"), name = scr ? d.id + ":" + scr.getAttribute("data-screen") : "";
+      if (name && screen && name !== screen) window.scrollTo(0, 0);
+      screen = name;
       if (!d) return;
       app.querySelectorAll("[data-keep]").forEach((el) => {
         const o = keep[el.getAttribute("data-keep")];
