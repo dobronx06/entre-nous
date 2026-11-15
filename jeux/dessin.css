@@ -1,0 +1,90 @@
+/* Dessine-moi. */
+.dessin { flex: 1 1 auto; display: flex; flex-direction: column; gap: 0.8rem; }
+/* Un prénom ou un mot sans espace passe à la ligne au lieu de faire défiler la page de côté. */
+.dessin .g-title, .dessin .g-lead, .dessin .hint, .dessin .sync, .dessin .g-pass h1, .dessin .g-pass p, .dessin .g-pass .btn { overflow-wrap: anywhere; }
+.dessin-step { font: 600 0.78rem var(--body); letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+.dessin-who { display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; color: var(--ink-2); }
+
+/* Écran de dessin : sujet, chrono, feuille et outils tiennent ensemble à l'écran. Sur un petit téléphone,
+   c'est la feuille qui rétrécit plutôt que de pousser les outils hors de portée du pouce. */
+.dessin-head, .dessin-tools { width: 100%; max-width: 30rem; margin-inline: auto; }
+.dessin-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+.dessin-subject { min-width: 0; font: 700 clamp(1.2rem, 5vw, 1.5rem)/1.15 var(--display); letter-spacing: -0.02em; text-wrap: balance; overflow-wrap: anywhere; }
+.dessin-time { flex: none; font: 700 1.25rem/1.15 var(--body); font-variant-numeric: tabular-nums; color: var(--ink); }
+.dessin-time.is-late { color: var(--crit); }
+.dessin-desk { display: flex; flex-direction: column; gap: 0.4rem; width: min(100%, max(12rem, calc(100vh - 20.25rem))); width: min(100%, max(12rem, calc(100dvh - 20.25rem))); margin-inline: auto; }
+.dessin-clock span { transition: none; }
+/* La feuille reste blanche dans les deux thèmes, comme les encres restent fixes : un dessin doit être le même
+   sur les deux téléphones et dans l'image enregistrée. Elle est cerclée de l'encre de son auteur. */
+.dessin-sheet, .dessin-art { display: block; width: 100%; height: auto; border-radius: 14px; background: #fff; box-shadow: 0 0 0 2px var(--who); }
+.dessin-sheet { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; cursor: crosshair; }
+
+.dessin-tools { display: flex; flex-direction: column; gap: 0.35rem; }
+.dessin-row { display: flex; align-items: center; justify-content: space-between; }
+/* Seconde rangée : des parts fixes, sur une seule ligne. « Tout effacer ? » passe à la ligne dans son bouton
+   au lieu de le déplacer : le second toucher doit tomber là où était le premier. */
+.dessin-row + .dessin-row { gap: 0.35rem; }
+.dessin-sizes { display: flex; gap: 0.35rem; }
+.dessin-pick { flex: 0 1 44px; display: grid; place-items: center; min-width: 0; height: 44px; padding: 0; border: 1.5px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); cursor: pointer; }
+.dessin-sizes .dessin-pick { flex: none; width: 44px; }
+.dessin-pick:hover, .dessin-do:hover { border-color: var(--ink); }
+.dessin-pick[aria-pressed="true"] { border-color: var(--ink); background: var(--wash); }
+.dessin-pick svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.dessin-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.dessin-pick[data-v="1"] .dessin-dot { width: 16px; height: 16px; }
+/* Une encre : une pastille bordée de blanc de papier, pour rester lisible sur fond sombre. */
+.dessin-ink, .dessin-ink[aria-pressed="true"] { border: 0; border-radius: 50%; background: none; }
+.dessin-ink::before { content: ""; width: 30px; height: 30px; border: 2px solid #fff; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 1px var(--line); }
+.dessin-ink[aria-pressed="true"]::before { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4.5px var(--ink); }
+.dessin-do { flex: 1 1 0; min-width: 0; min-height: 44px; padding: 0 0.4rem; border: 1.5px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font-size: 0.92rem; font-weight: 600; line-height: 1.1; cursor: pointer; }
+.dessin-do[data-act="clear"] { flex-grow: 1.3; }
+/* La feuille est taillée pour un sujet sur deux lignes. Là où il en prend souvent trois (téléphone étroit, ou
+   grand écran et ses caractères plus gros), elle cède une ligne : les outils ne passent pas sous « J'ai fini ». */
+@media (max-width: 22.4rem) {
+  .dessin-desk { width: min(100%, max(12rem, calc(100vh - 21.75rem))); width: min(100%, max(12rem, calc(100dvh - 21.75rem))); }
+}
+@media (min-width: 30rem) {
+  .dessin-desk { width: min(100%, max(12rem, calc(100vh - 21.25rem))); width: min(100%, max(12rem, calc(100dvh - 21.25rem))); }
+}
+/* En dessous de 340 px, sept outils de 44 px ne tiennent plus : la rangée emprunte dix pixels à chaque marge de la page. */
+@media (max-width: 21.2rem) {
+  .dessin-tools { width: auto; margin-inline: -0.625rem; }
+}
+/* Écran trop bas pour tout montrer : « J'ai fini » ne reste plus collé en bas, où il recouvrirait les outils. */
+@media (max-height: 33.7rem) {
+  .dessin-draw .g-actions { position: static; }
+}
+/* Téléphone tenu en largeur : la feuille à gauche, sur toute la hauteur ; le sujet, les outils et « J'ai fini » à droite. */
+@media (orientation: landscape) and (max-height: 33.7rem) and (min-width: 35rem) {
+  .dessin-draw { display: grid; grid-template: auto auto 1fr / auto minmax(0, 1fr); column-gap: 1rem; }
+  .dessin-draw .dessin-desk { grid-area: 1 / 1 / -1; width: max(12rem, calc(100vh - 5.5rem)); width: max(12rem, calc(100dvh - 5.5rem)); margin: 0; }
+  .dessin-draw .g-actions { align-self: end; padding-bottom: 0; }
+}
+
+/* Révélation et attente */
+.dessin-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7rem; }
+/* Les feuilles s'alignent par le bas : un long prénom qui passe sur deux lignes ne décale pas son dessin. */
+.dessin-fig figcaption { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; max-width: 100%; font-size: 0.9rem; color: var(--ink-2); }
+.dessin-fig { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 0.5rem; min-width: 0; margin: 0; }
+.dessin-mine { width: min(100%, 15rem); margin-inline: auto; }
+.dessin-keep { display: flex; justify-content: center; }
+.dessin-keep .btn { min-height: 44px; }
+/* « Rejouer avec » : la catégorie qu'on vient de jouer, repérée comme le choix en cours sur la présentation. */
+.dessin .g-choice[aria-current="true"] { border-color: var(--ink); background: var(--wash); }
+@media (prefers-reduced-motion: no-preference) {
+  .dessin-clock span { transition: width 0.25s linear; }
+  .dessin-pair.is-new .dessin-fig { animation: dessin-in 0.3s ease-out backwards; }
+  .dessin-pair.is-new .dessin-fig + .dessin-fig { animation-delay: 0.12s; }
+  @keyframes dessin-in { from { opacity: 0.3; transform: translateY(8px); } }
+}
+
+/* Galerie, sur la présentation du jeu et à la fin d'une pile */
+.dessin-gal { padding-block: 0.2rem; }
+.dessin-gal summary { padding-block: 0.6rem; }
+.dessin-gal .link { min-height: 44px; }
+.dessin-thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 0.6rem; }
+.dessin-thumb { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 0.5rem; min-width: 0; padding: 0.6rem; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink-2); font-size: 0.82rem; line-height: 1.3; text-align: left; cursor: pointer; }
+.dessin-thumb:hover { border-color: var(--ink); }
+.dessin-thumb span { grid-column: 1 / -1; overflow-wrap: anywhere; }
+.dessin-thumb .dessin-art { border-radius: 8px; box-shadow: 0 0 0 1.5px var(--a); }
+.dessin-thumb .dessin-art + .dessin-art { box-shadow: 0 0 0 1.5px var(--b); }

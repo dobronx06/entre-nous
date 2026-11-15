@@ -1,0 +1,74 @@
+/* Le match des envies. */
+/* Une carte qui part vers la droite ne doit pas élargir la page le temps du geste. */
+main[data-game="match"] { overflow-x: clip; }
+.match { flex: 1 1 auto; display: flex; flex-direction: column; gap: 1rem; }
+.match-head { display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; color: var(--ink-2); }
+.match .g-who { background: var(--who-soft); }
+.match-count { flex: none; margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* La carte du dessus et, derrière elle, ce qu'il reste du paquet. */
+.match-stage { position: relative; flex: 1 1 auto; display: flex; min-height: 11.5rem; max-height: 22rem; margin-bottom: 0.9rem; }
+.match-stage::before, .match-stage::after { content: ""; position: absolute; inset: 0; border-radius: 22px; background: var(--who-soft); transform-origin: 50% 100%; }
+.match-stage::before { transform: translateY(0.9rem) scale(0.9); opacity: 0.5; }
+.match-stage::after { transform: translateY(0.45rem) scale(0.95); }
+.match-stage[data-left="1"]::before, .match-stage[data-left="1"]::after, .match-stage[data-left="2"]::before { content: none; }
+/* La carte se saisit : pendant le geste, le navigateur ne doit ni faire défiler la page ni sélectionner le texte. */
+.match-card { position: relative; z-index: 1; flex: 1 1 auto; display: grid; grid-template-rows: 1fr auto; justify-content: normal; min-width: 0; min-height: 0; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; cursor: grab; }
+.match-card:active { cursor: grabbing; }
+.match-card .g-card-text { grid-row: 1; align-self: center; }
+.match-card .g-tag { grid-row: 2; justify-self: start; }
+/* Page plus haute que l'écran : le glisser vers le haut reste au défilement (voir mount), et l'aide n'en parle pas. */
+.match.is-flat .match-card { touch-action: pan-y; }
+.match.is-flat .match-up { display: none; }
+.match-prev .link { min-height: 44px; }
+/* Le tampon reprend l'allure du bouton de la même réponse. Il se pose à cheval sur le bord haut de la
+   carte : le pouce ne le cache pas, et il ne couvre jamais le texte. */
+.match-stamp { position: absolute; top: 0; left: 50%; display: inline-flex; align-items: center; min-height: 2.2rem; padding: 0 0.95rem; border: 1.5px solid var(--ink); border-radius: 999px; background: var(--surface); color: var(--ink); font-weight: 600; white-space: nowrap; opacity: 0; transform: translate(-50%, -50%); pointer-events: none; }
+.match-stamp.k1 { border-color: transparent; background: var(--who-soft); }
+.match-stamp.k2 { border-color: var(--btn); background: var(--btn); color: var(--btn-fg); }
+.match-stamp.is-on { transform: translate(-50%, -50%) scale(1.12); }
+.match-keys { display: none; }
+@media (hover: hover) and (pointer: fine) { .match-keys { display: inline; } }
+@media (prefers-reduced-motion: no-preference) {
+  .match-card.is-back { transition: transform 0.2s ease-out; }
+  .match-card.is-out { transition: transform 0.18s ease-in, opacity 0.18s ease-in; }
+  .match-stamp { transition: opacity 0.12s, transform 0.12s; }
+  .match-card .g-card-text { animation: match-in 0.2s ease-out; }
+  @keyframes match-in { from { opacity: 0; transform: translateY(6px); } }
+}
+
+/* Trois réponses à portée de pouce, de la plus tiède à la plus franche ; dessous, de quoi se reprendre. */
+/* Fond plein : ce qui passe sous la rangée ne doit pas se lire à travers elle ni à travers « Non ». */
+.match-acts { row-gap: 0.75rem; background: linear-gradient(to top, var(--bg) calc(100% - 0.8rem), transparent); }
+.match-acts .btn.alt:not(:hover) { background: var(--bg); }
+.match-acts .hint { flex: 1 0 100%; }
+.match-acts .btn { flex: 1 1 auto; min-height: 3.5rem; padding-inline: 0.7rem; font-size: clamp(0.9rem, 4.1vw, 1rem); }
+.match-soft { border-color: transparent; background: var(--who-soft); color: var(--ink); }
+.match-more { flex: 1 0 100%; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 1rem; }
+.match-more .link:last-child { margin-left: auto; }
+.match-more .link, .match-keep .link { min-height: 44px; }
+
+/* Résultat : les deux encres se recouvrent d'autant plus que le paquet a plu aux deux. */
+.match-venn { display: flex; justify-content: center; }
+.match-venn .venn { max-width: 11rem; }
+.match .g-big { display: block; }
+.match .g-choice[aria-current="true"] { border-color: var(--ink); background: var(--wash); }
+.match-list { display: flex; flex-direction: column; border-bottom: 1px solid var(--line); }
+.match-list li { display: flex; align-items: center; gap: 0.8rem; padding-block: 0.6rem; border-top: 1px solid var(--line); }
+.match-idea { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 0.3rem; color: var(--ink); font-weight: 600; overflow-wrap: anywhere; }
+.match-from { font-size: 0.82rem; font-weight: 400; color: var(--muted); }
+.match-duo { background: linear-gradient(90deg, var(--a-soft), var(--b-soft)); color: var(--ink); }
+.match-list .is-done p { color: var(--muted); text-decoration: line-through; }
+
+/* « Fait » : une pastille à cocher, large comme un doigt. */
+.match-done { position: relative; flex: none; display: inline-flex; align-items: center; gap: 0.45rem; min-height: 44px; padding: 0 0.9rem 0 0.7rem; border: 1.5px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink-2); font-size: 0.88rem; font-weight: 600; cursor: pointer; }
+.match-done:hover { border-color: var(--ink); }
+.match-done::before { content: ""; width: 1.05rem; height: 1.05rem; border: 1.5px solid var(--muted); border-radius: 50%; }
+.match-done::after { content: ""; position: absolute; left: 1.07rem; top: 50%; width: 0.3rem; height: 0.56rem; margin-top: -0.36rem; border: solid var(--on-fill); border-width: 0 2px 2px 0; transform: rotate(45deg); opacity: 0; }
+.match-done[aria-pressed="true"] { border-color: var(--good); color: var(--ink); }
+.match-done[aria-pressed="true"]::before { border-color: var(--good); background: var(--good); }
+.match-done[aria-pressed="true"]::after { opacity: 1; }
+
+/* « Nos envies », sous la présentation du jeu */
+.match-keep summary { padding-block: 0.65rem; }
+.match-keep summary .g-tag { margin-left: 0.3rem; vertical-align: 0.1em; }

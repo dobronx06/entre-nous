@@ -473,6 +473,81 @@ button, input, textarea { font: inherit; color: inherit; }
 .g-choice b { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; font-weight: 600; }
 .g-choice > span { font-size: 0.85rem; color: var(--ink-2); }
 
+/* Le match des envies. */
+/* Une carte qui part vers la droite ne doit pas élargir la page le temps du geste. */
+main[data-game="match"] { overflow-x: clip; }
+.match { flex: 1 1 auto; display: flex; flex-direction: column; gap: 1rem; }
+.match-head { display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; color: var(--ink-2); }
+.match .g-who { background: var(--who-soft); }
+.match-count { flex: none; margin-left: auto; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* La carte du dessus et, derrière elle, ce qu'il reste du paquet. */
+.match-stage { position: relative; flex: 1 1 auto; display: flex; min-height: 11.5rem; max-height: 22rem; margin-bottom: 0.9rem; }
+.match-stage::before, .match-stage::after { content: ""; position: absolute; inset: 0; border-radius: 22px; background: var(--who-soft); transform-origin: 50% 100%; }
+.match-stage::before { transform: translateY(0.9rem) scale(0.9); opacity: 0.5; }
+.match-stage::after { transform: translateY(0.45rem) scale(0.95); }
+.match-stage[data-left="1"]::before, .match-stage[data-left="1"]::after, .match-stage[data-left="2"]::before { content: none; }
+/* La carte se saisit : pendant le geste, le navigateur ne doit ni faire défiler la page ni sélectionner le texte. */
+.match-card { position: relative; z-index: 1; flex: 1 1 auto; display: grid; grid-template-rows: 1fr auto; justify-content: normal; min-width: 0; min-height: 0; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; cursor: grab; }
+.match-card:active { cursor: grabbing; }
+.match-card .g-card-text { grid-row: 1; align-self: center; }
+.match-card .g-tag { grid-row: 2; justify-self: start; }
+/* Page plus haute que l'écran : le glisser vers le haut reste au défilement (voir mount), et l'aide n'en parle pas. */
+.match.is-flat .match-card { touch-action: pan-y; }
+.match.is-flat .match-up { display: none; }
+.match-prev .link { min-height: 44px; }
+/* Le tampon reprend l'allure du bouton de la même réponse. Il se pose à cheval sur le bord haut de la
+   carte : le pouce ne le cache pas, et il ne couvre jamais le texte. */
+.match-stamp { position: absolute; top: 0; left: 50%; display: inline-flex; align-items: center; min-height: 2.2rem; padding: 0 0.95rem; border: 1.5px solid var(--ink); border-radius: 999px; background: var(--surface); color: var(--ink); font-weight: 600; white-space: nowrap; opacity: 0; transform: translate(-50%, -50%); pointer-events: none; }
+.match-stamp.k1 { border-color: transparent; background: var(--who-soft); }
+.match-stamp.k2 { border-color: var(--btn); background: var(--btn); color: var(--btn-fg); }
+.match-stamp.is-on { transform: translate(-50%, -50%) scale(1.12); }
+.match-keys { display: none; }
+@media (hover: hover) and (pointer: fine) { .match-keys { display: inline; } }
+@media (prefers-reduced-motion: no-preference) {
+  .match-card.is-back { transition: transform 0.2s ease-out; }
+  .match-card.is-out { transition: transform 0.18s ease-in, opacity 0.18s ease-in; }
+  .match-stamp { transition: opacity 0.12s, transform 0.12s; }
+  .match-card .g-card-text { animation: match-in 0.2s ease-out; }
+  @keyframes match-in { from { opacity: 0; transform: translateY(6px); } }
+}
+
+/* Trois réponses à portée de pouce, de la plus tiède à la plus franche ; dessous, de quoi se reprendre. */
+/* Fond plein : ce qui passe sous la rangée ne doit pas se lire à travers elle ni à travers « Non ». */
+.match-acts { row-gap: 0.75rem; background: linear-gradient(to top, var(--bg) calc(100% - 0.8rem), transparent); }
+.match-acts .btn.alt:not(:hover) { background: var(--bg); }
+.match-acts .hint { flex: 1 0 100%; }
+.match-acts .btn { flex: 1 1 auto; min-height: 3.5rem; padding-inline: 0.7rem; font-size: clamp(0.9rem, 4.1vw, 1rem); }
+.match-soft { border-color: transparent; background: var(--who-soft); color: var(--ink); }
+.match-more { flex: 1 0 100%; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0 1rem; }
+.match-more .link:last-child { margin-left: auto; }
+.match-more .link, .match-keep .link { min-height: 44px; }
+
+/* Résultat : les deux encres se recouvrent d'autant plus que le paquet a plu aux deux. */
+.match-venn { display: flex; justify-content: center; }
+.match-venn .venn { max-width: 11rem; }
+.match .g-big { display: block; }
+.match .g-choice[aria-current="true"] { border-color: var(--ink); background: var(--wash); }
+.match-list { display: flex; flex-direction: column; border-bottom: 1px solid var(--line); }
+.match-list li { display: flex; align-items: center; gap: 0.8rem; padding-block: 0.6rem; border-top: 1px solid var(--line); }
+.match-idea { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 0.3rem; color: var(--ink); font-weight: 600; overflow-wrap: anywhere; }
+.match-from { font-size: 0.82rem; font-weight: 400; color: var(--muted); }
+.match-duo { background: linear-gradient(90deg, var(--a-soft), var(--b-soft)); color: var(--ink); }
+.match-list .is-done p { color: var(--muted); text-decoration: line-through; }
+
+/* « Fait » : une pastille à cocher, large comme un doigt. */
+.match-done { position: relative; flex: none; display: inline-flex; align-items: center; gap: 0.45rem; min-height: 44px; padding: 0 0.9rem 0 0.7rem; border: 1.5px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink-2); font-size: 0.88rem; font-weight: 600; cursor: pointer; }
+.match-done:hover { border-color: var(--ink); }
+.match-done::before { content: ""; width: 1.05rem; height: 1.05rem; border: 1.5px solid var(--muted); border-radius: 50%; }
+.match-done::after { content: ""; position: absolute; left: 1.07rem; top: 50%; width: 0.3rem; height: 0.56rem; margin-top: -0.36rem; border: solid var(--on-fill); border-width: 0 2px 2px 0; transform: rotate(45deg); opacity: 0; }
+.match-done[aria-pressed="true"] { border-color: var(--good); color: var(--ink); }
+.match-done[aria-pressed="true"]::before { border-color: var(--good); background: var(--good); }
+.match-done[aria-pressed="true"]::after { opacity: 1; }
+
+/* « Nos envies », sous la présentation du jeu */
+.match-keep summary { padding-block: 0.65rem; }
+.match-keep summary .g-tag { margin-left: 0.3rem; vertical-align: 0.1em; }
+
 /* Sur la même longueur d'onde. */
 .onde { flex: 1 1 auto; display: flex; flex-direction: column; gap: 1rem; }
 /* Un mot ou un prénom sans espace passe à la ligne au lieu de faire défiler la page de côté. */
@@ -656,6 +731,97 @@ button, input, textarea { font: inherit; color: inherit; }
   .cartes .g-actions { padding-block: 0.4rem max(0.4rem, env(safe-area-inset-bottom, 0px)); }
   .cartes-end { gap: 0.7rem; padding-top: 0.25rem; }
 }
+
+/* Dessine-moi. */
+.dessin { flex: 1 1 auto; display: flex; flex-direction: column; gap: 0.8rem; }
+/* Un prénom ou un mot sans espace passe à la ligne au lieu de faire défiler la page de côté. */
+.dessin .g-title, .dessin .g-lead, .dessin .hint, .dessin .sync, .dessin .g-pass h1, .dessin .g-pass p, .dessin .g-pass .btn { overflow-wrap: anywhere; }
+.dessin-step { font: 600 0.78rem var(--body); letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+.dessin-who { display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; color: var(--ink-2); }
+
+/* Écran de dessin : sujet, chrono, feuille et outils tiennent ensemble à l'écran. Sur un petit téléphone,
+   c'est la feuille qui rétrécit plutôt que de pousser les outils hors de portée du pouce. */
+.dessin-head, .dessin-tools { width: 100%; max-width: 30rem; margin-inline: auto; }
+.dessin-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+.dessin-subject { min-width: 0; font: 700 clamp(1.2rem, 5vw, 1.5rem)/1.15 var(--display); letter-spacing: -0.02em; text-wrap: balance; overflow-wrap: anywhere; }
+.dessin-time { flex: none; font: 700 1.25rem/1.15 var(--body); font-variant-numeric: tabular-nums; color: var(--ink); }
+.dessin-time.is-late { color: var(--crit); }
+.dessin-desk { display: flex; flex-direction: column; gap: 0.4rem; width: min(100%, max(12rem, calc(100vh - 20.25rem))); width: min(100%, max(12rem, calc(100dvh - 20.25rem))); margin-inline: auto; }
+.dessin-clock span { transition: none; }
+/* La feuille reste blanche dans les deux thèmes, comme les encres restent fixes : un dessin doit être le même
+   sur les deux téléphones et dans l'image enregistrée. Elle est cerclée de l'encre de son auteur. */
+.dessin-sheet, .dessin-art { display: block; width: 100%; height: auto; border-radius: 14px; background: #fff; box-shadow: 0 0 0 2px var(--who); }
+.dessin-sheet { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; cursor: crosshair; }
+
+.dessin-tools { display: flex; flex-direction: column; gap: 0.35rem; }
+.dessin-row { display: flex; align-items: center; justify-content: space-between; }
+/* Seconde rangée : des parts fixes, sur une seule ligne. « Tout effacer ? » passe à la ligne dans son bouton
+   au lieu de le déplacer : le second toucher doit tomber là où était le premier. */
+.dessin-row + .dessin-row { gap: 0.35rem; }
+.dessin-sizes { display: flex; gap: 0.35rem; }
+.dessin-pick { flex: 0 1 44px; display: grid; place-items: center; min-width: 0; height: 44px; padding: 0; border: 1.5px solid var(--line); border-radius: 12px; background: var(--surface); color: var(--ink); cursor: pointer; }
+.dessin-sizes .dessin-pick { flex: none; width: 44px; }
+.dessin-pick:hover, .dessin-do:hover { border-color: var(--ink); }
+.dessin-pick[aria-pressed="true"] { border-color: var(--ink); background: var(--wash); }
+.dessin-pick svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.dessin-dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.dessin-pick[data-v="1"] .dessin-dot { width: 16px; height: 16px; }
+/* Une encre : une pastille bordée de blanc de papier, pour rester lisible sur fond sombre. */
+.dessin-ink, .dessin-ink[aria-pressed="true"] { border: 0; border-radius: 50%; background: none; }
+.dessin-ink::before { content: ""; width: 30px; height: 30px; border: 2px solid #fff; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 1px var(--line); }
+.dessin-ink[aria-pressed="true"]::before { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4.5px var(--ink); }
+.dessin-do { flex: 1 1 0; min-width: 0; min-height: 44px; padding: 0 0.4rem; border: 1.5px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font-size: 0.92rem; font-weight: 600; line-height: 1.1; cursor: pointer; }
+.dessin-do[data-act="clear"] { flex-grow: 1.3; }
+/* La feuille est taillée pour un sujet sur deux lignes. Là où il en prend souvent trois (téléphone étroit, ou
+   grand écran et ses caractères plus gros), elle cède une ligne : les outils ne passent pas sous « J'ai fini ». */
+@media (max-width: 22.4rem) {
+  .dessin-desk { width: min(100%, max(12rem, calc(100vh - 21.75rem))); width: min(100%, max(12rem, calc(100dvh - 21.75rem))); }
+}
+@media (min-width: 30rem) {
+  .dessin-desk { width: min(100%, max(12rem, calc(100vh - 21.25rem))); width: min(100%, max(12rem, calc(100dvh - 21.25rem))); }
+}
+/* En dessous de 340 px, sept outils de 44 px ne tiennent plus : la rangée emprunte dix pixels à chaque marge de la page. */
+@media (max-width: 21.2rem) {
+  .dessin-tools { width: auto; margin-inline: -0.625rem; }
+}
+/* Écran trop bas pour tout montrer : « J'ai fini » ne reste plus collé en bas, où il recouvrirait les outils. */
+@media (max-height: 33.7rem) {
+  .dessin-draw .g-actions { position: static; }
+}
+/* Téléphone tenu en largeur : la feuille à gauche, sur toute la hauteur ; le sujet, les outils et « J'ai fini » à droite. */
+@media (orientation: landscape) and (max-height: 33.7rem) and (min-width: 35rem) {
+  .dessin-draw { display: grid; grid-template: auto auto 1fr / auto minmax(0, 1fr); column-gap: 1rem; }
+  .dessin-draw .dessin-desk { grid-area: 1 / 1 / -1; width: max(12rem, calc(100vh - 5.5rem)); width: max(12rem, calc(100dvh - 5.5rem)); margin: 0; }
+  .dessin-draw .g-actions { align-self: end; padding-bottom: 0; }
+}
+
+/* Révélation et attente */
+.dessin-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7rem; }
+/* Les feuilles s'alignent par le bas : un long prénom qui passe sur deux lignes ne décale pas son dessin. */
+.dessin-fig figcaption { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; max-width: 100%; font-size: 0.9rem; color: var(--ink-2); }
+.dessin-fig { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: 0.5rem; min-width: 0; margin: 0; }
+.dessin-mine { width: min(100%, 15rem); margin-inline: auto; }
+.dessin-keep { display: flex; justify-content: center; }
+.dessin-keep .btn { min-height: 44px; }
+/* « Rejouer avec » : la catégorie qu'on vient de jouer, repérée comme le choix en cours sur la présentation. */
+.dessin .g-choice[aria-current="true"] { border-color: var(--ink); background: var(--wash); }
+@media (prefers-reduced-motion: no-preference) {
+  .dessin-clock span { transition: width 0.25s linear; }
+  .dessin-pair.is-new .dessin-fig { animation: dessin-in 0.3s ease-out backwards; }
+  .dessin-pair.is-new .dessin-fig + .dessin-fig { animation-delay: 0.12s; }
+  @keyframes dessin-in { from { opacity: 0.3; transform: translateY(8px); } }
+}
+
+/* Galerie, sur la présentation du jeu et à la fin d'une pile */
+.dessin-gal { padding-block: 0.2rem; }
+.dessin-gal summary { padding-block: 0.6rem; }
+.dessin-gal .link { min-height: 44px; }
+.dessin-thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 0.6rem; }
+.dessin-thumb { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 0.5rem; min-width: 0; padding: 0.6rem; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink-2); font-size: 0.82rem; line-height: 1.3; text-align: left; cursor: pointer; }
+.dessin-thumb:hover { border-color: var(--ink); }
+.dessin-thumb span { grid-column: 1 / -1; overflow-wrap: anywhere; }
+.dessin-thumb .dessin-art { border-radius: 8px; box-shadow: 0 0 0 1.5px var(--a); }
+.dessin-thumb .dessin-art + .dessin-art { box-shadow: 0 0 0 1.5px var(--b); }
 </style>
 <div id="app"></div>
 <script>
@@ -2126,6 +2292,644 @@ button, input, textarea { font: inherit; color: inherit; }
 });
 </script>
 <script>
+/* Le match des envies : six paquets de 36 envies auxquelles chacun répond « non », « pourquoi pas » ou
+   « carrément ». Seules les envies communes sont révélées ; le dernier paquet est réservé aux adultes. */
+(window.GAME_DATA = window.GAME_DATA || {}).match = {
+  decks: [
+    {
+      id: "sorties",
+      name: "Sorties et soirées",
+      hint: "De quoi mettre le nez dehors ce soir ou ce week-end, par tous les temps.",
+      items: [
+        "Voir un film en plein air, plaid sur les genoux",
+        "Tenter un escape game rien qu'à deux",
+        "Monter au point le plus haut de la ville à l'heure où elle s'allume",
+        "Chanter à tue-tête au karaoké, de préférence en duo",
+        "Chiner dans une brocante un dimanche matin",
+        "Visiter un musée en nocturne, quand les salles se vident",
+        "Pique-niquer au bord de l'eau à la tombée du jour",
+        "Aller au concert d'un groupe dont on n'a jamais entendu parler",
+        "Se promener en forêt quand les feuilles changent de couleur",
+        "Disputer une partie de bowling avec un gage pour qui perd",
+        "S'installer sous le dôme d'un planétarium, la tête dans les étoiles",
+        "Passer quelques heures au spa, entre hammam et bains chauds",
+        "Descendre à un arrêt choisi au hasard et explorer le quartier",
+        "Danser dans un bal populaire un soir d'été",
+        "Entrer dans une librairie et choisir un livre pour l'autre",
+        "Rire devant un match d'improvisation théâtrale",
+        "Louer une barque ou un canoë pour une heure sur l'eau",
+        "Sortir sous la neige dès les premiers flocons",
+        "S'essayer à la poterie dans un atelier d'initiation",
+        "Finir la soirée à la fête foraine, barbe à papa comprise",
+        "S'asseoir en terrasse et inventer la vie des passants",
+        "Survoler la campagne en montgolfière au lever du jour",
+        "Jouer à la pétanque en fin de journée, à la fraîche",
+        "Participer à une soirée quiz et viser le podium",
+        "Se baigner dans un lac par une journée de grande chaleur",
+        "S'habiller chic pour une soirée à l'opéra ou au ballet",
+        "Faire voler un cerf-volant un jour de grand vent",
+        "Aller encourager une équipe locale depuis les tribunes",
+        "Se réchauffer dans une serre tropicale au cœur de l'hiver",
+        "Chausser des patins à glace et ne plus lâcher la main de l'autre",
+        "Trouver le meilleur endroit pour regarder un feu d'artifice",
+        "Donner une matinée de bénévolat à une association du coin",
+        "Défier l'autre aux jeux d'arcade ou au flipper",
+        "Assister à une vente aux enchères, juste pour l'ambiance",
+        "Enchaîner les grimaces dans une cabine photo",
+        "Vivre un festival de bout en bout, bracelet au poignet"
+      ]
+    },
+    {
+      id: "maison",
+      name: "À la maison",
+      hint: "Soirées, rituels et petits projets à vivre sans quitter ses chaussons.",
+      items: [
+        "Construire une cabane de draps et de coussins dans le salon",
+        "Instaurer une soirée sans téléphone par semaine",
+        "Finir un puzzle de mille pièces, un peu chaque soir",
+        "Transformer le salon en salle de cinéma, pop-corn et rideaux tirés",
+        "Passer un dimanche entier en pyjama, du réveil au coucher",
+        "Pousser les meubles pour danser au milieu de la pièce",
+        "Lire le même roman et en discuter au fil des chapitres",
+        "Organiser un tournoi de jeux de société avec un trophée fait maison",
+        "Repeindre un mur d'une couleur qui change tout",
+        "S'interviewer comme à la télé, une cuillère en guise de micro",
+        "Écouter un album dans le noir, du premier au dernier titre",
+        "Glisser des mots doux dans les affaires de l'autre",
+        "Jouer à un jeu vidéo en coopération jusqu'au générique de fin",
+        "Adopter une plante verte et lui trouver un prénom",
+        "Passer une soirée entière à la bougie, toutes lumières éteintes",
+        "S'accorder une sieste à deux en plein après-midi",
+        "Organiser pour l'autre une chasse au trésor, indices cachés partout",
+        "Accrocher enfin les cadres qui attendent depuis des mois",
+        "Se défier au blind test sur les tubes de nos années collège",
+        "Tenir un carnet à deux et y écrire quelques lignes chaque semaine",
+        "Dessiner le portrait de l'autre, puis échanger les chefs-d'œuvre",
+        "Regarder tomber la pluie, au chaud sous une couverture",
+        "Préparer une capsule temporelle à n'ouvrir que dans dix ans",
+        "Improviser un défilé avec tout ce qui dort au fond des placards",
+        "S'étirer dix minutes ensemble chaque matin, au saut du lit",
+        "Commencer une série et jurer de ne jamais regarder un épisode en douce",
+        "Aménager un coin lecture avec fauteuil, plaid et petite lampe",
+        "Veiller jusqu'à l'aube à refaire le monde",
+        "Apprendre à l'autre ce qu'on sait faire de mieux, et inversement",
+        "Déclencher une bataille d'oreillers sans prévenir",
+        "Se mettre au tricot pour offrir à l'autre une écharpe avant l'hiver",
+        "Ressortir les photos d'enfance et raconter les histoires qui vont avec",
+        "Écrire une histoire à quatre mains, une phrase après l'autre",
+        "Faire le bilan de l'année et choisir trois envies pour la suivante",
+        "Rejouer le tout premier rendez-vous, version maison",
+        "Inviter les voisins à prendre un café pour faire connaissance"
+      ]
+    },
+    {
+      id: "voyages",
+      name: "Voyages et escapades",
+      hint: "Du week-end à deux pas au voyage d'une vie, toutes les façons de partir.",
+      items: [
+        "Prendre un train de nuit et se réveiller dans un autre pays",
+        "Passer une nuit dans une cabane perchée, au milieu des branches",
+        "Aller voir la mer hors saison, pour le vent et les plages désertes",
+        "Guetter les aurores boréales sous un ciel d'hiver",
+        "Dormir à la belle étoile par une nuit d'été",
+        "S'offrir trois jours dans une capitale européenne jamais visitée",
+        "Naviguer en péniche, au rythme tranquille des écluses",
+        "Partir en week-end surprise, destination révélée au dernier moment",
+        "Voir le Japon à la saison des cerisiers en fleurs",
+        "Passer des vacances au camping, tongs aux pieds et zéro contrainte",
+        "Faire visiter à l'autre l'endroit où l'on a grandi",
+        "Suivre un fleuve à vélo, d'étape en étape, sacoches pleines",
+        "Se blottir dans un chalet à la neige, avec ou sans skis",
+        "Échanger son logement pour les vacances, clés contre clés",
+        "Se retrouver en plein désert, des dunes à perte de vue",
+        "S'échapper deux jours à la campagne, dans une maison d'hôtes",
+        "Sauter d'île en île en ferry, un sac léger sur le dos",
+        "Réunir une bande d'amis pour des vacances sous le même toit",
+        "Faire le tour du monde, en prenant tout le temps qu'il faut",
+        "Voyager sur les traces d'un roman ou d'un film qu'on adore",
+        "Randonner plusieurs jours de refuge en refuge",
+        "Partir une semaine en formule tout compris, sans rien décider",
+        "Regarder le Machu Picchu sortir de la brume au petit matin",
+        "Séjourner dans une ferme et donner un coup de main aux récoltes",
+        "Rejoindre une destination lointaine sans jamais prendre l'avion",
+        "S'envoyer de chaque voyage une carte postale qui arrivera après nous",
+        "Nager avec masque et tuba au-dessus d'un récif de corail",
+        "S'installer dix jours dans un village où il ne se passe rien",
+        "S'envoler vers le soleil en plein mois de février",
+        "Se choisir un coin de paradis où retourner tous les ans",
+        "Découvrir chaque année une région où l'on n'a jamais mis les pieds",
+        "Se perdre dans les ruelles d'un souk, entre épices et tissus",
+        "Voyager à l'ancienne, avec une carte en papier et un guide corné",
+        "Explorer un pays de volcans, de glaciers et de geysers",
+        "Partir avec un aller simple et décider du retour sur place",
+        "Observer des animaux sauvages en liberté, jumelles autour du cou"
+      ]
+    },
+    {
+      id: "fous",
+      name: "Projets fous",
+      hint: "Grands rêves et coups de tête, à tenter un jour… ou dès demain.",
+      items: [
+        "Partir vivre un an à l'étranger",
+        "Apprendre une langue à deux pour pouvoir se parler en secret",
+        "Acheter une ruine à la campagne et la retaper pierre par pierre",
+        "S'entraîner des mois pour franchir ensemble une ligne d'arrivée",
+        "Changer de tête le même jour et garder la surprise jusqu'au soir",
+        "Se mettre à la musique et monter un duo, fausses notes comprises",
+        "Poser nos valises pour de bon au bord de la mer",
+        "Tourner un court-métrage, du scénario à la projection",
+        "Prendre les commandes d'un petit avion le temps d'une leçon",
+        "Ouvrir un lieu bien à nous, nos deux prénoms sur la devanture",
+        "Tenir un an sans rien acheter de neuf",
+        "Écrire un sketch et le jouer ensemble sur une scène ouverte",
+        "Planter un arbre et le regarder grandir d'année en année",
+        "Rejoindre un chantier de fouilles archéologiques, truelle à la main",
+        "Tenter sa chance à deux dans un jeu télévisé",
+        "Construire son propre bateau en bois et le mettre à l'eau",
+        "S'initier au surf, quitte à boire la tasse tout un été",
+        "Créer une association pour une cause qui nous tient à cœur",
+        "Se faire tatouer le même symbole, discret ou pas",
+        "Lancer un podcast à deux et aller au bout de dix épisodes",
+        "Vivre à plusieurs, entre amis, dans une grande maison partagée",
+        "Apprendre quelques tours de magie pour épater la galerie",
+        "Fabriquer de ses mains un meuble qu'on gardera toute la vie",
+        "Traverser le globe pour voir une éclipse totale",
+        "Garder un refuge de montagne pendant toute une saison",
+        "Donner une immense fête sans autre prétexte que l'envie",
+        "Ouvrir une encyclopédie au hasard et devenir incollables sur le sujet",
+        "Faire de la figuration dans un film et se chercher ensuite à l'écran",
+        "Battre un record du monde, aussi farfelu soit-il",
+        "Inventer un jeu de société et le faire tester aux amis",
+        "S'offrir un baptême de chute libre en soufflerie",
+        "Vivre un mois entier sans réveil, sans montre et sans agenda",
+        "Exposer nos plus belles photos et organiser un vrai vernissage",
+        "Apprendre un poème par cœur chaque mois pendant un an",
+        "Commencer une collection parfaitement inutile et s'y tenir des années",
+        "Dormir dans un château réputé hanté, ou du moins essayer"
+      ]
+    },
+    {
+      id: "table",
+      name: "À table",
+      hint: "Cuisines à goûter, plats à tenter à quatre mains, tables à découvrir.",
+      items: [
+        "Tester un restaurant éthiopien et manger avec les doigts",
+        "Fabriquer ses pâtes fraîches, de la farine jusqu'aux coudes",
+        "Traîner à table pour un brunch qui n'en finit pas",
+        "Tirer un pays au sort et cuisiner tout un repas de là-bas",
+        "S'offrir un menu dégustation dans un grand restaurant",
+        "Prendre le petit-déjeuner au lit, tant pis pour les miettes",
+        "Couvrir la table de mezzés libanais et ne rien laisser",
+        "Ouvrir la saison de la raclette dès le premier soir froid",
+        "Faire le marché sans liste et cuisiner ce qui fait envie",
+        "Dîner dans le noir complet et deviner ce qu'il y a dans l'assiette",
+        "Préparer une pizza maison, une moitié par personne",
+        "Comparer les éclairs de plusieurs pâtisseries et élire le meilleur",
+        "Cuisiner pour l'autre le plat préféré de son enfance",
+        "Partager un plateau de fruits de mer face au port",
+        "Se lancer dans le pain maison, du pétrissage à la première tranche",
+        "Oser le plat le plus épicé de la carte, pour voir",
+        "Suivre un cours de cuisine à deux et repartir avec la recette",
+        "Décréter une soirée crêpes et les faire sauter d'une seule main",
+        "Pousser la porte d'un restaurant entièrement végétal",
+        "S'affronter en cuisine avec les mêmes ingrédients imposés",
+        "Savourer un vrai goûter à l'anglaise, scones et théière fumante",
+        "Dîner à l'envers, en commençant par le dessert",
+        "Faire griller soi-même son dîner au barbecue coréen",
+        "Cueillir ses fruits à la ferme, puis en faire une tarte",
+        "Commander pour l'autre au restaurant, sans lui demander son avis",
+        "Inventer un cocktail, avec ou sans alcool, et lui donner un nom",
+        "Picorer de stand en stand dans un marché de cuisine de rue",
+        "Tenter un gâteau à étages, même s'il penche un peu",
+        "Mettre au point une recette signature, à ressortir aux grandes occasions",
+        "Dresser une belle table chez soi comme pour un grand soir",
+        "Sauter dans un train rien que pour déjeuner dans une autre ville",
+        "Rouler ses propres makis et les manger aussitôt",
+        "Enchaîner entrée, plat et dessert dans trois restaurants différents",
+        "Organiser une tablée où tout le monde apporte un plat",
+        "Visiter une chocolaterie et goûter tout ce qu'on nous tend",
+        "Se préparer un festin de minuit, juste parce qu'on a faim"
+      ]
+    },
+    {
+      id: "couette",
+      name: "Sous la couette",
+      hint: "Envies tendres ou plus osées, révélées seulement si vous les partagez.",
+      adult: true,
+      items: [
+        "S'embrasser longuement, comme au tout début",
+        "S'endormir en cuillère, sans rien attendre de plus",
+        "Écrire des mots du bout du doigt sur le dos de l'autre",
+        "Dire à l'autre ce qu'on lui trouve d'irrésistible",
+        "Commencer la journée par un câlin qui s'éternise",
+        "Se masser à l'huile tiède, à tour de rôle",
+        "Dormir sans pyjama, peau contre peau",
+        "Composer une playlist pour les moments sous la couette",
+        "Passer une soirée de caresses, sans chercher à aller plus loin",
+        "Partager une douche bien chaude et oublier l'heure",
+        "Se séduire toute une soirée comme si rien n'était gagné",
+        "Faire monter le désir toute la journée, par petits messages",
+        "Déshabiller l'autre lentement, bouton après bouton",
+        "Laisser la lumière allumée, pour une fois",
+        "Chuchoter à l'oreille de l'autre ce dont on a envie",
+        "Se donner rendez-vous au lit, date et heure notées dans l'agenda",
+        "Faire durer les préliminaires jusqu'à ne plus y tenir",
+        "Se raconter le souvenir à deux qui nous fait encore rougir",
+        "Porter pour l'autre la tenue qui fait toujours son petit effet",
+        "Promener une plume ou un glaçon sur la peau de l'autre",
+        "Écouter à deux un podcast qui parle de désir, puis en discuter",
+        "S'interdire de se toucher pendant une heure, pour mieux se retrouver",
+        "Guider la main de l'autre pour lui montrer ce qu'on aime",
+        "Réserver une chambre d'hôtel dans sa propre ville, juste pour une nuit",
+        "Fermer les yeux sous un bandeau et se laisser surprendre",
+        "Rester au lit après l'amour, à parler tout bas",
+        "Décider à pile ou face qui mène la danse, le temps d'un soir",
+        "Faire l'amour dans une autre pièce que la chambre",
+        "Se trouver un mot de code pour dire qu'on a envie, même en public",
+        "Jouer à action ou vérité, version réservée aux adultes",
+        "Écrire un fantasme sur un papier et l'échanger contre celui de l'autre",
+        "Lancer une partie de cartes où chaque manche perdue coûte un vêtement",
+        "Essayer une position jamais tentée, fous rires autorisés",
+        "Regarder un film érotique à deux, en commentant ou pas",
+        "Se glisser dans un jeu de rôle, costumes facultatifs",
+        "Choisir ensemble un jouet pour adultes, par curiosité"
+      ]
+    }
+  ]
+};
+</script>
+<script>
+/* Le match des envies : chacun trie les idées d'un paquet, et seules celles que les deux veulent
+   sont révélées.
+   Tranche d'un joueur : { v: "0212…" }, une réponse par idée dans l'ordre du paquet (0 non,
+   1 pourquoi pas, 2 carrément), envoyée en une seule fois quand il a fini. D'ici là, ses réponses
+   restent un brouillon sur l'appareil : g.local.d, dans l'ordre d'affichage ; g.local.end, quand il
+   s'arrête avant la fin ; g.local.go, quand le second joueur a repris le téléphone ; g.local.rev,
+   quand il rouvre le résultat précédent. Rien ne part sans « Valider mes réponses ». L'état commun ne sert pas.
+   Relancer un paquet glisse dans les réglages le résultat du précédent (setup.prev) : le téléphone
+   dont le joueur ne l'a pas quitté lui-même le garde à l'écran jusqu'à ce qu'il passe à la suite.
+   Sur l'appareil : « match:liste », les envies communes gardées ; « match:vu », le dernier résultat quitté. */
+(function () {
+  "use strict";
+
+  const DATA = (window.GAME_DATA && window.GAME_DATA.match) || {};
+  /* Un paquet vide n'est pas proposé : le jeu ne montre que ce qu'il peut faire jouer. */
+  const DECKS = (Array.isArray(DATA.decks) ? DATA.decks : []).filter((d) => d && Array.isArray(d.items) && d.items.length);
+  const LIST = "match:liste", SEEN = "match:vu";
+  const ANSWERS = ["Non", "Pourquoi pas", "Carrément"];
+  /* Distance, en pixels, à partir de laquelle un glisser vaut réponse ; en deçà, la carte revient. */
+  const REACH = 80;
+  const OUT = ["translate(-60%, 0) rotate(-9deg)", "translate(60%, 0) rotate(9deg)", "translate(0, -45%)"];
+  /* Un écran qui vient d'apparaître ne répond pas tout de suite : le toucher qui arrive visait l'ancien. */
+  const LOCK = 500;
+  /* drawn : l'état que montre l'écran ; screen et lock : l'écran affiché, et jusqu'à quand il ignore les touchers. */
+  let flight = 0, grip = null, drawn = "", screen = "", lock = 0;
+
+  const byId = (id) => DECKS.find((d) => d.id === id);
+  /* Un paquet inconnu (réglage venu de l'autre téléphone) retombe sur le premier, pareil des deux côtés. */
+  const deck = (g) => byId(g.setup.deck) || DECKS[0] || null;
+  const order = (g, dk) => g.kit.shuffle(dk.items.map((_, i) => i), g.setup.seed);
+  const tok = (g) => (g.gen + ":" + g.setup.seed).slice(0, 40);
+  const spot = (g) => tok(g) + "/" + (typeof g.local.d === "string" ? g.local.d.length : 0);
+  /* Des réponses ne comptent que complètes et bien formées : tout le reste veut dire « pas fini ». */
+  const vec = (g, w, dk) => { const v = g.S[w].v; return typeof v === "string" && v.length === dk.items.length && /^[012]+$/.test(v) ? v : null; };
+  const draft = (g, dk) => (typeof g.local.d === "string" && /^[012]*$/.test(g.local.d) ? g.local.d.slice(0, dk.items.length) : "");
+  /* Tout a reçu une réponse, ou le joueur s'arrête là : reste à valider, ou à revenir en arrière. */
+  const ended = (g, dk) => !!g.local.end || draft(g, dk).length === dk.items.length;
+  /* Sur un seul téléphone, celui qui commence change à chaque paquet : l'appareil est déjà dans
+     les mains de qui vient de finir le précédent. */
+  const first = (g) => (g.gen % 2 ? "a" : "b");
+  function turn(g, dk) {
+    if (g.duo) return vec(g, g.me, dk) ? null : g.me;
+    const f = first(g);
+    return !vec(g, f, dk) ? f : !vec(g, g.other(f), dk) ? g.other(f) : null;
+  }
+
+  /* Ce que les deux veulent, idée par idée : 0 dès que l'un a dit non, sinon 1 à 3 (3 : deux
+     « carrément »). Rien d'autre ne sort des réponses : ni total par joueur, ni envie restée seule. */
+  function mask(g, dk) {
+    const a = vec(g, "a", dk), b = vec(g, "b", dk);
+    return a && b ? Array.from(a, (x, i) => (+x && +b[i] ? +x + +b[i] - 1 : 0)).join("") : null;
+  }
+  /* Le résultat du paquet précédent, joint par celui qui a relancé : on ne s'y fie qu'après contrôle. */
+  function prev(g) {
+    const p = g.setup.prev, dk = p && typeof p === "object" ? byId(p.d) : null;
+    return dk && typeof p.k === "string" && p.k.length <= 40 && typeof p.m === "string" && p.m.length === dk.items.length && /^[0-3]+$/.test(p.m) ? { k: p.k, dk, m: p.m } : null;
+  }
+  /* Le résultat précédent à montrer avant le paquet en cours : celui que ce joueur n'a pas quitté lui-même
+     (miss : l'autre a relancé pendant qu'il le lisait, ou en son absence), ou celui qu'il a voulu revoir. */
+  function past(g) {
+    const p = prev(g);
+    if (!p) return null;
+    p.miss = g.kit.store.get(SEEN, "") !== p.k;
+    return p.miss || g.local.rev ? p : null;
+  }
+
+  /* ---------- « Nos envies » : la liste gardée sur l'appareil ---------- */
+  function wishes(k) {
+    const x = k.store.get(LIST, []);
+    return (Array.isArray(x) ? x : []).filter((it) => it && typeof it.t === "string" && it.t)
+      .map((it) => ({ t: it.t, d: String(it.d), s: it.s === 3 || it.s === 2 ? it.s : 1, f: it.f === true }));
+  }
+  /* Ajoute les envies communes d'un paquet, sans doublon : appelé à chaque affichage d'un résultat. */
+  function keep(k, dk, m) {
+    const list = wishes(k);
+    let dirty = false;
+    dk.items.forEach((t, i) => {
+      const s = +m[i], it = list.find((x) => x.t === t);
+      if (!s || (it && it.s >= s)) return;
+      if (it) it.s = s; else list.push({ t, d: dk.id, s, f: false });
+      dirty = true;
+    });
+    if (dirty) k.store.set(LIST, list);
+  }
+  /* « Fait » se coche sur place : un réaffichage refermerait la liste et ferait perdre le focus. */
+  function fait(k, el) {
+    const list = wishes(k), dk = byId(el.getAttribute("data-d")), i = parseInt(el.getAttribute("data-i"), 10);
+    const it = dk ? list.find((x) => x.t === dk.items[i]) : list[i];
+    if (!it) return;
+    it.f = !it.f;
+    k.store.set(LIST, list);
+    el.setAttribute("aria-pressed", String(it.f));
+    el.closest("li").classList.toggle("is-done", it.f);
+  }
+  /* Deux touchers pour ce qui ne se rattrape pas : le premier arme le bouton, le second confirme. */
+  function sure(el, label) {
+    if (el.getAttribute("data-armed")) return true;
+    const was = el.textContent;
+    el.setAttribute("data-armed", "1");
+    el.textContent = label;
+    setTimeout(() => {
+      if (!el.isConnected) return;
+      el.removeAttribute("data-armed");
+      el.textContent = was;
+    }, 4000);
+    return false;
+  }
+
+  /* ---------- Répondre ---------- */
+  /* Fin du paquet pour un joueur : ses réponses partent en une fois, rangées dans l'ordre du paquet ;
+     les idées qu'il n'a pas vues comptent pour un non. */
+  function finish(g, w, dk, d) {
+    const v = dk.items.map(() => "0");
+    order(g, dk).forEach((i, p) => { if (d[p]) v[i] = d[p]; });
+    g.local.d = "";
+    g.local.end = 0;
+    g.set(w, { v: v.join("") });
+  }
+  /* La dernière réponse ne part pas d'elle-même : elle aussi doit pouvoir se reprendre. */
+  function reply(g, a) {
+    const dk = deck(g), w = dk && turn(g, dk);
+    if (!w || ended(g, dk)) return;
+    g.local.d = draft(g, dk) + a;
+    g.save();
+    g.render();
+  }
+  /* Le tampon de la carte annonce la réponse que donnerait le geste en cours. */
+  function stamp(card, a, t) {
+    const s = card.querySelector(".match-stamp");
+    s.textContent = ANSWERS[a];
+    s.className = "match-stamp k" + a + (t >= 1 ? " is-on" : "");
+    s.style.opacity = Math.min(t, 1).toFixed(2);
+  }
+  /* La carte part du côté de sa réponse, puis la suivante arrive. La réponse n'est notée qu'à
+     l'atterrissage, et seulement si rien n'a bougé entre-temps (paquet relancé depuis l'autre téléphone). */
+  function fly(g, a) {
+    const card = document.querySelector(".match-card"), at = spot(g);
+    if (!card || flight || !(a >= 0 && a <= 2)) return;
+    /* Un bouton ou une touche l'emporte sur un glisser resté en suspens. */
+    grip = null;
+    const land = () => { flight = 0; g.hold(false); if (spot(g) === at) reply(g, a); else g.render(); };
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) { land(); return; }
+    g.hold(true);
+    stamp(card, a, 1);
+    card.classList.add("is-out");
+    card.style.transform = OUT[a];
+    card.style.opacity = "0";
+    flight = setTimeout(land, 180);
+  }
+
+  /* ---------- Écrans ---------- */
+  const head = (g, w, word, at, p, n) => '<p class="match-head">' + g.kit.who(w) + "<span>" + word + '</span><span class="match-count">' + at + " / " + n + "</span></p>" +
+    '<div class="progress" role="progressbar" aria-label="Avancement" aria-valuemin="0" aria-valuemax="' + n + '" aria-valuenow="' + p + '"><span style="width:' + (100 * p) / n + '%"></span></div>';
+
+  /* L'aide ne s'affiche qu'à la première carte : ensuite, la place revient à la carte. Le résultat précédent
+     s'y rouvre aussi, sur sa propre ligne : jamais là où « Revenir à la précédente » se touche en série. */
+  function vCard(g, dk, w) {
+    const k = g.kit, n = dk.items.length, p = draft(g, dk).length;
+    const btn = (a, cls) => '<button class="btn' + cls + '" type="button" data-act="rep" data-k="' + a + '">' + ANSWERS[a] + "</button>";
+    return '<div class="match as-' + w + '" data-screen="carte-' + w + '">' + head(g, w, "répond", p + 1, p, n) +
+      '<div class="match-stage" data-left="' + Math.min(n - p, 3) + '"><div class="g-card match-card"><span class="g-tag">' + k.esc(dk.name) + '</span><h1 class="g-card-text" tabindex="-1" data-focus>' + k.esc(dk.items[order(g, dk)[p]]) +
+      '</h1><span class="match-stamp" aria-hidden="true"></span></div></div>' +
+      (p ? "" : '<p class="hint">' + k.esc("Tu peux aussi faire glisser la carte : à gauche, non ; à droite, pourquoi pas") + '<span class="match-up">' + k.esc(" ; vers le haut, carrément") +
+        '</span>.<span class="match-keys"> Au clavier, les flèches font la même chose.</span></p>' +
+        (prev(g) ? '<p class="match-prev"><button class="link" type="button" data-act="review">Revoir le résultat précédent</button></p>' : "")) +
+      '<div class="g-actions match-acts">' + btn(0, " alt") + btn(1, " match-soft") + btn(2, "") + '<p class="match-more">' +
+      (p ? '<button class="link" type="button" data-act="undo">Revenir à la précédente</button>' : "") +
+      '<button class="link" type="button" data-act="stop">J\'arrête là</button></p></div></div>';
+  }
+
+  /* Avant l'envoi, un dernier écran : c'est le seul endroit d'où les réponses partent, et on peut encore en revenir. */
+  function vEnd(g, dk, w) {
+    const k = g.kit, n = dk.items.length, p = draft(g, dk).length, left = n - p;
+    return '<div class="match as-' + w + '" data-screen="fin-' + w + '">' + head(g, w, "a répondu", p, p, n) + '<h1 class="g-title" tabindex="-1" data-focus>' +
+      (left ? "Tu t'arrêtes là\u00a0?" : "C'était la dernière.") + '</h1><p class="g-lead">' +
+      k.esc(left ? (left > 1 ? "Les " + left + " idées que tu n'as pas vues compteront" : "L'idée que tu n'as pas vue comptera") + " comme un non." : "Encore un doute ? Tu peux revenir sur ta dernière réponse avant de valider.") +
+      '</p><div class="g-actions match-acts"><button class="btn" type="button" data-act="send">Valider mes réponses</button><p class="match-more"><button class="link" type="button" data-act="undo">' +
+      (left ? "Continuer le paquet" : "Revenir à la dernière carte") + "</button></p></div></div>";
+  }
+
+  function vWait(g, dk) {
+    const k = g.kit, o = k.nm(g.other(g.me));
+    return '<div class="match as-' + g.me + '" data-screen="attente"><p class="eyebrow">' + k.esc(dk.name) + '</p><h1 class="g-title" tabindex="-1" data-focus>C\'est noté.</h1><p class="g-lead">' +
+      k.esc("Le résultat s'ouvrira ici dès " + k.que(o) + " aura fini ce paquet. Tu peux fermer la page et revenir plus tard : rien ne se perd.") + "</p>" +
+      k.wait(g, "En attente des réponses " + k.de(o) + "…") + "</div>";
+  }
+
+  const row = (k, t, top, done, ref, from) => "<li" + (done ? ' class="is-done"' : "") + '><div class="match-idea">' + (top ? '<span class="g-tag match-duo">Coup de cœur à deux</span>' : "") + "<p>" + k.esc(t) + "</p>" +
+    (from ? '<span class="match-from">' + k.esc(from) + "</span>" : "") + '</div><button class="match-done" type="button" data-act="fait" ' + ref + ' aria-label="' + k.esc("Fait : " + t) + '" aria-pressed="' + !!done + '">Fait</button></li>';
+
+  /* Le résultat d'un paquet : celui qui vient de se jouer, ou le précédent (old : 1 s'il attend encore d'être
+     quitté, 2 s'il a été rouvert). Les deux portent le même nom d'écran : quand l'autre relance pendant qu'on
+     lit, la page ne remonte pas, et seul le bas de l'écran change. */
+  function vResult(g, dk, m, old) {
+    const k = g.kit, list = wishes(k), n = m.replace(/0/g, "").length, top = m.split("3").length - 1;
+    const lead = !n ? "Ça arrive, et ça ne dit rien de vous deux." + (old ? "" : " Ce paquet n'était pas le vôtre : essayez-en un autre.")
+      : n === 1 ? (top ? "Et c'est un coup de cœur à deux." : "Une seule, mais c'est la vôtre.")
+        : (top ? "Dont " + k.pl(top, "coup de cœur", "coups de cœur") + " à deux. " : "") + "Reste à choisir par laquelle commencer.";
+    const ideas = dk.items.map((t, i) => ({ t, i, s: +m[i] })).filter((x) => x.s).sort((x, y) => y.s - x.s)
+      .map((x) => row(k, x.t, x.s > 2, list.some((it) => it.t === x.t && it.f), 'data-d="' + k.esc(dk.id) + '" data-i="' + x.i + '"')).join("");
+    const again = () => '<div class="g-opts"><p class="g-opts-label">Jouer un autre paquet</p><div class="g-choices">' + DECKS.map((d) => '<button class="g-choice" type="button" data-act="again" data-deck="' + k.esc(d.id) + '"' +
+      (d === dk ? ' aria-current="true"' : "") + "><b>" + k.esc(d.name) + (d.adult === true ? ' <span class="g-tag">Adultes</span>' : "") + "</b></button>").join("") + "</div>" +
+      (g.duo ? '<p class="hint" role="status">Le paquet choisi démarre aussi chez ' + k.esc(k.nm(g.other(g.me))) + ".</p>" : "") + "</div>";
+    const next = () => '<div class="g-actions match-acts">' + (old === 1 ? '<p class="hint">' + k.esc("Le paquet suivant est déjà lancé : « " + deck(g).name + " ».") + "</p>" : "") +
+      '<button class="btn" type="button" data-act="ok">' + (old === 1 ? "Passer au paquet suivant" : "Revenir au paquet en cours") + "</button></div>";
+    return '<div class="match" data-screen="resultat"><p class="eyebrow">' + (old ? "Paquet précédent" : "Résultat") + " · " + k.esc(dk.name) + '</p><div class="match-venn">' + k.venn(Math.round((100 * n) / m.length)) +
+      '</div><h1 class="g-title" tabindex="-1" data-focus>' + (n ? '<span class="g-big">' + n + "</span> " + (n > 1 ? "envies" : "envie") + " en commun" : "Rien en commun, cette fois.") + '</h1><p class="g-lead">' + k.esc(lead) + "</p>" +
+      (n ? '<ul class="match-list">' + ideas + '</ul><p class="hint">' + k.esc((n > 1 ? "Elles sont gardées" : "Elle est gardée") + " sur cet appareil, dans « Nos envies » : la liste vous attend sur la page du jeu, une fois la partie arrêtée.") + "</p>" : "") +
+      (old ? next() : again()) + "</div>";
+  }
+
+  (window.GAMES = window.GAMES || []).push({
+    id: "match",
+    v: 1,
+    title: "Le match des envies",
+    hook: "Est-ce qu'on a envie des mêmes choses ?",
+    blurb: "Des idées de sorties, de voyages, de projets : chacun répond de son côté, et seules les envies que vous partagez sont révélées.",
+    meta: "6 paquets · 5 min",
+    intro: [
+      "Les idées d'un paquet défilent une à une : une sortie, un voyage, un projet un peu fou. Pour chacune, tu réponds « non », « pourquoi pas » ou « carrément », sans que l'autre voie tes réponses.",
+      "À la fin, seules les envies que vous partagez sont révélées, et gardées dans une liste à cocher. Les refus restent secrets : une envie qui n'est pas partagée n'apparaît nulle part."
+    ],
+    glyph: '<rect class="ink-a" x="6" y="10" width="22" height="30" rx="4" transform="rotate(-9 17 25)"/><rect class="ink-b" x="20" y="8" width="22" height="30" rx="4" transform="rotate(9 31 23)"/>',
+    live: false,
+    options: DECKS.length ? [{ id: "deck", label: "Paquet", def: (byId("sorties") || DECKS[0]).id, choices: DECKS.map((d) => ({ id: d.id, name: d.name, hint: d.hint, adult: d.adult === true })) }] : [],
+    view(g) {
+      const k = g.kit, dk = deck(g);
+      if (!dk) return '<div class="match" data-screen="vide"><h1 class="g-title" tabindex="-1" data-focus>Les cartes manquent.</h1><p class="g-lead">Le jeu n\'a pas pu charger ses paquets. Recharge la page, puis relance une partie.</p></div>';
+      const old = past(g), m = mask(g, dk), w = turn(g, dk);
+      if (old) return vResult(g, old.dk, old.m, old.miss ? 1 : 2);
+      if (!w) return m ? vResult(g, dk, m, 0) : vWait(g, dk);
+      if (!g.duo && w !== first(g) && !g.local.go) {
+        return '<div class="match" data-screen="passage">' + k.pass(w, "go") + '<p class="hint">' + k.esc("Les réponses " + k.de(k.nm(g.other(w))) + " restent secrètes : seules vos envies communes seront révélées.") + "</p></div>";
+      }
+      return ended(g, dk) ? vEnd(g, dk, w) : vCard(g, dk, w);
+    },
+    act(g, name, el) {
+      /* L'écran est resté figé pendant un geste alors que l'autre téléphone a relancé un paquet : ce toucher
+         visait l'ancien. On montre le nouveau, sans rien faire d'autre. */
+      if (drawn !== spot(g)) { g.render(); return; }
+      const k = g.kit, dk = deck(g), old = past(g), m = dk && mask(g, dk), w = dk && turn(g, dk), d = dk ? draft(g, dk) : "", id = el.getAttribute("data-deck");
+      if (name === "rep") {
+        fly(g, parseInt(el.getAttribute("data-k"), 10));
+      } else if (name === "undo" && w && (d || g.local.end)) {
+        /* Après « J'arrête là », revenir ne défait aucune réponse : on retrouve la carte laissée. */
+        if (!g.local.end) g.local.d = d.slice(0, -1);
+        g.local.end = 0;
+        g.save();
+        g.render();
+      } else if (name === "stop" && w) {
+        g.local.end = 1;
+        g.save();
+        g.render();
+      } else if (name === "send" && w && ended(g, dk)) {
+        finish(g, w, dk, d);
+      } else if (name === "go") {
+        g.local.go = 1;
+        g.save();
+        g.render();
+      } else if (name === "ok" && old) {
+        k.store.set(SEEN, old.k);
+        g.local.rev = 0;
+        g.save();
+        g.render();
+      } else if (name === "review" && prev(g)) {
+        g.local.rev = 1;
+        g.save();
+        g.render();
+      } else if (name === "fait") {
+        fait(k, el);
+      } else if (name === "again" && m && !old && byId(id)) {
+        /* Sans liaison, l'autre a peut-être déjà relancé, et même joué : deux relances de même rang se
+           départagent au profit d'une seule, et le paquet de l'autre serait perdu. */
+        if (g.duo && g.online !== "ok") {
+          el.closest(".g-opts").querySelector(".hint").textContent = "La connexion est coupée pour le moment. Réessaie dans un instant\u00a0: le paquet doit démarrer sur vos deux téléphones.";
+          return;
+        }
+        /* Quitter le résultat de soi-même, c'est l'avoir vu : il ne sera pas remontré d'office. */
+        k.store.set(SEEN, tok(g));
+        g.newGame({ deck: id, prev: { k: tok(g), d: dk.id, m } });
+      }
+    },
+    /* Un paquet est fini dès que son résultat peut s'afficher : l'accueil ne propose plus de le reprendre. */
+    over(g) {
+      const dk = deck(g);
+      return !!dk && !!mask(g, dk);
+    },
+    key(g, ev) {
+      const a = ["ArrowLeft", "ArrowRight", "ArrowUp"].indexOf(ev.key);
+      if (a < 0 || ev.metaKey || ev.ctrlKey || ev.altKey || !document.querySelector(".match-card")) return;
+      ev.preventDefault();
+      /* Une touche restée enfoncée ne doit pas faire défiler tout le paquet. */
+      if (ev.repeat || Date.now() < lock) return;
+      if (drawn !== spot(g)) g.render(); else fly(g, a);
+    },
+    mount(g, root) {
+      const k = g.kit, dk = deck(g), old = past(g), m = dk && mask(g, dk), scr = root.querySelector(".match"), card = root.querySelector(".match-card");
+      const name = scr.getAttribute("data-screen") + "|" + tok(g);
+      drawn = spot(g);
+      if (name !== screen) { screen = name; lock = Date.now() + LOCK; }
+      /* Tant que les touchers s'enchaînent sur un écran tout juste apparu, aucun ne compte, y compris sur
+         « Arrêter la partie » en bas de page : un doigt resté sur le rythme de l'écran d'avant ne lit pas. */
+      root.addEventListener("click", (e) => {
+        if (Date.now() >= lock) return;
+        lock = Date.now() + LOCK;
+        e.stopPropagation();
+        e.preventDefault();
+      }, true);
+      /* Les envies communes rejoignent la liste de l'appareil dès que leur résultat est affiché. */
+      if (old) keep(k, old.dk, old.m);
+      else if (m) keep(k, dk, m);
+      if (!card) return;
+      /* Quand la page dépasse de l'écran, un pouce posé sur la carte veut souvent la faire défiler : le
+         geste vers le haut est alors rendu au navigateur, et « carrément » ne se donne qu'au bouton. */
+      const flat = document.documentElement.scrollHeight > window.innerHeight;
+      scr.classList.toggle("is-flat", flat);
+      const aim = (e) => {
+        const x = e.clientX - grip.x, y = e.clientY - grip.y, up = -y > Math.abs(x);
+        return { x, y, a: up ? 2 : x < 0 ? 0 : 1, far: !up ? Math.abs(x) : flat && grip.finger ? 0 : -y };
+      };
+      card.addEventListener("pointerdown", (e) => {
+        if (flight || !e.isPrimary || e.button) return;
+        grip = { x: e.clientX, y: e.clientY, id: e.pointerId, finger: e.pointerType !== "mouse" };
+        /* Sans capture (navigateur ancien), le geste reste suivi tant que le doigt est sur la carte. */
+        try { card.setPointerCapture(e.pointerId); } catch (err) { /* voir ci-dessus */ }
+        card.classList.remove("is-back");
+        /* Ce qu'envoie l'autre téléphone attendra la fin du geste pour s'afficher. */
+        g.hold(true);
+      });
+      card.addEventListener("pointermove", (e) => {
+        if (!grip || e.pointerId !== grip.id) return;
+        const o = aim(e);
+        card.style.transform = "translate(" + o.x + "px," + o.y + "px) rotate(" + (o.x / 22).toFixed(1) + "deg)";
+        stamp(card, o.a, o.far / REACH);
+      });
+      const drop = (e) => {
+        if (!grip || e.pointerId !== grip.id) return;
+        const o = aim(e);
+        grip = null;
+        if (drawn !== spot(g)) { g.render(); return; }
+        if (e.type === "pointerup" && o.far >= REACH) { fly(g, o.a); return; }
+        card.classList.add("is-back");
+        card.style.transform = "";
+        stamp(card, o.a, 0);
+        g.hold(false);
+      };
+      card.addEventListener("pointerup", drop);
+      card.addEventListener("pointercancel", drop);
+      return () => { clearTimeout(flight); flight = 0; grip = null; };
+    },
+    extra(k) {
+      const list = wishes(k);
+      return list.length ? '<details class="more match-keep"><summary>Nos envies <span class="g-tag">' + list.length + '</span></summary><p class="hint">' +
+        k.esc("Les envies que vous partagez, gardées sur cet appareil. Cochez celles que vous avez réalisées.") + '</p><ul class="match-list">' +
+        list.map((it, i) => row(k, it.t, it.s > 2, it.f, 'data-i="' + i + '"', (byId(it.d) || {}).name)).join("") +
+        '</ul><p><button class="link" type="button" data-act="vider">Vider la liste</button></p></details>' : "";
+    },
+    extraAct(k, name, el) {
+      if (name === "fait") fait(k, el);
+      else if (name === "vider" && sure(el, "Toucher encore pour tout effacer")) {
+        /* Mise à jour sur place : un réaffichage ferait disparaître le bloc sans un mot, et le focus avec lui. */
+        const box = el.closest("[data-extra]");
+        k.store.del(LIST);
+        box.innerHTML = '<p class="hint" role="status" tabindex="-1">La liste est vide.</p>';
+        box.firstChild.focus();
+      }
+    }
+  });
+})();
+</script>
+<script>
 /* Sur la même longueur d'onde : trois paquets de thèmes auxquels chacun répond d'un mot, sans se concerter.
    Dans « nous », {a} et {b} = prénoms des joueurs, {de_a} et {de_b} = « de Tom » / « d'Inès ». */
 (window.GAME_DATA = window.GAME_DATA || {}).onde = {
@@ -3336,6 +4140,639 @@ button, input, textarea { font: inherit; color: inherit; }
         id = null;
         if (ok && Math.abs(dx) >= 50 && Math.abs(dx) > 2 * Math.abs(dy)) move(g, dx < 0 ? 1 : -1);
       });
+    }
+  });
+})();
+</script>
+<script>
+/* Dessine-moi : 80 sujets à dessiner au doigt en une minute, 20 par catégorie (champ c).
+   {o} = prénom de l'autre, {de_o} = « de Tom » / « d'Inès » : chacun dessine alors l'autre. */
+(window.GAME_DATA = window.GAME_DATA || {}).dessin = {
+  prompts: [
+    { c: "portrait", x: "{o} au réveil" },
+    { c: "portrait", x: "{o} qui cherche ses clés" },
+    { c: "portrait", x: "{o} aux fourneaux" },
+    { c: "portrait", x: "{o} qui te serre dans ses bras" },
+    { c: "portrait", x: "{o} à la chasse au moustique, en pleine nuit" },
+    { c: "portrait", x: "{o} qui hésite entre deux desserts" },
+    { c: "portrait", x: "{o} un jour de canicule" },
+    { c: "portrait", x: "{o} qui chante sous la douche" },
+    { c: "portrait", x: "{o} qui fait les courses le ventre vide" },
+    { c: "portrait", x: "{o} dans son élément" },
+    { c: "portrait", x: "{o} face à une notice de montage" },
+    { c: "portrait", x: "{o} qui vient de perdre à un jeu" },
+    { c: "portrait", x: "{o} sous un plaid, un soir d'automne" },
+    { c: "portrait", x: "{o} qui se prépare en quatrième vitesse" },
+    { c: "portrait", x: "La grimace préférée {de_o}" },
+    { c: "portrait", x: "{o} qui souffle ses bougies" },
+    { c: "portrait", x: "{o} qui plie un drap-housse" },
+    { c: "portrait", x: "{o} qui t'attend sur le quai de la gare" },
+    { c: "portrait", x: "{o} qui croise un chat dans la rue" },
+    { c: "portrait", x: "{o} qui fait sa valise" },
+
+    { c: "souvenir", x: "Votre premier rendez-vous" },
+    { c: "souvenir", x: "{o} le jour de votre rencontre" },
+    { c: "souvenir", x: "Votre plus gros fou rire" },
+    { c: "souvenir", x: "Votre premier baiser" },
+    { c: "souvenir", x: "Votre plus belle galère à deux" },
+    { c: "souvenir", x: "Votre meilleur repas en tête à tête" },
+    { c: "souvenir", x: "La plus vieille photo de vous deux" },
+    { c: "souvenir", x: "La pire météo que vous avez affrontée" },
+    { c: "souvenir", x: "Le moment où tu as craqué pour {o}" },
+    { c: "souvenir", x: "Le dernier film vu ensemble" },
+    { c: "souvenir", x: "Le plat que vous avez complètement raté" },
+    { c: "souvenir", x: "Le plus beau paysage admiré à deux" },
+    { c: "souvenir", x: "La fois où {o} a volé à ton secours" },
+    { c: "souvenir", x: "Votre trajet le plus long, côte à côte" },
+    { c: "souvenir", x: "Le plus petit endroit où vous avez tenu à deux" },
+    { c: "souvenir", x: "La frayeur qui vous fait bien rire aujourd'hui" },
+    { c: "souvenir", x: "La nuit où vous avez refait le monde" },
+    { c: "souvenir", x: "La surprise dont vous parlez encore" },
+    { c: "souvenir", x: "L'objet tout bête que vous gardez en souvenir" },
+    { c: "souvenir", x: "Votre record d'altitude à deux" },
+
+    { c: "futur", x: "Votre chez-vous dans dix ans" },
+    { c: "futur", x: "Le voyage de vos rêves" },
+    { c: "futur", x: "Vos vieux jours à deux" },
+    { c: "futur", x: "Votre programme de dimanche prochain" },
+    { c: "futur", x: "La carte postale de vos prochaines vacances" },
+    { c: "futur", x: "{o} qui réalise son plus grand rêve" },
+    { c: "futur", x: "L'exploit qui vous rendra célèbres" },
+    { c: "futur", x: "Le pique-nique que vous ferez aux beaux jours" },
+    { c: "futur", x: "La vue idéale depuis votre fenêtre" },
+    { c: "futur", x: "Votre prochain 31 décembre" },
+    { c: "futur", x: "Ce que vous aimeriez apprendre ensemble" },
+    { c: "futur", x: "Le cadeau que tu aimerais offrir à {o} un jour" },
+    { c: "futur", x: "Ce que vous ferez juste après cette partie" },
+    { c: "futur", x: "Le véhicule parfait pour partir à l'aventure" },
+    { c: "futur", x: "Votre soirée, tous écrans éteints" },
+    { c: "futur", x: "L'endroit où vous retournerez un jour" },
+    { c: "futur", x: "Une nuit à la belle étoile, rien que vous deux" },
+    { c: "futur", x: "La boutique que vous pourriez ouvrir à deux" },
+    { c: "futur", x: "Le petit rituel que vous garderez toujours" },
+    { c: "futur", x: "La prochaine lubie {de_o}" },
+
+    { c: "delire", x: "L'animal que vous formez à deux" },
+    { c: "delire", x: "Le superpouvoir secret {de_o}" },
+    { c: "delire", x: "La pizza qui résume votre couple" },
+    { c: "delire", x: "{o} à la tête d'une armée de canards" },
+    { c: "delire", x: "Vous deux en bonshommes de neige" },
+    { c: "delire", x: "Si {o} était un objet de la maison" },
+    { c: "delire", x: "Le monstre qui vit sous votre lit" },
+    { c: "delire", x: "{o} qui apprivoise un dragon" },
+    { c: "delire", x: "Votre maison au fond de l'océan" },
+    { c: "delire", x: "L'émoji qu'il faudrait inventer pour {o}" },
+    { c: "delire", x: "La statue {de_o} sur la place du village" },
+    { c: "delire", x: "La potion qui redonne le sourire à {o}" },
+    { c: "delire", x: "{o} qui fait la sieste sur un nuage" },
+    { c: "delire", x: "Vous deux au temps des pharaons" },
+    { c: "delire", x: "L'épreuve olympique où {o} remporterait l'or" },
+    { c: "delire", x: "La pochette du premier album de votre groupe" },
+    { c: "delire", x: "{o} en version miniature, dans ta poche" },
+    { c: "delire", x: "Ce que font vos chaussettes quand vous dormez" },
+    { c: "delire", x: "{o} qui présente le journal de 20 heures" },
+    { c: "delire", x: "La carte au trésor qui mène jusqu'à {o}" }
+  ]
+};
+</script>
+<script>
+/* Dessine-moi : un sujet, chacun le dessine au doigt, puis les deux feuilles côte à côte.
+   Tranche d'un joueur : { r: numéro du sujet, d: "dessin", q: { r, d } }, écrite une seule fois par sujet,
+   quand il rend sa feuille ; q est sa feuille du sujet d'avant, pour l'autre s'il n'a pas encore vu cette paire.
+   État commun : { r }, le sujet en cours pour les deux. Le premier qui touche « Sujet suivant » l'avance ;
+   l'autre garde la révélation à l'écran jusqu'à son propre toucher, qui n'envoie rien.
+   Sur l'appareil : g.local.cur = { r, w, t, n, s, c, z }, la feuille en cours (heure de départ, durée du chrono,
+   traits, encre, épaisseur) ; g.local.p, le nombre de révélations que cet appareil a quittées ; et, dans le
+   stockage du site, la galerie des paires révélées (« dessin:galerie ») et la paire à l'écran (« dessin:devant »).
+   Un dessin est un texte : des traits séparés par des points. Un trait = un caractère d'outil
+   (encre × 2 + épaisseur), trois caractères pour le premier point (deux fois 9 bits : une grille de 512),
+   puis, par point, deux caractères d'écart (de -31 à +31) ou « A » et trois caractères pour un saut plus long. */
+(function () {
+  "use strict";
+
+  const DATA = (window.GAME_DATA && window.GAME_DATA.dessin) || {};
+  const PROMPTS = (Array.isArray(DATA.prompts) ? DATA.prompts : []).filter((p) => p && typeof p.x === "string" && p.x);
+  const CATS = [["tous", "Tous", "Un peu de tout."], ["portrait", "Portraits", "Chacun dessine l'autre."], ["souvenir", "Souvenirs", "Ce que vous avez vécu."],
+    ["futur", "Futur", "Ce qui vous attend."], ["delire", "Délires", "Tout est permis."]];
+  const TIMES = { 60: "une minute", 30: "trente secondes", 0: "tout ton temps" };
+  /* Encres fixes, comme le blanc de la feuille : un dessin doit être le même sur les deux téléphones, en clair
+     comme en sombre, et dans l'image enregistrée. Les trois premières sont celles du site ; la dernière est la
+     gomme, du blanc de papier. */
+  const INKS = ["#141829", "#2a78d6", "#eb6834", "#d6294a", "#1e9e5a", "#fab219", "#ffffff"];
+  const NAMES = ["Noir", "Bleu", "Orange", "Rouge", "Vert", "Jaune", "Gomme"];
+  const RUBBER = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 20 3.6 15.1a1.6 1.6 0 0 1 0-2.3l8-8a1.6 1.6 0 0 1 2.3 0l5.4 5.4a1.6 1.6 0 0 1 0 2.3L11.7 20M21 20H8.5M6.5 10l7.6 7.6"/></svg>';
+  /* Un dessin ne dépasse jamais MAX_TEXT caractères (quatre messages au relais) : à l'envoi il est simplifié
+     jusqu'à y tenir, à la lecture le surplus est ignoré. MAX_STROKES traits réduits à leurs deux bouts y tiennent. */
+  const GRID = 511, STEP = 1.5, EPS = 0.75, MAX_TEXT = 10000, MAX_STROKES = 1000, MAX_STROKE = 8000, KEEP = 12, FRONT = "dessin:devant";
+  const ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_", NUM = {};
+  ABC.split("").forEach((ch, i) => { NUM[ch] = i; });
+  let pad = null; /* la feuille affichée, tant que l'écran de dessin est monté */
+  let seen = { k: "", t: 0 }; /* l'écran affiché, et depuis quand */
+  /* Un écran qui vient d'apparaître ne répond pas tout de suite : le second toucher d'un double toucher, ou un
+     doigt parti vers l'écran d'avant, tomberait sinon sur ce qui a pris sa place (le chrono lancé sans le
+     vouloir, un point sur la feuille, la révélation sautée). */
+  const settled = (ms) => Math.abs(Date.now() - seen.t) > ms;
+  /* Les boutons à deux touchers : libellé au repos, libellé armé. */
+  const LABELS = { clear: ["Effacer", "Tout effacer\u00a0?"], done: ["J'ai fini", "Rendre une feuille blanche\u00a0?"], empty: ["Vider la galerie", "Toucher encore pour tout vider"] };
+  let armed = { n: "", until: 0, timer: 0 };
+
+  /* ---------- Le dessin en texte ---------- */
+  const clamp = (v) => Math.max(0, Math.min(GRID, v));
+  const int = (v, max) => (Number.isInteger(v) && v >= 0 && v <= max ? v : 0);
+  const wide = (c, z) => (c === 6 ? [22, 44] : [6, 15])[z];
+  const code = (x, y) => ABC[x >> 3] + ABC[(x & 7) << 3 | y >> 6] + ABC[y & 63];
+
+  /* Ramer-Douglas-Peucker : ne garde que les points qui s'écartent de plus de eps de la ligne brisée. Sans
+     cela, un dessin d'une minute pèserait trois à dix fois plus, soit autant de messages en plus au relais. */
+  function simplify(p, eps) {
+    const n = p.length / 2, keep = [0, n - 1], todo = [[0, n - 1]], out = [];
+    if (n < 3) return p.slice();
+    while (todo.length) {
+      const [i, j] = todo.pop(), ax = p[2 * i], ay = p[2 * i + 1], dx = p[2 * j] - ax, dy = p[2 * j + 1] - ay, len = dx * dx + dy * dy;
+      let far = eps, at = 0;
+      for (let m = i + 1; m < j; m++) {
+        /* Distance au segment, et non à la droite : un aller-retour sur la même ligne doit garder son bout. */
+        const px = p[2 * m] - ax, py = p[2 * m + 1] - ay, t = len ? Math.max(0, Math.min(1, (px * dx + py * dy) / len)) : 0;
+        const d = Math.hypot(px - t * dx, py - t * dy);
+        if (d > far) { far = d; at = m; }
+      }
+      if (at) { keep.push(at); todo.push([i, at], [at, j]); }
+    }
+    keep.sort((a, b) => a - b).forEach((i) => out.push(p[2 * i], p[2 * i + 1]));
+    return out;
+  }
+
+  /* Un trait en texte. p : les coordonnées x, y à la suite, dans la grille. */
+  function pack(c, z, p) {
+    let x = Math.round(p[0]), y = Math.round(p[1]), out = ABC[c * 2 + z] + code(x, y);
+    for (let i = 2; i < p.length; i += 2) {
+      const nx = Math.round(p[i]), ny = Math.round(p[i + 1]), dx = nx - x, dy = ny - y;
+      if (!dx && !dy) continue;
+      out += Math.abs(dx) < 32 && Math.abs(dy) < 32 ? ABC[dx + 32] + ABC[dy + 32] : "A" + code(nx, ny);
+      x = nx; y = ny;
+    }
+    return out;
+  }
+
+  /* Lit un trait. Ce texte vient parfois de l'autre téléphone : un caractère inconnu ou un outil hors palette
+     font jeter le trait, sa longueur est bornée et chaque point est ramené dans la feuille. */
+  function unpack(s) {
+    const v = Array.from(s.slice(0, MAX_STROKE), (ch) => NUM[ch]), pt = (i) => [v[i] << 3 | v[i + 1] >> 3, (v[i + 1] & 7) << 6 | v[i + 2]];
+    if (v.length < 4 || v.includes(undefined) || v[0] > 13) return null;
+    let [x, y] = pt(1);
+    const p = [x, y];
+    for (let i = 4; i + 1 < v.length;) {
+      if (v[i]) { x = clamp(x + v[i] - 32); y = clamp(y + v[i + 1] - 32); i += 2; }
+      else if (i + 3 < v.length) { [x, y] = pt(i + 1); i += 4; }
+      else break;
+      if (x !== p[p.length - 2] || y !== p[p.length - 1]) p.push(x, y);
+    }
+    return { c: v[0] >> 1, z: v[0] & 1, p };
+  }
+  const decode = (d) => String(d).slice(0, MAX_TEXT).split(".").slice(0, MAX_STROKES).map(unpack).filter(Boolean);
+
+  /* Le dessin prêt à partir. Trop lourd, il est simplifié de plus en plus fort : à la fin il ne reste que
+     les deux bouts de chaque trait, ce qui tient toujours. */
+  function fit(list, max) {
+    let d = list.join(".");
+    for (let eps = 2 * EPS; d.length > max && eps < 2000; eps *= 2) {
+      d = list.map(unpack).filter(Boolean).map((s) => pack(s.c, s.z, simplify(s.p, eps))).join(".");
+    }
+    return d;
+  }
+
+  /* Le tracé d'un trait (syntaxe SVG, lue aussi par le canevas). Chaque sommet est arrondi, mais jamais au
+     point de s'écarter de plus d'un pas de grille de la ligne brisée : là où les points sont serrés, la courbe
+     va d'un milieu de segment au suivant et l'arrondi est lisse ; entre deux longs segments, l'angle reste un angle. */
+  function pathOf(p) {
+    const n = p.length / 2, f = (v) => Math.round(v * 10) / 10;
+    let d = "M" + p[0] + " " + p[1], end = "";
+    if (n < 2) return d + "h.01";
+    for (let i = 1; i < n - 1; i++) {
+      const x = p[2 * i], y = p[2 * i + 1], ax = p[2 * i - 2] - x, ay = p[2 * i - 1] - y, bx = p[2 * i + 2] - x, by = p[2 * i + 3] - y;
+      const a = Math.hypot(ax, ay) || 1, b = Math.hypot(bx, by) || 1, most = 2 / Math.max(0.01, Math.sqrt(Math.max(0, 1 + (ax * bx + ay * by) / (a * b)) / 2));
+      const ka = Math.min(0.5, most / a), kb = Math.min(0.5, most / b), from = f(x + ax * ka) + " " + f(y + ay * ka);
+      d += (from === end ? "" : "L" + from) + "Q" + x + " " + y + " ";
+      end = f(x + bx * kb) + " " + f(y + by * kb);
+      d += end;
+    }
+    return d + "L" + p[2 * n - 2] + " " + p[2 * n - 1];
+  }
+
+  /* Peint des traits sur un canevas déjà à l'échelle de la grille. */
+  function paint(x, strokes) {
+    x.lineCap = x.lineJoin = "round";
+    strokes.forEach((s) => { x.strokeStyle = INKS[s.c]; x.lineWidth = wide(s.c, s.z); x.stroke(new Path2D(pathOf(s.p))); });
+  }
+
+  /* Un dessin en SVG, construit uniquement à partir de nombres vérifiés. eps : simplification pour les vignettes. */
+  const art = (d, label, eps) => '<svg class="dessin-art" viewBox="0 0 ' + GRID + " " + GRID + '" ' + (label ? 'role="img" aria-label="' + label + '"' : 'aria-hidden="true"') +
+    '><g fill="none" stroke-linecap="round" stroke-linejoin="round">' + decode(d).map((s) => '<path stroke="' + INKS[s.c] + '" stroke-width="' + wide(s.c, s.z) + '" d="' +
+      pathOf(eps ? simplify(s.p, eps) : s.p) + '"/>').join("") + "</g></svg>";
+
+  /* ---------- Où en est la partie ---------- */
+  /* Le réglage vient parfois de l'autre téléphone : une des trois durées, en toutes lettres, ou la minute par défaut. */
+  const chrono = (g) => (typeof g.setup.chrono === "string" && TIMES.hasOwnProperty(g.setup.chrono) ? Number(g.setup.chrono) : 60);
+  /* Le chrono d'une feuille est celui qu'elle avait au départ (cur.n) : un réglage reçu ensuite n'y change rien. */
+  const remain = (cur) => Math.max(0, Math.min(cur.n, cur.n - (Date.now() - cur.t) / 1000));
+  const clock = (left) => Math.floor(Math.ceil(left) / 60) + ":" + String(Math.ceil(left) % 60).padStart(2, "0");
+  const tool = (cur) => [int(cur.c, 6), int(cur.z, 1)];
+
+  /* Les sujets de la manche, dans le même ordre sur les deux téléphones. Une catégorie vide ou inconnue donne toute la liste. */
+  function subjects(g) {
+    const some = PROMPTS.filter((p) => p.c === g.setup.sujets);
+    return g.kit.shuffle(some.length ? some : PROMPTS, Number(g.setup.seed) || 1).map((p) => p.x);
+  }
+  /* Le sujet tel que le lit le joueur w, qui dessine l'autre ; sans w, tel qu'on le lit à deux. */
+  function subject(g, x, w) {
+    const k = g.kit, o = w ? k.nm(g.other(w)) : "l'autre", s = k.fill(x, { o, de_o: k.de(o) });
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  }
+  /* La feuille rendue par w pour le sujet r (celle du sujet en cours, ou celle d'avant, gardée dans q), ou null.
+     Elle vient parfois de l'autre téléphone : une chaîne, bornée, ou rien. */
+  function sheet(g, w, r) {
+    const S = g.S[w], x = S.r === r ? S : S.q || {};
+    return x.r === r && typeof x.d === "string" ? x.d.slice(0, MAX_TEXT) : null;
+  }
+  const key = (g, r) => g.gen + ":" + String(g.setup.seed).slice(0, 20) + ":" + r;
+  /* La paire du sujet r, telle qu'elle est révélée puis rangée dans la galerie ; null tant qu'une feuille manque. */
+  function pair(g, list, r) {
+    const d = ["a", "b"].map((w) => sheet(g, w, r));
+    return r < list.length && d[0] != null && d[1] != null ? { k: key(g, r), x: subject(g, list[r]), n: [g.kit.nm("a"), g.kit.nm("b")], d } : null;
+  }
+  /* La galerie contient aussi ce que l'autre a envoyé : même méfiance à la relecture. */
+  function gallery(k) {
+    const list = k.store.get("dessin:galerie", null), two = (x) => Array.isArray(x) && typeof x[0] === "string" && typeof x[1] === "string";
+    return (Array.isArray(list) ? list : []).filter((p) => p && typeof p.k === "string" && typeof p.x === "string" && two(p.n) && two(p.d)).slice(-KEEP);
+  }
+  function remember(k, p) {
+    const list = gallery(k);
+    if (!list.some((q) => q.k === p.k)) k.store.set("dessin:galerie", list.concat(p).slice(-KEEP));
+  }
+
+  function stage(g) {
+    const k = g.kit, list = subjects(g), n = list.length, c = g.local.cur;
+    /* Le sujet en cours : le plus avancé de l'état commun et des feuilles déjà rendues. Un téléphone qui rejoint
+       la partie avec un stockage neuf n'a plus l'état commun ; il retrouve ainsi le sujet que l'autre a dessiné. */
+    const drawn = (w) => (typeof g.S[w].d === "string" ? int(g.S[w].r, n - 1) : 0);
+    const r = Math.max(Math.min(int(g.sh.r, Infinity), n), drawn("a"), drawn("b"));
+    const a = r < n && sheet(g, "a", r) != null, b = r < n && sheet(g, "b", r) != null;
+    /* Qui doit dessiner : moi sur deux téléphones ; sur un seul, « a » puis « b ». */
+    const w = r >= n ? null : g.duo ? ((g.me === "a" ? a : b) ? null : g.me) : !a ? "a" : !b ? "b" : null;
+    const mine = w && c && c.r === r && c.w === w && typeof c.t === "number" && [0, 30, 60].includes(c.n) && Array.isArray(c.s) && c.s.every((s) => typeof s === "string");
+    /* La révélation à l'écran. Un appareil ne quitte une révélation que sur son propre toucher. Si l'autre a
+       relancé une pile, la paire qui était à l'écran y reste, relue dans la galerie. S'il est passé au sujet
+       suivant, la plus récente des révélations que cet appareil n'a pas quittées (p les compte ; sans compte,
+       il est à jour) reste affichée ou, s'il n'était pas là, s'affiche d'abord : elle est relue dans les
+       tranches tant qu'elles la contiennent, sinon dans la galerie, où elle a été rangée en s'affichant. */
+    let all = null, show = null, at = r;
+    const kept = (id) => (all = all || gallery(k)).find((x) => x.k === id), front = k.store.get(FRONT, null);
+    const old = typeof front === "string" && front.indexOf(g.gen - 1 + ":") === 0 && kept(front);
+    const p = Number.isInteger(g.local.p) && g.local.p >= 0 ? Math.min(g.local.p, r) : r;
+    for (let q = r - 1; !old && !show && q >= p; q--) {
+      show = pair(g, list, q) || kept(key(g, q));
+      if (show) at = q;
+    }
+    if (old) at = int(parseInt(front.slice(front.lastIndexOf(":") + 1), 10), 1e6);
+    return { list, r, w, cur: mine ? c : null, show: old || show || pair(g, list, r), late: !!old || at < r, old: !!old, at };
+  }
+
+  /* L'image à garder : le sujet, les deux feuilles et les prénoms, aux couleurs du thème clair quel que soit le thème. */
+  function picture(p) {
+    const cv = document.createElement("canvas"), x = cv.getContext("2d"), S = 540, css = getComputedStyle(document.documentElement);
+    const write = (text, left, top, px, weight, face, max) => {
+      const font = (size) => { x.font = weight + " " + size + "px " + (css.getPropertyValue(face) || "sans-serif"); };
+      font(px);
+      /* Un texte trop long rétrécit plutôt que de déborder. */
+      font(Math.min(px, Math.floor((px * max) / x.measureText(text).width)));
+      x.fillText(text, left, top);
+    };
+    cv.width = 2 * S + 120;
+    cv.height = S + 250;
+    x.fillStyle = INKS[6];
+    x.fillRect(0, 0, cv.width, cv.height);
+    x.textBaseline = "middle";
+    x.fillStyle = INKS[0];
+    write(p.x.slice(0, 120), 40, 70, 46, 700, "--display", 2 * S + 40);
+    [0, 1].forEach((i) => {
+      /* Chaque feuille est peinte sur son propre canevas, dont les bords rognent ce qui dépasse. */
+      const leaf = document.createElement("canvas"), y = leaf.getContext("2d"), left = 40 + i * (S + 40);
+      leaf.width = leaf.height = S;
+      y.scale(S / GRID, S / GRID);
+      paint(y, decode(p.d[i]));
+      x.drawImage(leaf, left, 130);
+      x.strokeStyle = x.fillStyle = INKS[i + 1];
+      x.lineWidth = 5;
+      x.strokeRect(left, 130, S, S);
+      x.beginPath();
+      if (i) x.rect(left, S + 157, 26, 26); else x.arc(left + 13, S + 170, 13, 0, 7);
+      x.fill();
+      x.fillStyle = INKS[0];
+      write("Par " + p.n[i].slice(0, 24), left + 40, S + 171, 32, 600, "--body", S - 40);
+    });
+    x.fillStyle = "#646b82";
+    x.textAlign = "right";
+    write("Dessine-moi · Entre Nous", cv.width - 40, S + 218, 24, 500, "--body", S);
+    return cv;
+  }
+
+  /* Enregistre l'image : feuille de partage du téléphone quand elle accepte les fichiers, téléchargement sinon.
+     Tout est fait dans le geste du joueur, sans attente, sinon le navigateur refuse le partage. */
+  function save(p) {
+    const url = picture(p).toDataURL("image/png"), name = "dessine-moi.png";
+    const download = () => {
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    };
+    try {
+      const bin = atob(url.slice(url.indexOf(",") + 1)), file = new File([Uint8Array.from(bin, (ch) => ch.charCodeAt(0))], name, { type: "image/png" });
+      if (!navigator.canShare({ files: [file] })) throw new Error("partage de fichiers indisponible");
+      navigator.share({ files: [file], title: p.x }).catch((e) => { if (!e || e.name !== "AbortError") download(); });
+    } catch (e) {
+      download();
+    }
+  }
+
+  /* Deux touchers pour confirmer : le premier arme le bouton n et change son libellé pendant trois secondes ; le
+     second, s'il arrive dans ce délai, renvoie true. L'armement vit ici et non sur le bouton : un réaffichage (la
+     feuille de l'autre qui arrive) refait le bouton, et le second toucher doit encore compter. */
+  const label = (n) => LABELS[n][armed.n === n && Date.now() < armed.until ? 1 : 0];
+  function arm(n) {
+    const was = armed.n;
+    clearTimeout(armed.timer);
+    armed = { n, until: Date.now() + 3000, timer: n && setTimeout(arm, 3000, "") };
+    [was, n].forEach((x) => x && document.querySelectorAll('[data-act="' + x + '"]').forEach((el) => { el.textContent = label(x); }));
+  }
+  function twice(n) {
+    const ok = armed.n === n && Date.now() < armed.until;
+    arm(ok ? "" : n);
+    return ok;
+  }
+
+  /* Rend la feuille : le dessin part une seule fois, en entier, dans la tranche du joueur. La feuille du sujet
+     d'avant l'accompagne, allégée s'il le faut pour que le tout ne pèse pas plus qu'un seul dessin : si l'autre
+     avait posé son téléphone avant la révélation, il la trouvera encore là en revenant. */
+  function submit(g) {
+    const st = stage(g);
+    if (!st.cur) return;
+    const d = fit(st.cur.s, MAX_TEXT), was = sheet(g, st.w, st.r - 1), q = was == null ? null : fit(was.split("."), MAX_TEXT - d.length);
+    delete g.local.cur;
+    g.set(st.w, { r: st.r, d, q: q != null && d.length + q.length <= MAX_TEXT ? { r: st.r - 1, d: q } : null });
+  }
+
+  /* La pile est finie : tous les sujets sont passés et cet appareil a quitté la dernière révélation. */
+  function over(g) {
+    const st = stage(g);
+    return !st.show && st.list.length > 0 && st.r >= st.list.length;
+  }
+
+  /* ---------- Écrans ---------- */
+  function vReady(g, st) {
+    const k = g.kit, secs = chrono(g), o = g.other(st.w), O = k.esc(k.nm(o));
+    return '<div class="dessin as-' + st.w + '" data-screen="pret-' + st.r + "-" + st.w + '"><p class="dessin-step">' + (!st.r && g.gen > 1 ? "Nouvelle pile · " : "") + "Sujet " + (st.r + 1) +
+      '</p><p class="dessin-who">' + k.who(st.w) + " dessine</p>" +
+      '<h1 class="g-title" tabindex="-1" data-focus>Un sujet, ' + TIMES[secs] + '.</h1><p class="g-lead">' +
+      (secs ? "Le chrono démarre dès que le sujet s'affiche." : "Pas de chrono\u00a0: tu rends ta feuille quand tu veux.") + '</p><p class="hint">' + O +
+      (!g.duo ? " dessinera le même sujet juste après, sans avoir vu ta feuille."
+        : sheet(g, o, st.r) != null ? " a déjà rendu sa feuille. Tu la verras à côté de la tienne dès que tu auras fini."
+          : " dessine le même sujet de son côté. Vos deux feuilles se retrouvent ensuite côte à côte.") +
+      '</p><div class="g-actions"><button class="btn" type="button" data-act="start">Voir le sujet</button></div></div>';
+  }
+
+  function vDraw(g, st) {
+    const k = g.kit, secs = st.cur.n, left = remain(st.cur), [c, z] = tool(st.cur);
+    const inks = INKS.map((ink, i) => '<button class="dessin-pick' + (i < 6 ? " dessin-ink" : "") + '" type="button" data-act="ink" data-v="' + i + '" aria-pressed="' + (c === i) +
+      '" aria-label="' + NAMES[i] + '"' + (i < 6 ? ' style="--c:' + ink + '">' : ">" + RUBBER) + "</button>").join("");
+    const sizes = ["Trait fin", "Trait épais"].map((label, i) => '<button class="dessin-pick" type="button" data-act="size" data-v="' + i + '" aria-pressed="' + (z === i) +
+      '" aria-label="' + label + '"><i class="dessin-dot"></i></button>').join("");
+    return '<div class="dessin dessin-draw as-' + st.w + '" data-screen="dessin-' + st.r + "-" + st.w + '"><div class="dessin-head"><h1 class="dessin-subject" tabindex="-1" data-focus>' + k.esc(subject(g, st.list[st.r], st.w)) + "</h1>" +
+      (secs ? '<p class="dessin-time" role="timer" aria-label="Temps restant">' + clock(left) + "</p>" : "") + '</div><div class="dessin-desk">' +
+      (secs ? '<div class="progress dessin-clock" aria-hidden="true"><span style="width:' + (100 * left) / secs + '%"></span></div>' : "") +
+      '<canvas class="dessin-sheet" width="' + GRID + '" height="' + GRID + '" role="img" aria-label="Ta feuille de dessin"></canvas></div>' +
+      '<div class="dessin-tools"><div class="dessin-row" role="group" aria-label="Encres et gomme">' + inks + '</div><div class="dessin-row"><span class="dessin-sizes" role="group" aria-label="Épaisseur du trait">' + sizes +
+      '</span><button class="dessin-do" type="button" data-act="undo">Annuler</button><button class="dessin-do" type="button" data-act="clear">' + label("clear") + "</button></div></div>" +
+      '<div class="g-actions"><button class="btn" type="button" data-act="done">' + label("done") + "</button></div></div>";
+  }
+
+  function vWait(g, st) {
+    const k = g.kit, o = k.nm(g.other(g.me));
+    return '<div class="dessin as-' + g.me + '" data-screen="attente-' + st.r + '"><p class="dessin-step">Sujet ' + (st.r + 1) + '</p><h1 class="g-title" tabindex="-1" data-focus>' + k.esc(subject(g, st.list[st.r], g.me)) +
+      '</h1><p class="g-lead">Ta feuille est rendue. La voici, en attendant celle ' + k.esc(k.de(o)) + '.</p><div class="dessin-mine">' + art(sheet(g, g.me, st.r), "Ton dessin") + "</div>" +
+      k.wait(g, "En attente du dessin " + k.de(o) + "…") + "</div>";
+  }
+
+  function vReveal(g, st) {
+    const k = g.kit, p = st.show;
+    /* « Par » : sous « L'autre au réveil », un prénom seul se lirait comme celui du modèle. */
+    const fig = (w, i) => '<figure class="dessin-fig as-' + w + '"><figcaption>Par ' + k.who(w) + "</figcaption>" + art(p.d[i], "Le dessin " + k.esc(k.de(k.nm(w)))) + "</figure>";
+    return '<div class="dessin" data-screen="revelation-' + st.at + '"><p class="dessin-step">' + (st.old ? "Pile précédente · " : "") + "Sujet " + (st.at + 1) + '</p><h1 class="g-title" tabindex="-1" data-focus>' + k.esc(p.x.slice(0, 120)) +
+      '</h1><div class="dessin-pair">' + fig("a", 0) + fig("b", 1) + '</div><p class="dessin-keep"><button class="btn alt small" type="button" data-act="image">Enregistrer l\'image</button></p>' +
+      (st.late && g.duo ? '<p class="hint">' + k.esc(k.nm(g.other(g.me))) + (st.old ? " a relancé une pile de sujets. Touche le bouton quand tu as fini de regarder." : " t'attend pour la suite.") + "</p>" : "") +
+      '<div class="g-actions"><button class="btn" type="button" data-act="next">' + (st.old ? "Voir la nouvelle pile" : st.at + 1 < st.list.length ? "Sujet suivant" : "Terminer") + "</button></div></div>";
+  }
+
+  function vEnd(g) {
+    const cur = CATS.some((c) => c[0] === g.setup.sujets) ? g.setup.sujets : "tous", kept = g.def.extra(g.kit);
+    return '<div class="dessin" data-screen="fin"><p class="eyebrow">Fin de la pile</p><h1 class="g-title" tabindex="-1" data-focus>Vous avez tout dessiné.</h1>' +
+      '<p class="g-lead">' + (kept ? "Vos derniers dessins sont gardés sur cet appareil, juste en dessous. " : "") + "On mélange les sujets et on recommence\u00a0?</p>" +
+      '<div class="g-opts"><p class="g-opts-label">Rejouer avec</p><div class="g-choices">' + CATS.map((c) => '<button class="g-choice" type="button" data-act="again" data-v="' + c[0] + '"' +
+        (cur === c[0] ? ' aria-current="true"' : "") + "><b>" + c[1] + "</b></button>").join("") + "</div></div>" + kept + "</div>";
+  }
+
+  (window.GAMES = window.GAMES || []).push({
+    id: "dessin",
+    v: 1,
+    title: "Dessine-moi",
+    hook: "Est-ce qu'on a le même coup de crayon ?",
+    blurb: "Un sujet tombe, chacun le dessine au doigt en une minute, puis vos deux dessins s'affichent côte à côte.",
+    meta: (PROMPTS.length > 1 ? PROMPTS.length + " sujets · " : "") + "1 min par dessin",
+    intro: [
+      "Un sujet s'affiche : « Votre premier rendez-vous », « L'animal que vous formez à deux ». Chacun le dessine au doigt, sans montrer sa feuille, puis les deux dessins se retrouvent côte à côte.",
+      "Aucun talent requis, c'est souvent plus drôle sans. Les dessins que vous révélez sont gardés dans une galerie, sur cet appareil seulement."
+    ],
+    glyph: '<rect class="ink-b" x="19" y="9" width="24" height="24" rx="3"/><path class="ring-a" d="M5 36c9 2 17-3 19-10s-2-10-6-8-4 10 2 14 14 3 23-6"/>',
+    live: true,
+    options: [
+      { id: "chrono", label: "Temps", def: "60", choices: [{ id: "60", name: "Une minute" }, { id: "30", name: "Trente secondes" }, { id: "0", name: "Sans chrono" }] },
+      { id: "sujets", label: "Sujets", def: "tous", choices: CATS.map((c) => ({ id: c[0], name: c[1], hint: c[2] })) }
+    ],
+    view(g) {
+      const st = stage(g);
+      if (st.show) return vReveal(g, st);
+      /* Le fichier des sujets n'est pas arrivé sur cet appareil : surtout pas de fausse fin de pile, ni de « Rejouer ». */
+      if (!st.list.length) return '<div class="dessin" data-screen="vide"><h1 class="g-title" tabindex="-1" data-focus>Les sujets ne sont pas arrivés.</h1><p class="g-lead">Recharge la page\u00a0: la partie reprendra où elle en était.</p></div>';
+      if (st.r >= st.list.length) return vEnd(g);
+      if (st.cur) return vDraw(g, st);
+      /* Sur un seul téléphone, le second ne prend l'appareil qu'une fois la feuille du premier cachée. */
+      if (st.w) return g.duo || st.w === "a" ? vReady(g, st) : '<div class="dessin" data-screen="passe-' + st.r + '">' + g.kit.pass("b", "start") + '<p class="hint">Dès que tu touches le bouton, le sujet s\'affiche' + (chrono(g) ? " et le chrono démarre" : "") + ".</p></div>";
+      return vWait(g, st);
+    },
+    act(g, name, el) {
+      const st = stage(g), cur = st.cur, v = el.getAttribute("data-v");
+      /* Après le passage du téléphone, une seconde entière : le bouton « à moi » apparaît là où était la feuille,
+         sous un doigt qui dessinait peut-être encore quand le chrono l'a rendue. */
+      if (name === "start" && st.w && !cur && settled(!g.duo && st.w === "b" ? 1000 : 400)) {
+        g.local.cur = { r: st.r, w: st.w, t: Date.now(), n: chrono(g), s: [], c: 0, z: 0 };
+        g.local.p = st.r;
+        g.save();
+        g.render();
+        /* Un bip de départ : il annonce le chrono et, sur iPhone, c'est ce geste qui autorise le bip de fin. */
+        if (g.local.cur.n) g.kit.beep();
+      } else if ((name === "ink" || name === "size") && cur) {
+        if (name === "ink") cur.c = int(parseInt(v, 10), 6); else cur.z = int(parseInt(v, 10), 1);
+        g.save();
+        /* Sur place : un rendu complet referait la feuille et ferait perdre le focus. */
+        el.parentNode.querySelectorAll('[data-act="' + name + '"]').forEach((b) => b.setAttribute("aria-pressed", b === el));
+      } else if (cur && pad && (name === "undo" || (name === "clear" && twice(name)))) {
+        /* Tout effacer demande deux touchers : une minute de dessin ne doit pas disparaître sur un geste malheureux. */
+        pad.commit();
+        cur.s.length = name === "undo" ? Math.max(0, cur.s.length - 1) : 0;
+        g.save();
+        pad.redraw();
+      } else if (name === "done" && cur) {
+        if (pad) pad.commit();
+        /* Une feuille blanche ne part ni sur un seul toucher, ni dans la seconde où elle s'affiche : « J'ai fini »
+           est là où était « Voir le sujet », sous un doigt qui a pu toucher trois fois. */
+        if (cur.s.length || (settled(1000) && twice(name))) submit(g);
+      } else if (name === "next" && st.show && settled(1000)) {
+        /* Une seconde entière ici : le chrono peut rendre la feuille à l'instant où le doigt part vers « J'ai fini ».
+           Si l'autre est déjà passé à la suite, il n'y a rien à lui envoyer : cet appareil le rejoint. */
+        g.kit.store.del(FRONT);
+        if (!st.old) g.local.p = st.at + 1;
+        if (st.late) { g.save(); g.render(); } else g.share({ r: st.r + 1 });
+      } else if (name === "image" && st.show) {
+        /* Même délai : ce bouton apparaît au milieu de ce qui était la feuille. */
+        if (settled(1000)) save(st.show);
+      } else if ((name === "image" || name === "empty") && over(g)) {
+        g.def.extraAct(g.kit, name, el);
+      } else if (name === "again" && over(g)) {
+        g.newGame({ sujets: CATS.some((c) => c[0] === v) ? v : "tous" });
+      }
+    },
+    over,
+    mount(g, root) {
+      const k = g.kit, st = stage(g), cur = st.cur, cv = root.querySelector(".dessin-sheet"), screen = root.querySelector("[data-screen]");
+      /* Un écran se reconnaît à sa pile autant qu'à son nom : le « Sujet 1 » d'une partie relancée est un nouvel
+         écran. Une révélation, elle, reste le même écran quand l'autre relance une pile pendant qu'on la regarde. */
+      const name = st.show ? st.show.k : screen ? key(g, screen.getAttribute("data-screen")) : seen.k;
+      if (seen.k !== name) {
+        seen = { k: name, t: Date.now() };
+        if (armed.n) arm("");
+        /* Les deux feuilles ne font leur entrée qu'à la première apparition de la révélation, pas à chaque réaffichage. */
+        if (st.show) root.querySelector(".dessin-pair").classList.add("is-new");
+      }
+      /* Le compte des révélations quittées part du sujet où cet appareil se trouve, dès qu'il y a rendu une feuille
+         ou qu'il en voit la révélation (ou, dans act, qu'il s'y met à dessiner). Pas avant : un téléphone qui
+         rejoint la partie affiche d'abord le sujet 1, le temps de relire le salon. */
+      if (!Number.isInteger(g.local.p) && !st.old && (st.show || !st.w)) { g.local.p = st.at; g.save(); }
+      /* La paire à l'écran est rangée dans la galerie, et notée comme celle qu'on regarde : si l'autre relance
+         une pile, g.local est vidé, et c'est cette note qui la garde sous les yeux. */
+      if (st.show) {
+        remember(k, st.show);
+        if (!st.old && k.store.get(FRONT, null) !== st.show.k) k.store.set(FRONT, st.show.k);
+      } else if (k.store.get(FRONT, null) != null) {
+        k.store.del(FRONT);
+      }
+      if (!cv || !cur) return;
+      const x = cv.getContext("2d"), secs = cur.n, time = root.querySelector(".dessin-time"), bar = root.querySelector(".dessin-clock span");
+      let live = null, box = null;
+      cv.width = cv.height = Math.round(cv.clientWidth * Math.min(window.devicePixelRatio || 1, 3)) || GRID;
+      x.scale(cv.width / GRID, cv.width / GRID);
+      const redraw = () => { x.fillStyle = INKS[6]; x.fillRect(0, 0, GRID, GRID); paint(x, cur.s.map(unpack).filter(Boolean)); };
+      const dab = (ax, ay, cx, cy, bx, by) => { x.beginPath(); x.moveTo(ax, ay); x.quadraticCurveTo(cx, cy, bx, by); x.stroke(); };
+      const at = (e) => [clamp(((e.clientX - box.left) / box.width) * GRID), clamp(((e.clientY - box.top) / box.height) * GRID)];
+      /* Fin d'un trait : simplifié, rangé, enregistré. Un réaffichage ou un rechargement retrouve alors la feuille telle quelle. */
+      const commit = () => {
+        if (!live) return;
+        cur.s.push(pack(live.c, live.z, simplify(live.p, EPS)));
+        live = null;
+        g.save();
+      };
+      const down = (e) => {
+        /* Un seul trait à la fois, quel que soit le doigt : un pouce qui tient le téléphone, posé ailleurs sur
+           l'écran, ne doit pas empêcher de dessiner. */
+        if (live || e.button > 0 || cur.s.length >= MAX_STROKES || !settled(400)) return;
+        e.preventDefault();
+        if (armed.n) arm("");
+        box = cv.getBoundingClientRect();
+        const [c, z] = tool(cur), p = at(e);
+        live = { id: e.pointerId, c, z, p };
+        try { cv.setPointerCapture(e.pointerId); } catch (err) { /* sans importance */ }
+        /* Ce qui arrive de l'autre téléphone attendra la fin du trait. */
+        g.hold(true);
+        x.strokeStyle = INKS[c];
+        x.lineWidth = wide(c, z);
+        dab(p[0], p[1], p[0], p[1], p[0] + 0.01, p[1]);
+      };
+      const move = (e) => {
+        if (!live || e.pointerId !== live.id) return;
+        const all = e.getCoalescedEvents ? e.getCoalescedEvents() : [];
+        (all.length ? all : [e]).forEach((ev) => {
+          const q = at(ev), p = live.p, n = p.length;
+          if (Math.hypot(q[0] - p[n - 2], q[1] - p[n - 1]) < STEP) return;
+          /* Pendant le geste, une courbe d'un milieu de segment au suivant : le trait reste lisse même tracé vite. */
+          dab(n < 4 ? p[0] : (p[n - 4] + p[n - 2]) / 2, n < 4 ? p[1] : (p[n - 3] + p[n - 1]) / 2, p[n - 2], p[n - 1], (p[n - 2] + q[0]) / 2, (p[n - 1] + q[1]) / 2);
+          p.push(q[0], q[1]);
+          /* Un trait interminable est rangé par tronçons : chacun reste rapide à simplifier, et assez court pour être relu en entier. */
+          if (p.length >= MAX_STROKE / 2) {
+            const next = { id: live.id, c: live.c, z: live.z, p: q };
+            commit();
+            live = next;
+          }
+        });
+      };
+      const up = (e) => {
+        if (!live || e.pointerId !== live.id) return;
+        commit();
+        redraw();
+        g.hold(false);
+      };
+      cv.addEventListener("pointerdown", down);
+      cv.addEventListener("pointermove", move);
+      ["pointerup", "pointercancel", "lostpointercapture"].forEach((type) => cv.addEventListener(type, up));
+      /* Sur iPhone, c'est ce qui empêche la loupe et la sélection de texte sous un doigt qui s'attarde. */
+      cv.addEventListener("touchstart", (e) => e.preventDefault(), { passive: false });
+      /* Le chrono court depuis l'heure de départ enregistrée : recharger la page ne le remet pas à zéro. À zéro,
+         la feuille part telle quelle (c'est le minuteur que le joueur a lancé, pas une réaction à l'autre téléphone). */
+      const timer = secs && setInterval(() => {
+        const left = remain(cur);
+        if (left) {
+          time.textContent = clock(left);
+          time.classList.toggle("is-late", left <= 10);
+          bar.style.width = (100 * left) / secs + "%";
+          return;
+        }
+        /* Le minuteur s'arrête là et rend la main à l'affichage. Si cette feuille n'est plus celle de la partie
+           (une nouvelle pile est arrivée pendant un trait), il ne sonne pas et ne rend rien. */
+        clearInterval(timer);
+        commit();
+        const mine = stage(g).cur === cur;
+        g.hold(false);
+        if (mine) { k.buzz([120, 60, 120]); k.beep(); submit(g); }
+      }, 250);
+      redraw();
+      pad = { commit, redraw };
+      return () => { clearInterval(timer); commit(); pad = null; };
+    },
+    extra(k) {
+      const list = gallery(k);
+      return list.length ? '<details class="more dessin-gal"><summary>Vos dessins (' + list.length + ')</summary><p class="hint">Vos dernières paires, gardées sur cet appareil (' + KEEP +
+        ' au plus). Touche une paire pour enregistrer son image.</p><div class="dessin-thumbs">' + list.map((p, i) => '<button class="dessin-thumb" type="button" data-act="image" data-v="' + i +
+          '" aria-label="Enregistrer l\'image\u00a0: ' + k.esc(p.x.slice(0, 120)) + '">' + art(p.d[0], "", 3) + art(p.d[1], "", 3) + "<span>" + k.esc(p.x.slice(0, 120)) + "</span></button>").reverse().join("") +
+        '</div><p><button class="link" type="button" data-act="empty">' + label("empty") + "</button></p></details>" : "";
+    },
+    extraAct(k, name, el) {
+      const p = gallery(k)[int(parseInt(el.getAttribute("data-v"), 10), KEEP)];
+      if (name === "image" && p) {
+        save(p);
+      } else if (name === "empty" && twice(name)) {
+        k.store.del("dessin:galerie");
+        k.render();
+      }
     }
   });
 })();
