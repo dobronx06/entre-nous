@@ -486,8 +486,9 @@
       }
       let moved = false;
       if (n > s.seq[w][t]) {
-        /* Ma propre tranche ne revient du relais que dans une partie neuve, où je n'ai encore rien écrit. */
-        if (t === "d" && (w !== s.me || s.seq[w].d === 0)) { s.S[w] = { k: x.k, d: x.d }; moved = true; }
+        /* Ma propre tranche ne revient du relais que dans une partie neuve, tant que je n'y ai rien écrit
+           moi-même (mes numéros d'envoi, tirés de l'heure, sont postérieurs à la création de la partie). */
+        if (t === "d" && (w !== s.me || s.seq[w].d < (s.t0 || Infinity))) { s.S[w] = { k: x.k, d: x.d }; moved = true; }
         if (w === s.me) s.sent[t] = Math.max(s.sent[t], n);
         s.seq[w][t] = n;
         moved = moved || w !== s.me;
@@ -840,7 +841,7 @@
 
     function create(d, o) {
       const s = Object.assign({ id: d.id, v: d.v, sh: {}, st: 0, sw: "a", S: { a: { k: "", d: {} }, b: { k: "", d: {} } },
-        seq: { a: { h: 0, d: 0 }, b: { h: 0, d: 0 } }, sent: { h: 0, d: 0 }, gone: 0, local: {} }, o);
+        seq: { a: { h: 0, d: 0 }, b: { h: 0, d: 0 } }, sent: { h: 0, d: 0 }, gone: 0, t0: Date.now(), local: {} }, o);
       sessions[d.id] = s;
       /* Premier envoi dès l'arrivée : c'est lui qui dit à l'autre téléphone « je suis là ». */
       if (s.duo) { s.seq[s.me].h = Date.now(); publishSoon(s, 0); }

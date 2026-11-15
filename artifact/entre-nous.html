@@ -390,6 +390,141 @@ button, input, textarea { font: inherit; color: inherit; }
 .more { padding-block: 0.8rem; border-top: 1px solid var(--line); }
 .more summary { cursor: pointer; font-weight: 600; color: var(--ink); }
 .more > * + * { margin-top: 0.8rem; }
+
+/* Jeux : styles partagés par tous les jeux (les règles propres à un jeu sont dans
+   jeux/<id>.css). Mêmes encres que le reste du site : bleu pour la première personne,
+   orange pour la seconde. */
+
+/* L'encre d'un joueur, pour tout ce qui lui appartient à l'écran. */
+.game, .g-pass { --who: var(--ink); --who-soft: var(--wash); }
+.as-a { --who: var(--a); --who-soft: var(--a-soft); }
+.as-b { --who: var(--b); --who-soft: var(--b-soft); }
+
+/* ---------- Cadre d'une partie ---------- */
+.g-top { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; padding-block: 0.8rem; }
+.g-top > :last-child { justify-self: end; }
+/* Un titre long passe sur deux lignes plutôt que de déborder sur la pastille de liaison. */
+.g-name { min-width: 0; font: 600 0.78rem/1.3 var(--body); letter-spacing: 0.07em; text-transform: uppercase; text-align: center; text-wrap: balance; color: var(--muted); }
+.g-net { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; font-weight: 600; color: var(--ink-2); white-space: nowrap; }
+.g-net::before { content: ""; flex: none; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--good); }
+.g-net[data-net="wait"]::before { background: var(--warn); }
+.g-net[data-net="err"]::before, .g-net[data-net="full"]::before { background: var(--crit); }
+
+.game { gap: 1.1rem; min-height: calc(100vh - 4.5rem); min-height: calc(100dvh - 4.5rem); padding-block: 0.5rem 1.5rem; }
+.game button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.g-foot { margin-top: auto; padding-top: 1.5rem; text-align: center; font-size: 0.85rem; }
+.g-foot .link { color: var(--muted); }
+/* Lien qui sert de bouton : 44 px de haut, la taille d'un doigt. */
+.g-link { display: inline-flex; align-items: center; min-height: 44px; }
+.banner-actions .btn { min-height: 44px; }
+/* La racine de chaque écran de jeu (data-screen) reprend la colonne de l'écran. */
+.game > [data-screen] { flex: 1 1 auto; display: flex; flex-direction: column; gap: 1.1rem; }
+.g-gone { display: flex; flex-wrap: wrap; align-items: center; gap: 0 0.6rem; }
+
+.g-title { font: 700 clamp(1.7rem, 6vw, 2.4rem)/1.1 var(--display); letter-spacing: -0.025em; text-wrap: balance; }
+.g-lead { font-size: 1.05rem; color: var(--ink-2); }
+.g-note { padding: 0.8rem 1rem; border-radius: 12px; background: var(--wash); font-size: 0.9rem; color: var(--ink-2); }
+
+/* Pastille « encre + prénom » */
+.g-who { display: inline-flex; align-items: center; gap: 0.45rem; max-width: 100%; padding: 0.3rem 0.75rem; border-radius: 999px; background: var(--a-soft); color: var(--ink); font-size: 0.9rem; font-weight: 600; overflow-wrap: anywhere; }
+.g-who.b { background: var(--b-soft); }
+
+/* Étiquette courte (type de carte, « Adultes »…) */
+.g-tag { display: inline-flex; align-items: center; align-self: flex-start; padding: 0.2rem 0.6rem; border-radius: 999px; background: var(--wash); color: var(--ink-2); font: 600 0.72rem var(--body); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+.g-tag.a { background: var(--a-soft); color: var(--ink); }
+.g-tag.b { background: var(--b-soft); color: var(--ink); }
+
+/* Grande carte à jouer */
+.g-card { display: flex; flex-direction: column; justify-content: center; gap: 0.9rem; min-height: 15rem; padding: 1.5rem 1.3rem; border: 1px solid var(--line); border-radius: 22px; background: var(--surface); color: var(--ink); }
+.g-card.a { border-color: transparent; background: var(--a-soft); }
+.g-card.b { border-color: transparent; background: var(--b-soft); }
+.g-card-text { font: 650 clamp(1.35rem, 5vw, 1.8rem)/1.2 var(--display); letter-spacing: -0.015em; text-wrap: balance; overflow-wrap: anywhere; }
+
+/* Champ de saisie (16 px au moins : en dessous, iOS zoome sur le champ) */
+.g-field { width: 100%; min-height: 3.2rem; padding: 0.8rem 1rem; border: 1.5px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); font-size: 1.15rem; }
+.g-field:focus-visible { outline-color: var(--who); }
+
+/* Score à deux */
+.g-score { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; }
+.g-score > * { display: flex; flex-direction: column; align-items: flex-start; gap: 0.4rem; min-width: 0; padding: 0.9rem 1rem; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+.g-score b { font: 700 2rem/1 var(--body); font-variant-numeric: tabular-nums; color: var(--ink); }
+.g-big { font: 700 clamp(3.2rem, 15vw, 5.2rem)/0.95 var(--body); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; color: var(--ink); }
+
+/* Rangée de boutons collée en bas de l'écran, à portée de pouce */
+.g-actions { position: sticky; bottom: 0; z-index: 2; display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: auto; padding-block: 0.8rem max(0.8rem, env(safe-area-inset-bottom, 0px)); background: linear-gradient(to top, var(--bg) 70%, transparent); }
+.g-actions .btn { flex: 1 1 8rem; min-height: 3rem; }
+.g-actions + .g-foot { margin-top: 0; padding-top: 0.3rem; }
+
+/* Passage du téléphone, attente de l'autre */
+.g-pass { display: flex; flex-direction: column; gap: 1.1rem; padding-top: 2.5rem; }
+.g-pass h1 { font: 700 clamp(1.9rem, 6.5vw, 2.75rem)/1.08 var(--display); letter-spacing: -0.025em; text-wrap: balance; color: var(--ink); }
+.g-pass .btn { gap: 0.55rem; }
+.g-wait { display: flex; flex-direction: column; gap: 0.6rem; }
+.sync.is-here::before { background: var(--good); animation: none; }
+
+/* Options sur la présentation d'un jeu */
+.g-opts { display: flex; flex-direction: column; gap: 0.45rem; }
+.g-opts-label { font: 600 0.78rem var(--body); letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+.g-choices { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 0.5rem; }
+.g-choice { display: flex; flex-direction: column; gap: 0.2rem; min-height: 3rem; padding: 0.65rem 0.85rem; border: 1.5px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); text-align: left; cursor: pointer; transition: border-color 0.12s, background 0.12s; }
+.g-choice:hover { border-color: var(--ink); }
+.g-choice[aria-pressed="true"] { border-color: var(--ink); background: var(--wash); }
+.g-choice[aria-pressed="true"] .g-tag { background: var(--surface); }
+.g-choice b { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; font-weight: 600; }
+.g-choice > span { font-size: 0.85rem; color: var(--ink-2); }
+
+/* Sur la même longueur d'onde. */
+.onde { flex: 1 1 auto; display: flex; flex-direction: column; gap: 1rem; }
+/* Un mot ou un prénom sans espace passe à la ligne au lieu de faire défiler la page de côté. */
+.onde .g-title, .onde .g-lead, .onde .hint, .onde .eyebrow, .onde .sync, .onde-theme { overflow-wrap: anywhere; }
+.onde-top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.2rem 1rem; }
+.onde-step { font: 600 0.78rem var(--body); letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+.onde-score { font-size: 0.9rem; color: var(--ink-2); }
+.onde-score b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.onde-who { display: flex; align-items: center; gap: 0.5rem; font-size: 0.95rem; color: var(--ink-2); }
+.onde .g-who { background: var(--who-soft); }
+.onde-form { flex: 1 1 auto; display: flex; flex-direction: column; gap: 0.8rem; }
+/* Sans cela le navigateur impose son gris, trop pâle sur le fond sombre. */
+.onde-form .g-field::placeholder { color: var(--muted); opacity: 1; }
+
+/* Révélation : les deux mots côte à côte, puis les deux encres qui se rejoignent ou non.
+   Tout doit tenir au-dessus de la rangée de boutons sur un petit téléphone, d'où les cartes compactes. */
+.onde-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; }
+.onde-pair .g-card { justify-content: flex-start; gap: 0.5rem; min-height: 0; padding: 0.9rem; }
+.onde-pair .g-who { padding: 0; background: none; }
+/* Une demi-carte est étroite : le mot rétrécit un peu et, s'il le faut, se coupe entre deux syllabes. */
+.onde-pair .g-card-text { font-size: clamp(1.1rem, 4.6vw, 1.6rem); -webkit-hyphens: auto; hyphens: auto; }
+.onde-venn { display: flex; justify-content: center; }
+.onde-venn .venn { max-width: 8rem; }
+/* Le verdict tient sur une ligne, même sur le plus étroit des téléphones. */
+.onde-verdict { font-size: clamp(1.55rem, 6vw, 2.4rem); }
+/* La question et son bouton l'un sous l'autre : le bouton ne change pas de place quand le texte change. */
+.onde-ask { display: flex; flex-direction: column; align-items: flex-start; }
+.onde-ask .link { display: inline-flex; align-items: center; min-height: 44px; }
+/* « Manche suivante » est inerte une demi-seconde (double toucher sur « Valider ») : cela ne doit pas se voir. */
+.onde .g-actions .btn:disabled { opacity: 1; }
+/* Écran court (petit téléphone, barres du navigateur comprises) : on resserre, pour que la question et son
+   bouton restent au-dessus de la rangée de boutons. */
+@media (max-height: 620px) {
+  .game > .onde { gap: 0.75rem; }
+  .onde-venn .venn { max-width: 6rem; }
+}
+.onde .g-big span { font-size: 0.42em; font-weight: 600; letter-spacing: 0; color: var(--muted); }
+@media (prefers-reduced-motion: no-preference) {
+  .onde-pair.is-new .g-card { animation: onde-in 0.3s ease-out backwards; }
+  .onde-pair.is-new .g-card.b { animation-delay: 0.12s; }
+  @keyframes onde-in { from { opacity: 0.3; transform: translateY(8px); } }
+}
+
+/* Récapitulatif des dix manches */
+.onde-list { display: flex; flex-direction: column; }
+.onde-list li { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: 0.15rem 0.7rem; padding-block: 0.7rem; border-top: 1px solid var(--line); }
+.onde-list .st { grid-row: 1 / 3; padding-top: 0.1rem; }
+.onde-theme { font-size: 0.88rem; color: var(--muted); }
+.onde-words { display: flex; flex-wrap: wrap; gap: 0.2rem 1.1rem; font-weight: 600; color: var(--ink); overflow-wrap: anywhere; }
+.onde-words > span { display: inline-flex; align-items: center; gap: 0.4rem; min-width: 0; }
+/* Le paquet qu'on vient de jouer, repéré comme le choix en cours sur la présentation. */
+.onde .g-choice[aria-current="true"] { border-color: var(--ink); background: var(--wash); }
 </style>
 <div id="app"></div>
 <script>
@@ -1860,6 +1995,1384 @@ button, input, textarea { font: inherit; color: inherit; }
 });
 </script>
 <script>
+/* Sur la même longueur d'onde : trois paquets de thèmes auxquels chacun répond d'un mot, sans se concerter.
+   Dans « nous », {a} et {b} = prénoms des joueurs, {de_a} et {de_b} = « de Tom » / « d'Inès ». */
+(window.GAME_DATA = window.GAME_DATA || {}).onde = {
+  packs: [
+    {
+      id: "classique",
+      name: "Classique",
+      hint: "Des catégories de tous les jours, idéales pour commencer.",
+      themes: [
+        "Un fruit rouge",
+        "Une capitale européenne",
+        "Un objet qu'on perd tout le temps",
+        "Un animal de la ferme",
+        "Le meilleur jour de la semaine",
+        "Un sport de raquette",
+        "Un cliché sur les Français",
+        "Un endroit où il faut chuchoter",
+        "Un outil de bricolage",
+        "Un super-héros",
+        "La première chose qu'on fait au réveil",
+        "Une fleur qu'on offre en bouquet",
+        "Un fromage qui sent fort",
+        "Une ville française au bord de la mer",
+        "Un jeu de société",
+        "Une excuse classique quand on arrive en retard",
+        "Un film qui fait pleurer",
+        "Une viennoiserie",
+        "Une planète du système solaire",
+        "Un cadeau de dernière minute",
+        "Un insecte qui pique",
+        "La pire corvée de la maison",
+        "Un méchant de conte de fées",
+        "Un plat qui réchauffe en hiver",
+        "Un pays voisin de la France",
+        "Ce qu'on emporte forcément à la plage",
+        "Un signe astrologique",
+        "Une appli qu'on ouvre tous les jours",
+        "Une sauce pour accompagner les frites",
+        "Un monument français hors de Paris",
+        "Un instrument trop bruyant pour un appartement",
+        "Un métier où l'on porte un uniforme",
+        "Une bonne résolution qu'on ne tient jamais",
+        "Ce qu'on aime regarder dans le ciel",
+        "Un lieu où l'on fait toujours la queue",
+        "Un objet qu'on prête et qu'on ne revoit jamais",
+        "Une couleur qui va avec tout",
+        "Une chanson qui remplit la piste de danse",
+        "Un bonbon qui colle aux dents",
+        "Une île paradisiaque",
+        "Un vêtement pour les jours de grand froid",
+        "Un porte-bonheur",
+        "Une activité pour un dimanche de pluie",
+        "Un oiseau qui ne vole pas",
+        "Ce qu'on tartine au petit-déjeuner",
+        "La pièce où finissent toujours les soirées",
+        "Un appareil qui lâche quand on en a le plus besoin",
+        "Une matière scolaire",
+        "Une fête qu'on attend toute l'année",
+        "Une spécialité bretonne",
+        "Une danse de salon",
+        "Une chose qu'on collectionne",
+        "Une phobie très répandue",
+        "Un mot de passe beaucoup trop simple",
+        "Une série que tout le monde a vue",
+        "Un endroit où l'on enlève ses chaussures",
+        "Ce qu'on oublie toujours de mettre dans la valise",
+        "Un sport olympique d'hiver",
+        "Une langue qu'on rêve de parler couramment",
+        "Une position pour dormir",
+        "Un jeu de cour de récré",
+        "Ce qui gâche un pique-nique",
+        "Un nom de chien",
+        "Une sorte de pâtes",
+        "Un souvenir qu'on rapporte de vacances",
+        "Une attraction de fête foraine",
+        "Un juron qu'on peut dire devant tout le monde",
+        "Un parfum de glace",
+        "Une odeur qui donne faim",
+        "Un bruit de la campagne"
+      ]
+    },
+    {
+      id: "nous",
+      name: "Spécial nous",
+      hint: "Vos goûts, vos habitudes, vos souvenirs : la réponse est dans votre histoire.",
+      themes: [
+        "Le lieu de notre premier rendez-vous",
+        "Le dessert auquel {a} ne résiste jamais",
+        "La spécialité {de_b} en cuisine",
+        "Notre série du moment",
+        "La couleur préférée {de_a}",
+        "Le petit nom qu'on se donne tous les jours",
+        "Le métier dont {b} rêvait enfant",
+        "Le plat qu'on commande le plus souvent",
+        "Le tic de langage {de_a}",
+        "L'aliment banni de l'assiette {de_b}",
+        "Le mois de notre rencontre",
+        "La ville où {a} se verrait bien vivre",
+        "L'objet qu'on se chipe sans arrêt",
+        "Le super-pouvoir que choisirait {b}",
+        "La chanson qu'on chante à tue-tête ensemble",
+        "L'animal qui fait craquer {a}",
+        "Le vêtement fétiche {de_b}",
+        "La destination de nos plus belles vacances",
+        "Le domaine où {a} est imbattable",
+        "Les derniers mots qu'on se dit avant de dormir",
+        "L'animal auquel {b} ressemble le plus au réveil",
+        "Le premier film qu'on a regardé ensemble",
+        "La saison où {a} revit",
+        "Le premier réflexe {de_b} en rentrant",
+        "Notre balade préférée",
+        "Le sujet dont on peut parler pendant des heures",
+        "La commande habituelle {de_a} au café",
+        "L'idole de jeunesse {de_b}",
+        "Le jeu auquel on joue le plus",
+        "Le rêve un peu fou {de_a}",
+        "Ce qui finit toujours dans notre panier de courses",
+        "Ce dont {b} raffole sans trop s'en vanter",
+        "La recette qu'on rate à tous les coups",
+        "L'endroit où {a} se ressource le mieux",
+        "Le moment de la journée où {b} déborde d'énergie",
+        "L'activité qu'on a testée une fois, pas deux",
+        "La dernière lubie {de_a}",
+        "Le film qu'on cite à longueur de journée",
+        "L'objet qui suit {b} partout, à part son téléphone",
+        "La question qu'on se pose tous les soirs",
+        "Le dessin animé qui a bercé l'enfance {de_a}",
+        "La réaction {de_b} devant une araignée",
+        "Le pays qu'on rêve de découvrir à deux",
+        "Le fond d'écran du téléphone {de_a}",
+        "Un mot qui n'a de sens que pour nous deux",
+        "La qualité qui saute aux yeux chez {b}",
+        "Le magasin où l'on perd la notion du temps",
+        "Le petit geste qui fait fondre {a}",
+        "L'artiste dont {b} connaît toutes les paroles",
+        "Notre soirée idéale à la maison"
+      ]
+    },
+    {
+      id: "absurde",
+      name: "Absurde",
+      hint: "Des thèmes farfelus où tomber d'accord tient du miracle.",
+      themes: [
+        "Un prénom pour un aspirateur robot",
+        "Le légume le plus triste du potager",
+        "Le cri qu'on pousse en sautant en parachute",
+        "Un animal qui ferait un très mauvais colocataire",
+        "Un parfum de dentifrice qui ne se vendra jamais",
+        "La couleur du lundi matin",
+        "Ce qu'on planterait en premier sur la Lune",
+        "Un sport qu'on peut pratiquer en pantoufles",
+        "L'instrument dont joue un squelette",
+        "Un métier déconseillé à un tyrannosaure",
+        "Ce qui se cache sous le lit",
+        "Une invention qui mériterait le prix Nobel de la flemme",
+        "Un fruit qu'on pourrait utiliser comme ballon",
+        "L'indispensable de tout fantôme qui se respecte",
+        "Le pire moment pour avoir le hoquet",
+        "Un objet qui fait un très bon micro",
+        "Le péché mignon d'un dragon",
+        "Une chose impossible à faire avec des moufles",
+        "Un huitième nain pour Blanche-Neige",
+        "Ce qu'on redoute d'entendre chez le dentiste",
+        "Un moyen de transport qui n'existe pas encore",
+        "Un plat qu'on ne servirait jamais à un mariage",
+        "Le premier mot à apprendre à un perroquet",
+        "Une formule magique pour ranger la maison",
+        "Un accessoire parfaitement inutile au pôle Nord",
+        "Ce qu'on fait quand personne ne regarde",
+        "Un ustensile de cuisine pour repousser un zombie",
+        "Ce qu'on fabrique avec un carton géant",
+        "L'endroit où disparaissent les chaussettes",
+        "Ce qu'un chat écrirait sur sa liste de courses",
+        "Une chose plus lente qu'un escargot",
+        "Un pays qui n'existe que dans les histoires",
+        "Un objet du quotidien qui nous juge en silence",
+        "Ce que fait le père Noël au mois d'août",
+        "Une bonne raison de porter une cape",
+        "Un message à glisser dans une bouteille à la mer",
+        "Le déguisement idéal pour se fondre dans le décor",
+        "Le bruit que fait une idée de génie",
+        "Une chose qu'on fait mieux les yeux fermés",
+        "Ce qu'il ne faut jamais demander à un grand chef"
+      ]
+    }
+  ]
+};
+</script>
+<script>
+/* Sur la même longueur d'onde : un thème, un mot chacun sans se concerter, dix manches.
+   Tranche d'un joueur : { w: [mot de la manche 0, mot de la manche 1, …], ok: { "3": 1 }, fin: 1 }.
+   - ok compte, manche par manche, les fois où le couple a contredit le verdict du jeu (« On compte
+     quand même », « Finalement non »). Le plus grand des deux compteurs décide : impair, le verdict
+     est inversé. Chacun n'écrit que le sien, donc deux décisions prises au même instant, sur la même
+     manche ou sur deux manches, ne s'écrasent jamais.
+   - fin : ce joueur a vu le résultat. Sur deux téléphones, on ne relance que lorsque les deux l'ont vu.
+   Réglages : pack, puis, après un « Rejouer », deck (la seed de la première partie) et at (où en est
+   chaque paquet), pour ne pas resservir les thèmes qu'on vient de voir.
+   Chaque appareil avance à son rythme d'une révélation à la suivante (g.local.r), mais une manche
+   ne se révèle que lorsque les deux mots sont là. */
+(function () {
+  "use strict";
+
+  const DATA = (window.GAME_DATA && window.GAME_DATA.onde) || { packs: [] };
+  const ROUNDS = 10;
+  const MIX = [["classique", 4], ["nous", 4], ["absurde", 2]];
+  const LEVELS = [
+    [9, "Télépathie confirmée."],
+    [7, "Presque la même fréquence."],
+    [5, "Bonne réception."],
+    [3, "Ça capte par moments."],
+    [0, "Deux planètes, et c'est très bien comme ça."]
+  ];
+  const pack = (id) => DATA.packs.find((p) => p.id === id);
+  /* Un entier borné lu dans un objet venu de l'autre téléphone (ou restauré depuis le relais) : sinon 0. */
+  const int = (o, key) => { const n = o && typeof o === "object" ? o[key] : 0; return Number.isInteger(n) && n > 0 && n < 1e6 ? n : 0; };
+  const seedOf = (g) => Number(g.setup.seed) || 1;
+  const token = (g) => g.gen + ":" + g.setup.seed;
+
+  /* Deux réponses comptent pour la même si elles ne diffèrent que par la casse, les accents, les
+     articles en tête, le pluriel ou une faute de frappe. */
+  const ARTICLE = /^(?:le|la|les|l|un|une|des|du|de|d|a|au|aux|mon|ma|mes|ton|ta|tes|son|sa|ses|notre|nos|votre|vos|leur|leurs)$/;
+  /* Un mot : des lettres ou des chiffres, dans n'importe quelle écriture. Passé par RegExp() pour qu'un
+     navigateur qui ignore \p{…} garde le jeu, en alphabet latin, au lieu de rejeter tout le fichier. */
+  let WORD = /[a-z0-9]+/g;
+  try { WORD = new RegExp("[\\p{L}\\p{N}][\\p{L}\\p{N}\\p{M}]*", "gu"); } catch (e) { /* alphabet latin seulement */ }
+  function norm(s) {
+    const t = s.toLowerCase().replace(/œ/g, "oe").replace(/æ/g, "ae").normalize("NFD").replace(/[\u0300-\u036f]/g, "").match(WORD) || [];
+    while (t.length > 1 && ARTICLE.test(t[0])) t.shift();
+    return t.map((w) => (w.length > 3 ? w.replace(/[sx]$/, "") : w)).join(" ");
+  }
+  function distance(a, b) {
+    let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+    for (let i = 1; i <= a.length; i++) {
+      const cur = [i];
+      for (let j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      prev = cur;
+    }
+    return prev[b.length];
+  }
+  /* 2 : le même mot. 1 : le même à une faute de frappe près (le couple peut le refuser). 0 : deux mots. */
+  function same(a, b) {
+    const raw = (s) => s.normalize("NFC").trim().toLowerCase();
+    /* Deux réponses identiques comptent toujours, même faites d'un emoji ou de signes. */
+    if (raw(a) === raw(b)) return 2;
+    const x = norm(a), y = norm(b);
+    if (!x || !y) return 0;
+    /* Un espace ou un trait d'union de plus ne fait pas un autre mot : « week-end », « weekend ». */
+    if (x.replace(/ /g, "") === y.replace(/ /g, "")) return 2;
+    /* La faute de frappe ne vaut que pour les lettres : « 22h30 » n'est pas « 23h30 ». */
+    const digits = (s) => (s.match(/\d+/g) || []).join(" "), letters = (s) => s.replace(/[\d ]/g, "").length;
+    const n = Math.min(letters(x), letters(y));
+    return digits(x) === digits(y) && n >= 5 && distance(x, y) <= (n >= 9 ? 2 : 1) ? 1 : 0;
+  }
+
+  /* Ce que la partie prend dans chaque paquet. */
+  const plan = (g) => (pack(g.setup.pack) ? [[g.setup.pack, ROUNDS]] : MIX);
+  /* Les dix thèmes de la partie, tirés de la même façon sur les deux téléphones. Chaque paquet garde
+     le même ordre d'une partie à la suivante (deck) et « Rejouer » y reprend où l'on s'était arrêté
+     (at) : un thème ne revient qu'une fois son paquet épuisé. */
+  function themes(g) {
+    const k = g.kit, deck = Number(g.setup.deck) || seedOf(g);
+    let list = [];
+    plan(g).forEach(([id, n]) => {
+      const p = pack(id), all = p ? k.shuffle(p.themes, deck + DATA.packs.indexOf(p)) : [];
+      for (let i = 0; i < Math.min(n, all.length); i++) list.push(all[(int(g.setup.at, id) + i) % all.length]);
+    });
+    if (!pack(g.setup.pack)) list = k.shuffle(list, seedOf(g));
+    const map = { a: k.nm("a"), b: k.nm("b"), de_a: k.de(k.nm("a")), de_b: k.de(k.nm("b")) };
+    return list.map((t) => k.fill(t, map));
+  }
+
+  /* Les mots viennent parfois de l'autre téléphone : dix au plus, et seulement des chaînes courtes. */
+  const words = (g, w) => (Array.isArray(g.S[w].w) ? g.S[w].w.slice(0, ROUNDS) : []).map((x) => (typeof x === "string" && x.trim() ? x.slice(0, 40) : null));
+  const flips = (g, r) => Math.max(int(g.S.a.ok, r), int(g.S.b.ok, r));
+  /* auto : le verdict du jeu. sure : mot pour mot le même, rien à discuter. flip : le couple a contredit le jeu. */
+  function result(g, r) {
+    const a = words(g, "a")[r], b = words(g, "b")[r];
+    if (a == null || b == null) return null;
+    const m = same(a, b), flip = m < 2 && flips(g, r) % 2 === 1;
+    return { a, b, auto: m > 0, sure: m === 2, flip, ok: (m > 0) !== flip };
+  }
+  const score = (g, upTo) => { let n = 0; for (let r = 0; r < upTo; r++) { const x = result(g, r); if (x && x.ok) n++; } return n; };
+  const done = (g) => { for (let r = 0; r < ROUNDS; r++) if (!result(g, r)) return false; return true; };
+  const round = (g) => Math.min(Math.max(parseInt(g.local.r, 10) || 0, 0), ROUNDS);
+  /* Qui doit écrire maintenant : moi sur deux téléphones ; sur un seul, celui qui n'a pas encore
+     écrit, en alternant qui commence. Renvoie null quand les deux mots sont là. */
+  function writer(g, r) {
+    if (g.duo) return words(g, g.me)[r] == null ? g.me : null;
+    const first = r % 2 ? "b" : "a", second = g.other(first);
+    return words(g, first)[r] == null ? first : words(g, second)[r] == null ? second : null;
+  }
+  /* Relancer emmène l'autre téléphone dans la nouvelle partie : on attend qu'il ait vu le résultat de celle-ci. */
+  const ready = (g) => !g.duo || !!g.S[g.other(g.me)].fin;
+  /* Le record gardé sur l'appareil : { n, k, was }, k étant la partie qui l'a établi et was le record
+     d'avant elle. Renvoie n et le record à battre : tant que la partie en cours est celle du record,
+     son score peut encore bouger (un point accordé puis repris), c'est donc was qui compte. */
+  function best(g) {
+    const b = g.kit.store.get("onde:best", null), n = b && Number.isInteger(b.n) ? b.n : -1;
+    return { n, was: n >= 0 && b.k === token(g) ? (Number.isInteger(b.was) ? b.was : -1) : n };
+  }
+
+  /* Haut d'écran : où l'on en est et, sur la révélation, le score (à droite, pour ne pas finir sous les boutons). */
+  const top = (g, r, right) => '<div class="onde-top"><p class="onde-step">' + (!r && g.gen > 1 && !right ? "Nouvelle partie · " : "") + "Manche " + (r + 1) + " sur " + ROUNDS + "</p>" + (right || "") +
+    '</div><div class="progress" role="progressbar" aria-label="Avancement" aria-valuemin="0" aria-valuemax="' + ROUNDS + '" aria-valuenow="' + r + '"><span style="width:' + (100 * r) / ROUNDS + '%"></span></div>';
+
+  function vWrite(g, r, w, theme) {
+    const k = g.kit, oth = k.nm(g.other(w));
+    /* Sur un seul téléphone, qui écrit en second ouvre la révélation et garde l'appareil pour commencer la manche suivante. */
+    const second = !g.duo && words(g, g.other(w))[r] != null;
+    return '<div class="onde as-' + w + '" data-screen="ecrire-' + r + "-" + w + '">' + top(g, r) + '<p class="onde-who">' + k.who(w) + ' écrit</p><h1 class="g-title" tabindex="-1" data-focus>' + k.esc(theme) + "</h1>" +
+      '<form class="onde-form"><input class="g-field" name="mot" data-keep="mot-' + g.gen + "-" + seedOf(g) + "-" + r + "-" + w + '" maxlength="40" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="Ton mot" aria-label="' +
+      k.esc(k.nm(w) + ", ton mot pour « " + theme + " »") + '"><p class="hint">' + k.esc("Un mot ou deux, sans rien dire à voix haute. " + oth +
+        (second ? " a déjà écrit le sien : les deux mots s'affichent dès que tu valides." : " ne le verra qu'une fois le sien écrit." + (g.duo ? "" : " Ensuite, passe-lui le téléphone."))) + "</p>" +
+      '<div class="g-actions"><button class="btn" type="submit">Valider</button></div></form></div>';
+  }
+
+  function vWait(g, r, theme) {
+    const k = g.kit;
+    return '<div class="onde as-' + g.me + '" data-screen="attente-' + r + '">' + top(g, r) + '<h1 class="g-title">' + k.esc(theme) + '</h1><p class="g-lead" tabindex="-1" data-focus>Tu as écrit\u00a0: <b>' + k.esc(words(g, g.me)[r]) + "</b></p>" +
+      k.wait(g, "En attente du mot " + k.de(k.nm(g.other(g.me))) + "…") + "</div>";
+  }
+
+  function vReveal(g, r, theme) {
+    const k = g.kit, x = result(g, r);
+    const cell = (w) => '<div class="g-card ' + w + '">' + k.who(w) + '<p class="g-card-text">' + k.esc(x[w]) + "</p></div>";
+    /* data-on dit ce que le bouton veut obtenir : s'il change de sens sous le doigt, le toucher ne défait rien. */
+    const ask = x.sure ? "" : '<div class="onde-ask"><p class="hint">' +
+      (x.flip ? (x.auto ? "Vous avez décidé que ça ne comptait pas." : "Vous avez décidé que ça comptait.") : x.auto ? "Pas tout à fait le même mot\u00a0?" : "Deux façons de dire la même chose\u00a0?") +
+      '</p><button class="link" type="button" data-act="force" data-on="' + (x.flip ? 0 : 1) + '">' + (x.flip ? (x.auto ? "Finalement si" : "Finalement non") : x.auto ? "On ne compte pas" : "On compte quand même") + "</button></div>";
+    return '<div class="onde" data-screen="revele-' + r + '">' + top(g, r, '<p class="onde-score">Score\u00a0: <b>' + score(g, r + 1) + "</b> sur " + (r + 1) + "</p>") + '<p class="eyebrow">' + k.esc(theme) +
+      '</p><div class="onde-pair">' + cell("a") + cell("b") + '</div><div class="onde-venn">' + k.venn(x.ok ? 100 : 0) + '</div><h1 class="g-title onde-verdict" tabindex="-1" data-focus>' + (x.ok ? "Même longueur d'onde." : "Pas cette fois.") + "</h1>" + ask +
+      '<div class="g-actions"><button class="btn" type="button" data-act="next">' + (r === ROUNDS - 1 ? "Voir le résultat" : "Manche suivante") + "</button></div></div>";
+  }
+
+  function vEnd(g, list) {
+    const k = g.kit, n = score(g, ROUNDS), was = best(g).was, cur = pack(g.setup.pack) ? g.setup.pack : "melange";
+    const word = (x, w) => '<span><i class="sw ' + w + '"></i><span class="sr">' + k.esc(k.nm(w) + " : ") + "</span>" + k.esc(x[w]) + "</span>";
+    const choice = (id, name) => '<button class="g-choice" type="button" data-act="again" data-pack="' + id + '"' + (cur === id ? ' aria-current="true"' : "") + "><b>" + k.esc(name) + "</b></button>";
+    return '<div class="onde" data-screen="resultat"><p class="eyebrow">Résultat</p><div class="onde-venn">' + k.venn(10 * n) + '</div><p class="g-big">' + n + "<span> / " + ROUNDS + '</span></p><h1 class="g-title" tabindex="-1" data-focus>' +
+      LEVELS.find((l) => n >= l[0])[1] + '</h1><p class="g-lead">' + (n > was ? "Nouveau record." : "Votre record\u00a0: " + was + " sur " + ROUNDS + ".") + '</p><ul class="onde-list">' + list.map((t, r) => {
+        const x = result(g, r);
+        return x ? '<li><span class="st ' + (x.ok ? "ok" : "gap") + '"><i aria-hidden="true">' + (x.ok ? "=" : "≠") + '</i><span class="sr">' + (x.ok ? "Pareil" : "Différent") + '</span></span><p class="onde-theme">' + k.esc(t) +
+          '</p><p class="onde-words">' + word(x, "a") + word(x, "b") + "</p></li>" : "";
+      }).join("") + "</ul>" + (ready(g)
+        ? '<div class="g-opts"><p class="g-opts-label">Rejouer avec</p><div class="g-choices">' + choice("melange", "Mélange") + DATA.packs.map((p) => choice(p.id, p.name)).join("") + "</div></div>"
+        : k.wait(g, "Vous pourrez rejouer dès " + k.que(k.nm(g.other(g.me))) + " aura vu le résultat.")) + "</div>";
+  }
+
+  /* La révélation à l'écran : quand elle est apparue, et quand la décision du couple y a changé pour la dernière fois. */
+  let seen = { key: "", flip: false, at: 0, flipAt: 0 };
+
+  (window.GAMES = window.GAMES || []).push({
+    id: "onde",
+    v: 1,
+    title: "Sur la même longueur d'onde",
+    hook: "Est-ce qu'on pense au même mot ?",
+    blurb: "Un thème, un mot chacun, sans se concerter. Dix manches pour voir si vous captez la même fréquence.",
+    meta: "10 manches · 5 min",
+    intro: [
+      "Un thème s'affiche : « Un fruit rouge », « Le plat qu'on commande le plus souvent ». Chacun écrit un mot sans rien dire. Si vous avez écrit le même, c'est gagné.",
+      "Dix manches. Il ne s'agit pas de donner la meilleure réponse, mais de deviner celle que l'autre va écrire."
+    ],
+    glyph: '<path class="ring-a" d="M4 24q5-13 10 0t10 0 10 0 10 0"/><path class="ring-b" d="M4 24q5 13 10 0t10 0 10 0 10 0"/>',
+    live: true,
+    options: [{
+      id: "pack", label: "Thèmes", def: "melange",
+      choices: [{ id: "melange", name: "Mélange", hint: "Un peu de tout." }].concat(DATA.packs.map((p) => ({ id: p.id, name: p.name, hint: p.hint })))
+    }],
+    view(g) {
+      const list = themes(g), r = round(g);
+      /* Le fichier des thèmes n'est pas arrivé sur cet appareil : surtout pas de faux résultat, ni de « Rejouer ». */
+      if (list.length < ROUNDS) return '<div class="onde" data-screen="vide"><h1 class="g-title" tabindex="-1" data-focus>Les thèmes ne sont pas arrivés.</h1><p class="g-lead">Recharge la page\u00a0: la partie reprendra où elle en était.</p></div>';
+      if (r >= ROUNDS) return vEnd(g, list);
+      const w = writer(g, r);
+      if (w) return vWrite(g, r, w, list[r]);
+      return result(g, r) ? vReveal(g, r, list[r]) : vWait(g, r, list[r]);
+    },
+    submit(g, form) {
+      const r = round(g), w = r < ROUNDS && writer(g, r), field = form.querySelector("[name=mot]");
+      const word = field ? field.value.trim().replace(/\s+/g, " ").slice(0, 40) : "";
+      if (!w || !field) return;
+      if (!word) { field.focus(); return; }
+      const list = words(g, w);
+      for (let i = 0; i <= r; i++) if (list[i] === undefined) list[i] = null;
+      list[r] = word;
+      g.set(w, { w: list });
+    },
+    act(g, name, el) {
+      const r = round(g), x = r < ROUNDS ? result(g, r) : null;
+      if (name === "next" && x) {
+        g.local.r = r + 1;
+        g.save();
+        /* Dernière révélation sur deux téléphones : l'autre apprend que j'ai vu le résultat (un message, sur mon toucher). */
+        if (g.duo && r === ROUNDS - 1 && !g.S[g.me].fin) g.set(g.me, { fin: 1 }); else g.render();
+      } else if (name === "force" && x && !x.sure) {
+        /* Rien à faire si c'est déjà décidé ainsi (l'autre vient de toucher le même bouton), ni dans la seconde
+           qui suit un changement : le bouton vient de changer de sens, ce toucher visait l'ancien. */
+        if (x.flip === (el.getAttribute("data-on") === "1") || Date.now() - seen.flipAt < 1000) return;
+        const w = g.me || "a", ok = {};
+        for (let i = 0; i < ROUNDS; i++) if (int(g.S[w].ok, i)) ok[i] = int(g.S[w].ok, i);
+        ok[r] = flips(g, r) + 1;
+        g.set(w, { ok });
+      } else if (name === "again" && r >= ROUNDS && ready(g) && themes(g).length === ROUNDS) {
+        const id = el.getAttribute("data-pack"), at = {};
+        DATA.packs.forEach((p) => { at[p.id] = int(g.setup.at, p.id); });
+        plan(g).forEach(([p, n]) => { at[p] = (at[p] + n) % pack(p).themes.length; });
+        g.newGame({ pack: pack(id) ? id : "melange", deck: Number(g.setup.deck) || seedOf(g), at });
+      }
+    },
+    over(g) { return round(g) >= ROUNDS; },
+    mount(g, root) {
+      const field = root.querySelector(".onde-form .g-field"), pair = root.querySelector(".onde-pair");
+      let timer = null;
+      /* Le clavier s'ouvre tout seul quand c'est possible (le navigateur l'exige dans un geste). */
+      if (field && document.activeElement !== field) { try { field.focus({ preventScroll: true }); } catch (e) { /* sans importance */ } }
+      if (pair) {
+        const r = round(g), key = token(g) + ":" + r, flip = result(g, r).flip, now = Date.now(), next = root.querySelector('[data-act="next"]');
+        /* Les deux cartes ne font leur entrée qu'à la première apparition de la révélation, pas à chaque réaffichage. */
+        if (key !== seen.key) { seen = { key, flip, at: now, flipAt: 0 }; pair.classList.add("is-new"); }
+        else if (flip !== seen.flip) { seen.flip = flip; seen.flipAt = now; }
+        /* « Manche suivante » prend la place de « Valider » : pendant une demi-seconde il ne répond pas,
+           sinon le second toucher d'un double toucher ferait sauter la révélation. */
+        const wait = seen.at + 500 - now;
+        if (wait > 0) { next.disabled = true; timer = setTimeout(() => { next.disabled = false; }, wait); }
+      }
+      /* Le record se note dès que les dix manches sont connues, même si cet appareil n'affiche pas (encore) le résultat. */
+      if (done(g)) {
+        const n = score(g, ROUNDS), b = best(g), high = Math.max(n, b.was);
+        if (high !== b.n) g.kit.store.set("onde:best", { n: high, k: token(g), was: b.was });
+      }
+      return () => clearTimeout(timer);
+    }
+  });
+})();
+</script>
+<script>
+/* Entre Nous : socle des jeux à deux.
+
+   Chaque jeu se joue sur UN téléphone (qu'on se passe) ou sur DEUX (chacun le sien, dans
+   la même pièce ou à distance). Ce fichier fournit ce que les jeux ont en commun : la
+   présentation, l'invitation, l'état partagé entre les deux téléphones (salon chiffré sur
+   le même relais que les tests), l'enregistrement et la reprise. Un jeu ne s'occupe que de
+   son écran et de ses règles ; il s'écrit une seule fois pour les deux façons de jouer.
+
+   ÉCRIRE UN JEU (jeux/<id>.js, chargé avant ce fichier ; styles dans jeux/<id>.css,
+   classes préfixées par l'id ; contenu dans window.GAME_DATA[id])
+
+     (window.GAMES = window.GAMES || []).push({
+       id: "onde",                 // [a-z0-9]+ ; la page du jeu est #jeu-onde
+       v: 1,                       // à augmenter si la forme de l'état change : les parties et invitations d'avant sont jetées
+       title: "Sur la même longueur d'onde",
+       hook: "Est-ce qu'on pense au même mot ?",       // titre de la carte d'accueil et de la présentation
+       blurb: "Une phrase pour la carte d'accueil.",
+       meta: "10 thèmes · 5 min",
+       intro: ["Paragraphe.", "Paragraphe."],           // présentation du jeu
+       glyph: '<circle class="ink-a" cx="18" cy="24" r="13"/>',   // intérieur d'un SVG 48 x 48 (classes ink-a, ink-b, ring-a, ring-b)
+       live: true,                 // true : partie en direct, les deux doivent être là en même temps.
+                                   // false : chacun joue de son côté, en même temps ou non, et le résultat s'ouvre quand les deux ont fini.
+       options: [{ id: "deck", label: "Paquet", def: "leger", duo: false,
+                   choices: [{ id: "leger", name: "Léger", hint: "Pour rire.", adult: false }] }],
+                                   // facultatif : choix proposés sur la présentation ; ils arrivent dans g.setup.
+                                   // duo: true n'affiche l'option que là où l'on peut jouer sur deux téléphones.
+       view(g) { return "<p>…</p>"; },                  // HTML de l'écran de jeu : fonction pure de g, rappelée à chaque changement
+       act(g, name, el, ev) {},                         // clic sur un élément data-act="name" de l'écran de jeu
+       input(g, el, ev) {}, submit(g, form, ev) {}, key(g, ev) {},   // facultatifs (le submit est déjà neutralisé)
+       mount(g, root) { return () => {}; },             // facultatif : après chaque rendu (root = le <main> du jeu) ; peut
+                                                        // retourner un nettoyage, appelé avant le rendu suivant et en quittant la page
+       extra(kit) { return ""; }, extraAct(kit, name, el, ev) {},    // facultatifs : bloc en bas de la présentation quand aucune
+                                                                     // partie n'est en cours (liste gardée, galerie) et ses clics
+       over(g) { return false; }                        // facultatif : true quand la manche en cours est terminée ; l'accueil
+                                                        // ne propose alors plus de « reprendre » cette partie
+     });
+
+   LA POIGNÉE g
+     g.duo            true sur deux téléphones
+     g.me             "a" ou "b" sur deux téléphones (qui a créé la partie est "a") ; null sur un seul
+     g.gen            numéro de la manche de jeu en cours dans cette partie (1, 2, 3…)
+     g.setup          { seed, ...options } de la manche en cours, identique sur les deux téléphones
+     g.S.a, g.S.b     la « tranche » de chaque joueur : un petit objet JSON que seul son propriétaire écrit
+                      ({} tant qu'il n'a rien écrit dans la manche en cours). En lecture seule.
+     g.sh             l'état commun de la manche ({} au départ), le dernier qui écrit gagne. En lecture seule.
+     g.local          objet qui reste sur cet appareil (brouillon, avancement, « j'ai vu ») : modifie-le puis g.save().
+                      Vidé à chaque nouvelle manche.
+     g.set(w, patch)  fusionne patch dans la tranche du joueur w, enregistre, envoie, réaffiche. Ne retourne rien.
+                      Sur deux téléphones, w doit être g.me. Sur un seul, "a" et "b" sont permis.
+     g.share(patch)   fusionne patch dans l'état commun, enregistre, envoie, réaffiche. Ne retourne rien.
+     g.save()         enregistre g.local (sans envoi ni réaffichage)        g.render()  réaffiche
+     g.newGame(patch) lance la manche suivante pour tout le monde : setup = l'ancien + patch + une nouvelle seed ;
+                      tranches, état commun et g.local repartent de zéro sur les deux téléphones.
+     g.stop()         termine la partie sur cet appareil (l'autre téléphone en est prévenu) et revient à la présentation
+     g.hold(on)       tant que c'est tenu, ce qui arrive de l'autre téléphone est enregistré mais le réaffichage
+                      attend g.hold(false). À utiliser pendant un glisser ou un trait de dessin. (Pendant un simple
+                      appui, le socle diffère déjà le réaffichage tout seul.)
+     g.here(w)        sur deux téléphones : le joueur w a-t-il déjà rejoint la partie ? Toujours true sur un seul.
+     g.online         "ok", "wait", "err" ou "full" (relais saturé) : l'état de la liaison au moment du rendu (toujours "ok" sur un seul
+                      téléphone). Un changement de liaison ne rappelle PAS view() : pour un affichage qui suit en
+                      direct, place un élément <span data-net></span>, dont le socle met à jour le texte sur place.
+     g.nm(w), g.other(w), g.kit, g.def, g.id
+                      Les prénoms (g.nm, kit.nm et tout ce qui les utilise) sont ceux de la partie : fixés à sa
+                      création et transmis par l'invitation, ils ne changent pas si on modifie ceux de l'accueil.
+
+   RÈGLES À CONNAÎTRE
+     - Un seul téléphone : g.me vaut null, c'est au jeu de savoir qui tient l'appareil (dans g.local) et de
+       cacher ce que l'autre ne doit pas voir, avec kit.pass() entre les deux tours.
+     - Les tranches ne se marchent jamais dessus : mets-y tout ce qui appartient à un joueur (ses réponses,
+       son vote, son dessin). L'état commun sert à ce que l'un OU l'autre peut décider (carte en cours,
+       phase). Si les deux y écrivent au même instant, un seul des deux objets est gardé, en entier.
+     - N'appelle g.set, g.share ou g.newGame que depuis une action du joueur (ou un minuteur qu'il a lancé),
+       jamais depuis view() ni en réaction automatique à ce que l'autre vient d'envoyer : les deux téléphones
+       se répondraient sans fin et le relais plafonne à 250 messages par jour. Une soupape étale les envois
+       au-delà de trente messages d'affilée (un toutes les huit secondes, puis un par minute passé
+       quatre-vingts dans l'heure).
+     - g.set envoie ta tranche entière, g.share et g.newGame envoient l'état commun entier avec g.setup
+       (jamais les deux à la fois) : garde-les petits. g.setup doit rester sous 4 000 caractères (sinon
+       g.newGame est refusé), et l'état commun plus g.setup sous 7 ko (sinon il ne part plus) ; une tranche peut aller jusqu'à 60 ko (un dessin), découpée en messages
+       de 2,6 ko, mais chaque message compte : le relais accepte 60 requêtes d'affilée puis une toutes
+       les cinq secondes pour les deux téléphones d'un même réseau, et 250 messages par jour. Vise
+       quelques ko par envoi et retire ce qui ne sert plus (g.set(w, { dessin: null })).
+     - Tout ce qui est rangé dans la partie peut venir de l'autre téléphone, ou de quiconque a le lien
+       d'invitation : la tranche de l'autre, la tienne quand elle est restaurée depuis le relais, g.sh,
+       g.setup (des deux côtés) et les prénoms. Passe chaque texte par kit.esc() avant de l'afficher et
+       vérifie forme, type et bornes avant de t'en servir. Une valeur mal formée ne doit jamais bloquer l'écran.
+     - Un secret n'est secret qu'à l'écran : sur deux téléphones, la tranche de l'autre est enregistrée sur ce
+       téléphone (en clair dans le stockage du navigateur) dès qu'elle arrive. Ne l'affiche pas trop tôt, et
+       ne promets pas aux joueurs plus que « l'autre ne le verra pas ».
+     - view() peut être rappelée à tout moment (l'autre téléphone vient d'écrire). Un champ de saisie garde
+       sa valeur, le focus et le curseur s'il porte data-keep="clé" ; la clé doit changer quand le champ
+       change de sens (autre manche, autre joueur), sinon le texte de l'un réapparaîtrait chez l'autre.
+       Le bouton qui avait le focus le garde si l'écran n'a pas changé.
+     - Donne à l'élément racine de chaque écran (le premier enfant de ce que retourne view) un attribut
+       data-screen="nom" (par exemple "ecrire-3", "resultat") : quand ce nom change, le socle remonte en haut
+       de la page et laisse le focus aller à l'élément data-focus du nouvel écran. Cet élément racine reçoit
+       la même mise en page en colonne que l'écran de jeu (assets/jeux.css).
+     - Noms d'action réservés : ceux qui commencent par « g- », plus « copy » et « share ».
+
+   LES OUTILS (g.kit)
+     esc, de, que, pl, fill, other          ceux du moteur (échappement, élisions, pluriels, gabarits)
+     nm(w)                                  le prénom du joueur w dans la partie affichée
+     store                                  stockage local du site ; préfixe tes clés par "<id>:"
+     seed()                                 un entier au hasard
+     rng(seed)                              générateur reproductible : retourne une fonction qui donne des réels dans [0, 1)
+     shuffle(liste, seed)                   copie mélangée, identique sur les deux téléphones pour une même seed
+     who(w)                                 pastille « encre + prénom »
+     pass(w, act)                           bloc « Passe le téléphone » avec un bouton data-act=act « Je suis …, à moi »
+     wait(g, texte)                         bloc d'attente de l'autre (avec rappel du lien d'invitation tant qu'il n'a pas rejoint)
+     buzz(motif), beep()                    vibration et bip, sans erreur s'ils sont indisponibles. Le son est
+                                            débloqué au premier toucher sur la page du jeu (exigence d'iOS).
+     venn(p), canRoom, render()
+
+   LES STYLES (assets/jeux.css) : .as-a / .as-b (donnent --who et --who-soft, l'encre d'un joueur), .g-title,
+   .g-lead, .g-card (+ .a / .b), .g-card-text, .g-tag (+ .a / .b), .g-who, .g-field, .g-score, .g-big,
+   .g-actions (rangée de boutons collée en bas, à portée de pouce), .g-pass, .g-wait, .g-note, .g-link
+   (un lien-bouton de 44 px de haut). */
+(function () {
+  "use strict";
+
+  window.ENGames = function (core) {
+    const store = core.store, esc = core.esc, de = core.de, other = core.other, app = core.app;
+    const DEFS = (window.GAMES || []).filter((d) => d && /^[a-z0-9]+$/.test(d.id || "") && typeof d.view === "function");
+    /* Sans prototype : une adresse comme #jeu-constructor ne doit trouver aucun jeu. */
+    const BY = Object.create(null);
+    DEFS.forEach((d) => { BY[d.id] = d; });
+
+    /* Bornes : une tranche jusqu'à 24 morceaux (60 ko), l'en-tête (état commun et réglages) jusqu'à 3. */
+    const MAX_PARTS = 24, HEAD_PARTS = 3, GEN_MAX = 1e6, ST_MAX = 1e9, N_MAX = 1e15, DAY = 864e5;
+    const NET = { ok: "En ligne", wait: "Connexion…", err: "Hors ligne", full: "Relais saturé" };
+    const isObj = (x) => !!x && typeof x === "object" && !Array.isArray(x);
+    const isInt = (x, lo, hi) => Number.isInteger(x) && x >= lo && x <= hi;
+    const isStr = (x, max) => typeof x === "string" && x.length <= max;
+    const isRoom = (r, k) => isStr(r, 32) && /^[0-9a-f]{32}$/.test(r) && isStr(k, 64) && /^[\w-]{20,64}$/.test(k);
+    const cleanNames = (n) => [0, 1].map((i) => (Array.isArray(n) && typeof n[i] === "string" ? n[i].trim().slice(0, 20) : ""));
+    const routeDef = (route) => { const m = /^jeu-([a-z0-9]+)$/.exec(route || ""); return (m && BY[m[1]]) || null; };
+    const onRoute = (id) => { const d = routeDef(core.route()); return !!d && d.id === id; };
+    const glyph = (d) => '<svg class="inks" viewBox="0 0 48 48" aria-hidden="true">' + (d.glyph || "") + "</svg>";
+    const call = (fn) => { try { return fn(); } catch (e) { console.error(e); } };
+
+    /* ---------- Hasard reproductible : la même seed donne le même tirage sur les deux téléphones ---------- */
+    const seed = () => { try { return crypto.getRandomValues(new Uint32Array(1))[0]; } catch (e) { return Math.floor(Math.random() * 4294967296); } };
+    const rng = (s) => {
+      let a = (Number(s) >>> 0) || 1;
+      return () => {
+        a = (a + 0x6d2b79f5) | 0;
+        let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    };
+    const shuffle = (list, s) => {
+      const out = list.slice(), r = rng(s);
+      for (let i = out.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)), x = out[i]; out[i] = out[j]; out[j] = x; }
+      return out;
+    };
+
+    /* ---------- Parties enregistrées ----------
+       Une partie par jeu. Une tranche porte la marque de la manche (numéro + seed) pour laquelle
+       elle a été écrite : dès que la manche change, les anciennes tranches ne comptent plus. */
+    const sessions = Object.create(null);
+    const tok = (s) => s.gen + ":" + s.setup.seed;
+    const slice = (s, w) => (s.S[w].k === tok(s) ? s.S[w].d : {});
+    /* Les réglages voyagent dans chaque en-tête et dans le lien d'invitation : 4 000 caractères au plus. */
+    const SETUP_MAX = 4000;
+    const okSetup = (x) => isObj(x) && (Number.isFinite(x.seed) || isStr(x.seed, 40)) && JSON.stringify(x).length <= SETUP_MAX;
+    const okCount = (c) => isObj(c) && isInt(c.h, 0, N_MAX) && isInt(c.d, 0, N_MAX);
+    function okSession(s, d) {
+      return !!d && isObj(s) && s.id === d.id && s.v === d.v && typeof s.duo === "boolean" &&
+        (s.duo ? (s.me === "a" || s.me === "b") && isObj(s.room) && isRoom(s.room.r, s.room.k) && (s.phase === "invite" || s.phase === "play")
+          : s.me === null && s.phase === "play") &&
+        Array.isArray(s.n) && s.n.length === 2 && s.n.every((x) => isStr(x, 20)) &&
+        isInt(s.gen, 1, GEN_MAX) && okSetup(s.setup) && isObj(s.sh) && isInt(s.st, 0, ST_MAX) && (s.sw === "a" || s.sw === "b") &&
+        isObj(s.S) && ["a", "b"].every((w) => isObj(s.S[w]) && typeof s.S[w].k === "string" && isObj(s.S[w].d)) &&
+        isObj(s.seq) && okCount(s.seq.a) && okCount(s.seq.b) && okCount(s.sent) && isInt(s.gone, 0, N_MAX) && isObj(s.local);
+    }
+    function load(id) {
+      if (!(id in sessions)) {
+        let s = store.get("g:" + id, null);
+        /* Une partie illisible (ancienne version, stockage abîmé) est jetée : elle ne doit jamais bloquer la page. */
+        if (s && !okSession(s, BY[id])) { store.del("g:" + id); s = null; }
+        sessions[id] = s || null;
+      }
+      return sessions[id];
+    }
+    const persist = (s) => { s.at = Date.now(); store.set("g:" + s.id, s); };
+    function drop(id) {
+      sessions[id] = null;
+      store.del("g:" + id);
+      if (link && link.id === id) disconnect();
+      if (pubs[id]) { clearTimeout(pubs[id].timer); delete pubs[id]; }
+    }
+
+    /* Prénom du joueur w dans une partie (même repli que le moteur quand il est vide). */
+    const nmOf = (n, w) => (n[w === "b" ? 1 : 0] || "").trim() || (w === "b" ? "Partenaire 2" : "Partenaire 1");
+    /* La partie de la page affichée, s'il y en a une : ses prénoms priment sur ceux de l'accueil. */
+    const shownSession = () => { const d = routeDef(core.route()); return d ? load(d.id) : null; };
+    const nm = (w) => { const s = shownSession(); return s ? nmOf(s.n, w) : core.nm(w); };
+
+    let invite = store.get("ginvite", null);
+    if (invite && !(isObj(invite) && BY[invite.g] && invite.v === BY[invite.g].v && isRoom(invite.r, invite.k) && okSetup(invite.su) &&
+      isInt(invite.gen, 1, GEN_MAX) && Array.isArray(invite.n))) clearInvite();
+    function clearInvite() { invite = null; store.del("ginvite"); }
+
+    /* Les salons que ce téléphone a créés : rouvrir son propre lien ne doit pas en faire l'invité. */
+    const mine = () => { const m = store.get("g:mine", null); return Array.isArray(m) ? m.filter((x) => typeof x === "string") : []; };
+
+    function options(d) {
+      const saved = store.get("go:" + d.id, null), out = {};
+      (d.options || []).forEach((o) => {
+        const v = isObj(saved) ? saved[o.id] : null;
+        out[o.id] = o.choices.some((c) => c.id === v) ? v : o.def;
+      });
+      return out;
+    }
+
+    /* ---------- Affichage ---------- */
+    let cleanup = null, keep = {}, focusWas = null, shown = "", screen = "", held = false, waiting = false;
+    let pressing = 0, pressTimer = null, armed = null;
+    const rerender = () => core.render(true);
+    /* Ce qui arrive de l'autre téléphone ne doit casser ni un geste ni un appui en cours. */
+    function remote() {
+      if (pressing && Date.now() - pressing > 3000) pressing = 0; /* appui jamais relâché : on n'attend plus */
+      if (held || pressing) waiting = true; else rerender();
+    }
+    function flushWaiting() { if (waiting && !held && !pressing) { waiting = false; rerender(); } }
+    app.addEventListener("pointerdown", () => { if (routeDef(core.route())) pressing = Date.now(); }, true);
+    const release = () => {
+      if (!pressing) return;
+      pressing = 0;
+      clearTimeout(pressTimer);
+      /* Le clic suit le relâchement : on lui laisse le temps d'arriver sur le bouton touché. */
+      pressTimer = setTimeout(flushWaiting, 120);
+    };
+    document.addEventListener("pointerup", release, true);
+    document.addEventListener("pointercancel", release, true);
+
+    function unmount() {
+      if (cleanup) { const c = cleanup; cleanup = null; call(c); }
+      held = false;
+      waiting = false;
+    }
+
+    function changed(s, kind) {
+      if (sessions[s.id] !== s) return; /* partie terminée entre-temps (minuteur attardé) */
+      /* Les envois sont numérotés par l'heure : un téléphone dont le stockage a été vidé, et qui rejoint
+         la même partie, repart ainsi au-dessus de ses anciens numéros au lieu d'être ignoré par l'autre. */
+      if (s.duo) { s.seq[s.me][kind] = Math.max(s.seq[s.me][kind] + 1, Date.now()); publishSoon(s); }
+      persist(s);
+      /* Un minuteur attardé ne doit pas redessiner une autre page que celle du jeu. */
+      if (onRoute(s.id)) rerender();
+    }
+
+    function stop(s) {
+      if (s.duo && core.canRoom) bye(s);
+      drop(s.id);
+    }
+
+    function handle(s) {
+      return {
+        kit, def: BY[s.id], id: s.id, other,
+        nm: (w) => nmOf(s.n, w),
+        get duo() { return s.duo; },
+        get me() { return s.me; },
+        get gen() { return s.gen; },
+        get setup() { return s.setup; },
+        get sh() { return s.sh; },
+        get local() { return s.local; },
+        get online() { return netState(s); },
+        S: { get a() { return slice(s, "a"); }, get b() { return slice(s, "b"); } },
+        here: (w) => !s.duo || s.seq[w].h > 0,
+        set(w, patch) {
+          if ((w !== "a" && w !== "b") || (s.duo && w !== s.me)) { console.warn("Entre Nous : g.set(" + w + ") ignoré, cette tranche appartient à l'autre joueur."); return; }
+          s.S[w] = { k: tok(s), d: Object.assign({}, slice(s, w), patch) };
+          changed(s, "d");
+        },
+        share(patch) {
+          if (s.st >= ST_MAX) { console.warn("Entre Nous : état commun à sa limite, écriture ignorée."); return; }
+          s.sh = Object.assign({}, s.sh, patch);
+          s.st++;
+          s.sw = s.me || "a";
+          changed(s, "h");
+        },
+        save() { if (sessions[s.id] === s) persist(s); },
+        render() { if (onRoute(s.id)) rerender(); },
+        newGame(patch) {
+          const su = Object.assign({}, s.setup, patch, { seed: seed() });
+          if (s.gen >= GEN_MAX || !okSetup(su)) { console.warn("Entre Nous : manche suivante impossible (limite atteinte ou réglages trop volumineux)."); return; }
+          s.gen++;
+          s.setup = su;
+          s.sh = {};
+          s.st = 0;
+          s.sw = s.me || "a";
+          s.local = {};
+          changed(s, "h");
+        },
+        stop() { if (sessions[s.id] === s) { stop(s); if (onRoute(s.id)) core.render(); } },
+        hold(on) { held = !!on; flushWaiting(); }
+      };
+    }
+
+    /* ---------- Deux téléphones : envoi ----------
+       Ce dont je réponds part en deux photos numérotées séparément : l'en-tête « h » (manche, réglages,
+       état commun tel que je le connais) et ma tranche « d ». Seule celle qui a changé repart : passer à
+       la carte suivante ne renvoie pas un dessin. Le destinataire ne garde que la plus récente de chaque
+       sorte : l'ordre, les doublons et les pertes n'ont donc aucune importance. */
+    const pubs = Object.create(null);
+    const topic = (s) => core.RELAY + "entrenous-" + s.room.r;
+    const pubOf = (id) => pubs[id] || (pubs[id] = { timer: null, busy: false, fails: 0, full: 0, last: 0, prog: {} });
+    const pending = (s) => s.duo && (s.sent.h < s.seq[s.me].h || s.sent.d < s.seq[s.me].d);
+
+    /* Requête au relais avec un délai maximal : une requête qui ne répond jamais ne doit rien bloquer. */
+    async function relay(url, opt, ms, read) {
+      const ctl = typeof AbortController === "function" ? new AbortController() : null;
+      let timer = null;
+      const limit = new Promise((resolve, reject) => { timer = setTimeout(() => { if (ctl) ctl.abort(); reject(new Error("délai dépassé")); }, ms); });
+      try {
+        return await Promise.race([limit, (async () => {
+          const res = await fetch(url, ctl ? Object.assign({ signal: ctl.signal }, opt) : opt);
+          if (!res.ok) { const e = new Error("relais " + res.status); e.status = res.status; throw e; }
+          return read ? res.text() : "";
+        })()]);
+      } finally { clearTimeout(timer); }
+    }
+
+    /* Soupape commune à tous les jeux : trente messages d'affilée, puis un toutes les huit secondes ;
+       au-delà de quatre-vingts dans l'heure, un par minute. Les deux téléphones d'un même réseau restent
+       ainsi sous ce que le relais accepte (60 d'affilée, puis douze par minute), et un jeu qui s'emballe
+       ne vide pas le quota du jour (250 messages) en une soirée. Retourne l'attente nécessaire, ou 0. */
+    const bucket = { tokens: 30, at: Date.now() }, hour = [];
+    function token() {
+      const now = Date.now();
+      while (hour.length && now - hour[0] > 3600000) hour.shift();
+      if (hour.length >= 80 && now - hour[hour.length - 1] < 60000) return hour[hour.length - 1] + 60000 - now;
+      bucket.tokens = Math.min(30, bucket.tokens + (now - bucket.at) / 8000);
+      bucket.at = now;
+      if (bucket.tokens < 1) return Math.ceil((1 - bucket.tokens) * 8000);
+      bucket.tokens -= 1;
+      hour.push(now);
+      return 0;
+    }
+
+    /* Découpe en morceaux qui, une fois chiffrés, restent sous la limite de 4 096 octets du relais. */
+    function split(text) {
+      const enc = new TextEncoder(), out = [];
+      let i = 0;
+      while (i < text.length) {
+        let len = Math.min(2600, text.length - i);
+        while (len > 1 && enc.encode(JSON.stringify(text.substr(i, len))).length > 2700) len = Math.floor(len * 0.8);
+        const last = text.charCodeAt(i + len - 1);
+        if (len > 1 && last >= 0xd800 && last <= 0xdbff) len--; /* ne pas couper un caractère double (emoji) */
+        out.push(text.substr(i, len));
+        i += len;
+      }
+      return out.length ? out : [""];
+    }
+    const headOf = (s) => ({ gen: s.gen, su: s.setup, sh: s.sh, st: s.st, sw: s.sw });
+
+    function publishSoon(s, delay) {
+      if (!core.canRoom) return;
+      const p = pubOf(s.id);
+      if (p.timer || p.busy) return;
+      p.timer = setTimeout(() => { p.timer = null; flush(s.id); }, delay != null ? delay : Math.max(60, p.last + 350 - Date.now()));
+    }
+
+    async function flush(id) {
+      const s = sessions[id], p = pubOf(id);
+      if (!s || !s.duo || p.busy || !pending(s)) return;
+      const late = (t) => s.sent[t] < s.seq[s.me][t];
+      p.busy = true;
+      let status = 0, wait = 0, left = 0;
+      try {
+        for (const t of ["h", "d"]) {
+          if (!late(t)) continue;
+          const n = s.seq[s.me][t];
+          const parts = split(JSON.stringify(t === "h" ? headOf(s) : s.S[s.me]));
+          if (parts.length > (t === "h" ? HEAD_PARTS : MAX_PARTS)) {
+            console.warn("Entre Nous : " + (t === "h" ? "état commun" : "tranche") + " trop volumineux, non envoyé.");
+            s.sent[t] = n;
+            persist(s);
+            continue;
+          }
+          /* Une photo interrompue (refus, panne, soupape) reprend au morceau où elle s'était arrêtée. */
+          let pr = p.prog[t];
+          if (!pr || pr.n !== n || pr.c !== parts.length) pr = p.prog[t] = { n, c: parts.length, i: 0 };
+          left = parts.length - pr.i;
+          while (pr.i < parts.length) {
+            wait = token();
+            if (wait) throw new Error("soupape");
+            const body = await core.seal(s.room, { g: s.id, v: s.v, w: s.me, t, n, p: pr.i, c: parts.length, s: parts[pr.i] });
+            await relay(topic(s), { method: "POST", body }, 15000);
+            pr.i++;
+            left--;
+            p.last = Date.now();
+          }
+          if (sessions[id] === s) { s.sent[t] = Math.max(s.sent[t], n); persist(s); }
+        }
+        p.fails = 0;
+        p.full = 0;
+      } catch (e) {
+        if (!wait) { p.fails++; status = e.status || 0; p.full = status === 429 ? p.full + 1 : 0; }
+      }
+      p.busy = false;
+      paintNet();
+      if (sessions[id] !== s) return;
+      /* Après un refus pour excès de requêtes, on attend que le reste puisse passer d'un coup (le relais
+         rend une requête toutes les cinq secondes), avec un léger décalage pour que les deux téléphones
+         ne réessaient pas au même instant. */
+      const jitter = Math.floor(Math.random() * 3000);
+      if (wait) publishSoon(s, wait);
+      else if (p.full) publishSoon(s, Math.max(30000, left * 5500) + jitter);
+      else if (p.fails) publishSoon(s, [2000, 4000, 8000, 15000][Math.min(p.fails - 1, 3)] + jitter);
+      else if (pending(s)) publishSoon(s);
+    }
+
+    /* Prévient l'autre téléphone que je quitte la partie, après avoir envoyé ce qui ne l'était pas encore
+       (un dernier g.share juste avant g.stop). Sans attendre de réponse : la page peut se fermer. */
+    async function bye(s) {
+      const out = [];
+      ["h", "d"].forEach((t) => {
+        if (s.sent[t] >= s.seq[s.me][t]) return;
+        const parts = split(JSON.stringify(t === "h" ? headOf(s) : s.S[s.me]));
+        if (parts.length <= HEAD_PARTS) parts.forEach((x, i) => out.push({ g: s.id, v: s.v, w: s.me, t, n: s.seq[s.me][t], p: i, c: parts.length, s: x }));
+      });
+      out.push({ g: s.id, v: s.v, w: s.me, t: "x", n: Math.max(Date.now(), s.seq[s.me].h + 1), p: 0, c: 1, s: "" });
+      try {
+        for (const o of out) await fetch(topic(s), { method: "POST", body: await core.seal(s.room, o), keepalive: true });
+      } catch (e) { /* tant pis : l'autre verra seulement que je ne joue plus */ }
+    }
+
+    /* Ce qui n'avait pas pu partir repart dès que possible : à l'ouverture du site, au retour du réseau. */
+    function resume(now) {
+      if (!core.canRoom) return;
+      DEFS.forEach((d) => {
+        const s = load(d.id), p = pubs[d.id];
+        if (!s || !pending(s)) return;
+        if (now && p && p.timer && !p.busy) { clearTimeout(p.timer); p.timer = null; }
+        publishSoon(s, now ? 0 : 1500);
+      });
+    }
+
+    /* ---------- Deux téléphones : réception ---------- */
+    let link = null;
+
+    const okSnap = (t, x) => isObj(x) && (t === "h"
+      ? isInt(x.gen, 1, GEN_MAX) && okSetup(x.su) && isObj(x.sh) && isInt(x.st, 0, ST_MAX) && (x.sw === "a" || x.sw === "b")
+      : typeof x.k === "string" && x.k.length <= 64 && isObj(x.d));
+
+    /* Déchiffre un message, range le morceau, et retourne la photo quand elle est complète.
+       Tout ce qui est illisible ou mal formé est ignoré : n'importe qui ayant le lien peut écrire dans le salon. */
+    async function take(l, s, sealed) {
+      let o;
+      try { o = await core.unseal(s.room, sealed); } catch (e) { return null; }
+      /* Un numéro venu du futur (au-delà d'un jour d'écart d'horloge) figerait les compteurs : refusé. */
+      if (!isObj(o) || o.g !== s.id || o.v !== s.v || (o.w !== "a" && o.w !== "b") || ["h", "d", "x"].indexOf(o.t) < 0 ||
+        !isInt(o.n, 1, Math.min(N_MAX, Date.now() + DAY)) || !isInt(o.c, 1, o.t === "d" ? MAX_PARTS : HEAD_PARTS) ||
+        !isInt(o.p, 0, o.c - 1) || typeof o.s !== "string" || o.s.length > 4000) return null;
+      if (o.t === "x") return o.s === "" ? { w: o.w, t: "x", n: o.n, x: null } : null;
+      const key = o.w + o.t + o.n;
+      let box = l.parts[key];
+      if (!box || box.c !== o.c) box = l.parts[key] = { key, w: o.w, t: o.t, n: o.n, c: o.c, got: 0, arr: [] };
+      if (box.arr[o.p] == null) { box.arr[o.p] = o.s; box.got++; }
+      if (box.got < box.c) {
+        /* Au plus trois photos incomplètes de chaque sorte par joueur en mémoire. */
+        const same = Object.keys(l.parts).map((k) => l.parts[k]).filter((b) => b.w === o.w && b.t === o.t).sort((x, y) => x.n - y.n);
+        while (same.length > 3) delete l.parts[same.shift().key];
+        return null;
+      }
+      delete l.parts[key];
+      let x;
+      try { x = JSON.parse(box.arr.join("")); } catch (e) { return null; }
+      return okSnap(o.t, x) ? { w: o.w, t: o.t, n: o.n, x } : null;
+    }
+
+    /* Intègre une photo. L'état commun le plus récent gagne : manche, puis compteur d'écritures,
+       puis, à égalité, celui du joueur « a », pour que les deux téléphones tranchent pareil. Cet ordre
+       ne dépend pas des numéros d'envoi : un joueur qui revient avec une partie neuve retrouve ainsi
+       l'état qu'il avait lui-même écrit en dernier. */
+    function apply(s, snap) {
+      const w = snap.w, t = snap.t, n = snap.n, x = snap.x;
+      if (t === "x") {
+        if (w === s.me || n <= s.gone) return false;
+        s.gone = n;
+        persist(s);
+        return true;
+      }
+      let moved = false;
+      if (n > s.seq[w][t]) {
+        /* Ma propre tranche ne revient du relais que dans une partie neuve, tant que je n'y ai rien écrit
+           moi-même (mes numéros d'envoi, tirés de l'heure, sont postérieurs à la création de la partie). */
+        if (t === "d" && (w !== s.me || s.seq[w].d < (s.t0 || Infinity))) { s.S[w] = { k: x.k, d: x.d }; moved = true; }
+        if (w === s.me) s.sent[t] = Math.max(s.sent[t], n);
+        s.seq[w][t] = n;
+        moved = moved || w !== s.me;
+      }
+      if (t === "h") {
+        const wins = x.gen !== s.gen ? x.gen > s.gen : x.st !== s.st ? x.st > s.st : x.sw === "a" && s.sw !== "a";
+        if (wins) {
+          const before = tok(s);
+          s.gen = x.gen; s.setup = x.su; s.sh = x.sh; s.st = x.st; s.sw = x.sw;
+          if (tok(s) !== before) s.local = {};
+          moved = true;
+        }
+      }
+      /* Partie en direct : dès que l'autre arrive, on quitte l'écran d'invitation. */
+      if (s.phase === "invite" && BY[s.id].live && s.seq[other(s.me)].h > 0) { s.phase = "play"; moved = true; }
+      if (moved) persist(s);
+      return moved;
+    }
+    /* L'autre a-t-il arrêté la partie depuis la dernière fois qu'il s'y est montré ? */
+    const left = (s) => s.duo && s.gone > s.seq[other(s.me)].h;
+
+    function netState(s) {
+      if (!s.duo) return "ok";
+      const p = pubs[s.id], on = link && link.id === s.id;
+      if (p && p.full) return "full";
+      if ((p && p.fails) || (on && link.state === "err")) return "err";
+      return on && link.state === "ok" ? "ok" : "wait";
+    }
+    /* La pastille de liaison est mise à jour sur place : un changement de réseau ne doit pas redessiner le jeu. */
+    function paintNet() {
+      const s = shownSession();
+      if (!s || !s.duo) return;
+      const st = netState(s);
+      app.querySelectorAll("[data-net]").forEach((el) => { el.setAttribute("data-net", st); el.textContent = NET[st]; });
+      /* Une attente qui ne peut pas aboutir (relais injoignable) le dit, au lieu de pulser pour rien. */
+      app.querySelectorAll("[data-wait]").forEach((el) => {
+        const bad = st === "err" || st === "full";
+        el.classList.toggle("is-err", bad);
+        el.textContent = bad ? "Pas de connexion au relais pour l'instant. Nouvel essai dans quelques secondes." : el.getAttribute("data-wait");
+      });
+    }
+
+    function connect(s) {
+      if (link && link.id === s.id && link.room === s.room.r) return;
+      disconnect();
+      link = { id: s.id, room: s.room.r, es: null, timer: null, dog: null, last: "", tries: 0, run: 0, state: "wait", parts: {}, hidden: 0 };
+      start(link);
+    }
+    function quiet(l) {
+      clearTimeout(l.timer);
+      clearTimeout(l.dog);
+      if (l.es) { l.es.close(); l.es = null; }
+    }
+    function disconnect() {
+      if (!link) return;
+      quiet(link);
+      link.run++;
+      link = null;
+    }
+    /* Une lecture complète du salon, puis l'écoute en continu. */
+    async function start(l) {
+      const s = sessions[l.id];
+      if (link !== l || !s) return;
+      /* Un réveil (retour au premier plan, réseau revenu) peut relancer une lecture pendant qu'une autre
+         est en cours : seule la dernière lancée a le droit de lire les messages et d'ouvrir le flux. */
+      const run = ++l.run, stale = () => link !== l || l.run !== run || sessions[l.id] !== s;
+      try {
+        const text = await relay(topic(s) + "/json?poll=1&since=all", { cache: "no-store" }, 20000, true);
+        if (stale()) return;
+        const seen = { h: 0, d: 0 };
+        let moved = false;
+        for (const line of text.split("\n")) {
+          let m = null;
+          try { m = JSON.parse(line); } catch (e) { continue; }
+          if (!m || m.event !== "message" || typeof m.message !== "string") continue;
+          if (typeof m.id === "string") l.last = m.id;
+          const snap = await take(l, s, m.message);
+          if (stale()) return;
+          if (!snap) continue;
+          if (snap.w === s.me && snap.t !== "x") seen[snap.t] = Math.max(seen[snap.t], snap.n);
+          if (apply(s, snap)) moved = true;
+        }
+        /* Le relais oublie tout au bout de douze heures : je redépose mon dernier état s'il n'y est plus. */
+        ["h", "d"].forEach((t) => { if (s.seq[s.me][t] > seen[t] && s.sent[t] > seen[t]) s.sent[t] = seen[t]; });
+        if (pending(s)) publishSoon(s);
+        if (moved) remote();
+        listen(l, s);
+      } catch (e) {
+        if (!stale()) retry(l);
+      }
+    }
+    function listen(l, s) {
+      if (!window.EventSource) {
+        /* Sans flux continu : une lecture toutes les douze secondes, pas plus (le relais compte les requêtes). */
+        l.state = "ok";
+        l.tries = 0;
+        paintNet();
+        l.timer = setTimeout(() => start(l), 12000);
+        return;
+      }
+      const run = l.run, es = l.es = new EventSource(topic(s) + "/sse?since=" + encodeURIComponent(l.last || "all"));
+      const mineNow = () => link === l && l.run === run && sessions[l.id] === s;
+      /* Le relais envoie un signe de vie toutes les 45 secondes : sans rien pendant 70, le flux est mort. */
+      const beat = () => { clearTimeout(l.dog); l.dog = setTimeout(() => retry(l), 70000); };
+      es.addEventListener("open", () => { if (!mineNow()) return; l.tries = 0; l.state = "ok"; paintNet(); beat(); });
+      es.addEventListener("keepalive", beat);
+      es.onmessage = (e) => {
+        if (!mineNow()) return;
+        beat();
+        let m = null;
+        try { m = JSON.parse(e.data); } catch (err) { return; }
+        if (!m || m.event !== "message" || typeof m.message !== "string") return;
+        if (typeof m.id === "string") l.last = m.id;
+        take(l, s, m.message).then((snap) => { if (snap && mineNow() && apply(s, snap)) remote(); });
+      };
+      /* On reprend la main sur les reconnexions : celles du navigateur, immédiates, épuiseraient le relais. */
+      es.onerror = () => { if (mineNow()) retry(l); };
+      beat();
+    }
+    function retry(l) {
+      if (link !== l) return;
+      quiet(l);
+      l.run++;
+      l.state = l.tries >= 2 ? "err" : "wait";
+      paintNet();
+      l.timer = setTimeout(() => start(l), [2000, 5000, 10000, 20000, 30000][Math.min(l.tries++, 4)]);
+    }
+    function wake() {
+      resume(true);
+      if (!link) return;
+      quiet(link);
+      link.tries = 0;
+      start(link);
+    }
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) { if (link) link.hidden = Date.now(); return; }
+      resume(true);
+      if (!link) return;
+      /* Un téléphone verrouillé gèle le flux sans le fermer : après une vraie absence, on relit tout. */
+      if (!link.es || link.es.readyState !== 1 || (link.hidden && Date.now() - link.hidden > 15000)) wake();
+    });
+    window.addEventListener("online", wake);
+    window.addEventListener("pageshow", (e) => { if (e.persisted) wake(); });
+
+    /* ---------- Outils offerts aux jeux ---------- */
+    let audio = null;
+    /* iOS ne joue un son que si le contexte audio a été débloqué pendant un geste : on le fait au premier toucher. */
+    const unlock = () => {
+      if (!routeDef(core.route()) || (audio && audio.state === "running")) return;
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        audio = audio || new AC();
+        if (audio.state === "suspended") audio.resume();
+      } catch (e) { /* pas de son : sans importance */ }
+    };
+    ["touchend", "click", "keydown"].forEach((ev) => document.addEventListener(ev, unlock, true));
+
+    const inviteUrl = (d, s) => location.origin + location.pathname + "#g=" +
+      core.encode({ g: d.id, v: d.v, n: s.n, r: s.room.r, k: s.room.k, su: s.setup, gen: s.gen });
+    const inviteBox = (d, s) => core.shareBox({
+      url: inviteUrl(d, s),
+      label: "Le lien de la partie pour " + esc(nmOf(s.n, "b")),
+      how: core.hasQr() ? "Fais scanner ce QR code avec l'appareil photo de son téléphone, ou envoie le lien par message." : "Envoie ce lien par message.",
+      text: nmOf(s.n, "a") + " t'invite à jouer à « " + d.title + " »"
+    });
+    const ink = (w) => (w === "b" ? "b" : "a");
+    const kit = {
+      esc, nm, de, other, store, seed, rng, shuffle,
+      que: core.que, pl: core.pl, fill: core.fill, venn: core.venn, canRoom: core.canRoom, render: rerender,
+      who: (w) => '<span class="g-who ' + ink(w) + '"><i class="sw ' + ink(w) + '"></i>' + esc(nm(w)) + "</span>",
+      pass(w, act) {
+        const N = esc(nm(w));
+        return '<section class="g-pass as-' + ink(w) + '"><p class="eyebrow">Passe le téléphone</p><h1 tabindex="-1" data-focus>Au tour ' + esc(de(nm(w))) +
+          ".</h1><p>Donne l'appareil à " + N + ', sans regarder l\'écran.</p><div class="actions"><button class="btn" type="button" data-act="' + esc(act) + '"><i class="sw ' + ink(w) +
+          '"></i>Je suis ' + N + ", à moi</button></div></section>";
+      },
+      wait(g, text) {
+        const s = sessions[g.id];
+        const late = s && s.duo && s.me === "a" && !s.seq.b.h;
+        return '<div class="g-wait"><p class="sync" role="status">' + esc(text) + "</p>" +
+          (late ? '<details class="more"><summary>' + esc(nmOf(s.n, "b")) + " n'a pas encore rejoint la partie\u00a0?</summary>" + inviteBox(BY[s.id], s) + "</details>" : "") + "</div>";
+      },
+      buzz(pattern) { try { if (navigator.vibrate) navigator.vibrate(pattern || 200); } catch (e) { /* sans importance */ } },
+      beep() {
+        try {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          if (!AC) return;
+          audio = audio || new AC();
+          if (audio.state === "suspended") audio.resume();
+          const o = audio.createOscillator(), v = audio.createGain(), t = audio.currentTime;
+          o.frequency.value = 880;
+          v.gain.setValueAtTime(0.0001, t);
+          v.gain.exponentialRampToValueAtTime(0.25, t + 0.02);
+          v.gain.exponentialRampToValueAtTime(0.0001, t + 0.5);
+          o.connect(v);
+          v.connect(audio.destination);
+          o.start(t);
+          o.stop(t + 0.55);
+        } catch (e) { /* pas de son : sans importance */ }
+      }
+    };
+
+    /* ---------- Confirmation en deux touchers ----------
+       Arrêter ou abandonner une partie demande un second toucher, au moins 0,4 s et au plus 4 s après le
+       premier : un double toucher accidentel ne suffit pas. L'état survit aux réaffichages. */
+    const ARM_LABEL = "Toucher encore pour confirmer";
+    const isArmed = (key) => !!armed && armed.key === key && Date.now() - armed.at < 4000;
+    function confirm(key, el) {
+      if (isArmed(key)) {
+        if (Date.now() - armed.at < 400) return false;
+        armed = null;
+        return true;
+      }
+      const a = armed = { key, at: Date.now() };
+      el.textContent = ARM_LABEL;
+      el.setAttribute("data-armed", "1");
+      setTimeout(() => {
+        if (armed !== a) return;
+        armed = null;
+        app.querySelectorAll("[data-label]").forEach((b) => { b.textContent = b.getAttribute("data-label"); b.removeAttribute("data-armed"); });
+      }, 4000);
+      return false;
+    }
+    const stopBtn = (key, act, label, id) => '<button class="link g-link" type="button" data-act="' + act + '"' + (id ? ' data-id="' + id + '"' : "") +
+      ' data-label="' + label + '"' + (isArmed(key) ? ' data-armed="1">' + ARM_LABEL : ">" + label) + "</button>";
+
+    /* ---------- Écrans du socle ---------- */
+    /* Partie à reprendre : il y en a une, et sa manche n'est pas terminée. */
+    function open(d) {
+      const s = load(d.id);
+      return !!s && !(d.over && call(() => d.over(handle(s))));
+    }
+    function card(d) {
+      return '<article class="card"><div class="glyph">' + glyph(d) + '</div><div class="card-body"><p class="eyebrow">' + esc(d.title) + '</p><h3><a class="card-link" href="#jeu-' + d.id + '">' + esc(d.hook) +
+        '</a></h3><p class="blurb">' + esc(d.blurb) + '</p><p class="meta">' + esc(d.meta) + (core.canRoom ? " · 1 ou 2 téléphones" : "") + "</p>" +
+        (open(d) ? '<a class="card-state" href="#jeu-' + d.id + '">Partie en cours · reprendre</a>' : "") + "</div></article>";
+    }
+
+    function home() {
+      const banners = DEFS.filter(open).map((d) => '<aside class="banner"><p><b>' + esc(d.title) + "</b>\u00a0: une partie est en cours.</p>" +
+        '<div class="banner-actions"><a class="btn small" href="#jeu-' + d.id + '">Reprendre</a>' + stopBtn("g-drop:" + d.id, "g-drop", "Abandonner", d.id) + "</div></aside>").join("");
+      const group = DEFS.length ? '<section class="group"><h2 class="group-title">Pour jouer</h2><div class="cards">' + DEFS.map(card).join("") + "</div></section>" : "";
+      return { banners, group, count: DEFS.length };
+    }
+
+    function vIntro(d) {
+      const inv = invite && invite.g === d.id, s = load(d.id);
+      let start;
+      if (inv) {
+        const A = esc(nmOf(invite.n, "a")), B = esc(nmOf(invite.n, "b"));
+        start = '<div class="invite"><p><b>' + A + "</b> t'invite à jouer, chacun sur son téléphone." + (d.live ? " La partie se joue en direct." : "") +
+          (s ? " Rejoindre cette partie remplacera celle que tu as en cours." : "") + "</p></div>" +
+          '<div class="actions"><button class="btn" type="button" data-act="g-join">Je suis ' + B + ", je rejoins</button></div>" +
+          '<p class="hint"><button class="link g-link" type="button" data-act="g-decline">Ignorer cette invitation</button></p>';
+      } else {
+        const cur = options(d);
+        const opts = (d.options || []).filter((o) => !o.duo || core.canRoom).map((o) => '<div class="g-opts"><p class="g-opts-label" id="go-' + o.id + '">' + esc(o.label) +
+          '</p><div class="g-choices" role="group" aria-labelledby="go-' + o.id + '">' +
+          o.choices.map((c) => '<button class="g-choice" type="button" data-act="g-opt" data-opt="' + o.id + '" data-val="' + c.id + '" aria-pressed="' + (cur[o.id] === c.id) + '"><b>' + esc(c.name) +
+            (c.adult ? ' <span class="g-tag">Adultes</span>' : "") + "</b>" + (c.hint ? "<span>" + esc(c.hint) + "</span>" : "") + "</button>").join("") + "</div></div>").join("");
+        start = opts + core.namesForm("Ton prénom", "Le prénom de l'autre") + '<div class="actions">' +
+          (core.canRoom ? '<button class="btn" type="button" data-act="g-start" data-mode="duo">Chacun sur son téléphone</button>' : "") +
+          '<button class="btn' + (core.canRoom ? " alt" : "") + '" type="button" data-act="g-start" data-mode="solo">Sur un seul téléphone</button></div><p class="hint">' +
+          (!core.canRoom ? "Vous jouez sur cet appareil, en vous le passant."
+            : "Chacun sur son téléphone\u00a0: tu obtiens un lien et un QR code à faire scanner. " +
+              (d.live ? "La partie se joue en direct, au même moment sur vos deux téléphones." : "Chacun joue de son côté, en même temps ou non, et le résultat s'ouvre chez vous deux quand tout le monde a fini.") +
+              " Ce que vous échangez passe chiffré par un relais qui ne peut pas le lire.") + "</p>";
+      }
+      const extra = !inv && d.extra ? call(() => d.extra(kit)) : "";
+      return core.topbar(false) + '<main class="wrap narrow intro"><div class="glyph big">' + glyph(d) + '</div><p class="eyebrow">' + esc(d.title) + "</p><h1>" + esc(d.hook) + "</h1>" +
+        (d.intro || []).map((p) => "<p>" + esc(p) + "</p>").join("") + start + (extra ? "<div data-extra>" + extra + "</div>" : "") + "</main>";
+    }
+
+    function vInvite(d, s) {
+      const B = esc(nmOf(s.n, "b")), here = s.seq.b.h > 0, st = netState(s);
+      return core.topbar(false) + '<main class="wrap narrow intro"><div class="glyph big">' + glyph(d) + '</div><p class="eyebrow">' + esc(d.title) + "</p><h1>Invite " + B + " à jouer.</h1><p>" + B +
+        " ouvre ce lien sur son téléphone et rejoint la partie. " + (d.live ? "La partie se joue en direct\u00a0: elle démarre dès " + esc(core.que(nmOf(s.n, "b"))) + " est là."
+          : "Tu peux commencer sans attendre\u00a0: " + B + " jouera de son côté.") + "</p>" +
+        inviteBox(d, s) + (here ? '<p class="sync is-here" role="status">' + B + " est là.</p>"
+          : '<p class="sync" role="status" data-wait="En attente ' + esc(de(nmOf(s.n, "b"))) + '…">En attente ' + esc(de(nmOf(s.n, "b"))) + "…</p>") +
+        '<p class="hint">Liaison avec le relais\u00a0: <span class="g-net" data-net="' + st + '">' + NET[st] + "</span></p>" +
+        '<div class="actions"><button class="btn' + (d.live && !here ? " alt" : "") + '" type="button" data-act="g-go">' + (d.live && !here ? "Commencer sans attendre" : "Commencer") + "</button></div>" +
+        '<p class="hint">' + stopBtn("g-stop:" + d.id, "g-stop", "Annuler cette partie") + "</p></main>";
+    }
+
+    function vPlay(d, s) {
+      let body = call(() => d.view(handle(s)));
+      if (typeof body !== "string") body = '<p class="note">Ce jeu a rencontré un problème. Tu peux arrêter la partie puis la relancer.</p>';
+      const st = netState(s);
+      const gone = left(s) ? '<p class="g-note g-gone" role="status"><b>' + esc(nmOf(s.n, other(s.me))) + "</b> a arrêté la partie de son côté. " +
+        '<button class="link g-link" type="button" data-act="g-end">Arrêter aussi</button></p>' : "";
+      return '<header class="top g-top"><a class="link g-link" href="#accueil">Quitter</a><span class="g-name">' + esc(d.title) + "</span>" +
+        (s.duo ? '<span class="g-net" data-net="' + st + '" role="status">' + NET[st] + "</span>" : "<span></span>") + "</header>" +
+        '<main class="wrap narrow game" data-game="' + d.id + '">' + gone + body +
+        '<footer class="g-foot">' + stopBtn("g-stop:" + d.id, "g-stop", "Arrêter la partie") + "</footer></main>";
+    }
+
+    /* ---------- Branchements du moteur ---------- */
+    /* Ce qui identifie un bouton d'un rendu à l'autre, pour lui rendre le focus. */
+    const ATTRS = ["data-act", "data-k", "data-w", "data-val", "data-opt", "data-id", "data-pack", "data-i"];
+    function view(route) {
+      unmount();
+      keep = {};
+      focusWas = null;
+      /* Les champs data-keep et le bouton qui a le focus ne sont repris que d'un rendu au suivant de la même page. */
+      if (route === shown) {
+        app.querySelectorAll("[data-keep]").forEach((el) => {
+          const o = { v: el.value, f: document.activeElement === el };
+          if (o.f) { try { o.s = el.selectionStart; o.e = el.selectionEnd; } catch (e) { /* champ sans curseur */ } }
+          keep[el.getAttribute("data-keep")] = o;
+        });
+        const a = document.activeElement;
+        if (a && a !== document.body && app.contains(a) && a.hasAttribute("data-act") && !a.hasAttribute("data-keep")) {
+          focusWas = ATTRS.filter((n) => a.hasAttribute(n)).map((n) => "[" + n + '="' + String(a.getAttribute(n)).replace(/["\\]/g, "\\$&") + '"]').join("");
+        }
+      }
+      shown = route;
+      const d = routeDef(route);
+      if (!d) return null;
+      const s = load(d.id);
+      return !s || (invite && invite.g === d.id) ? vIntro(d) : s.phase === "invite" ? vInvite(d, s) : vPlay(d, s);
+    }
+
+    function after(route) {
+      const d = routeDef(route), s = d && load(d.id);
+      if (s && s.duo && core.canRoom) connect(s); else disconnect();
+      /* Un nouvel écran du jeu commence en haut de page (le moteur, lui, garde le défilement entre deux rendus). */
+      const scr = d && app.querySelector("main.game [data-screen]"), name = scr ? d.id + ":" + scr.getAttribute("data-screen") : "";
+      const same = name === screen;
+      if (name && screen && !same) window.scrollTo(0, 0);
+      screen = name;
+      if (!d) return;
+      app.querySelectorAll("[data-keep]").forEach((el) => {
+        const o = keep[el.getAttribute("data-keep")];
+        if (!o) return;
+        if (typeof o.v === "string") el.value = o.v;
+        if (o.f) { try { el.focus({ preventScroll: true }); if (o.s != null) el.setSelectionRange(o.s, o.e); } catch (e) { /* sans importance */ } }
+      });
+      if (focusWas && same) {
+        let el = null;
+        try { el = app.querySelector(focusWas); } catch (e) { el = null; }
+        if (el) { try { el.focus({ preventScroll: true }); } catch (e) { /* sans importance */ } }
+      }
+      if (s && s.phase === "play" && d.mount && !(invite && invite.g === d.id)) {
+        const c = call(() => d.mount(handle(s), app.querySelector("main.game")));
+        if (typeof c === "function") cleanup = c;
+      }
+    }
+
+    function create(d, o) {
+      const s = Object.assign({ id: d.id, v: d.v, sh: {}, st: 0, sw: "a", S: { a: { k: "", d: {} }, b: { k: "", d: {} } },
+        seq: { a: { h: 0, d: 0 }, b: { h: 0, d: 0 } }, sent: { h: 0, d: 0 }, gone: 0, t0: Date.now(), local: {} }, o);
+      sessions[d.id] = s;
+      /* Premier envoi dès l'arrivée : c'est lui qui dit à l'autre téléphone « je suis là ». */
+      if (s.duo) { s.seq[s.me].h = Date.now(); publishSoon(s, 0); }
+      persist(s);
+      core.render();
+    }
+
+    function kitAct(act, el) {
+      if (act === "g-drop") {
+        const id = el.getAttribute("data-id");
+        if (BY[id] && load(id) && confirm("g-drop:" + id, el)) { stop(load(id)); core.render(true); }
+        return;
+      }
+      const d = routeDef(core.route());
+      if (!d) return;
+      const s = load(d.id), inv = invite && invite.g === d.id;
+      if (act === "g-opt") {
+        const o = (d.options || []).find((x) => x.id === el.getAttribute("data-opt")), val = el.getAttribute("data-val");
+        if (!o || !o.choices.some((c) => c.id === val)) return;
+        const saved = options(d);
+        saved[o.id] = val;
+        store.set("go:" + d.id, saved);
+        /* Mise à jour sur place : un rendu complet ferait perdre le focus et les prénoms en cours de saisie. */
+        el.parentNode.querySelectorAll('[data-act="g-opt"]').forEach((b) => b.setAttribute("aria-pressed", b === el ? "true" : "false"));
+      } else if (act === "g-start" && !s && !inv) {
+        core.readNames();
+        const duo = el.getAttribute("data-mode") === "duo" && core.canRoom, room = duo ? core.newRoom() : null;
+        if (duo) store.set("g:mine", mine().concat(room.r).slice(-30));
+        create(d, { duo, me: duo ? "a" : null, room, n: cleanNames(core.names()), phase: duo ? "invite" : "play", gen: 1, setup: Object.assign({ seed: seed() }, options(d)) });
+      } else if (act === "g-join" && inv && core.canRoom) {
+        const i = invite, n = cleanNames(i.n);
+        clearInvite();
+        if (s) stop(s);
+        /* Sur le téléphone de l'invité, « Ton prénom » est le sien : on ne remplit l'accueil que s'il est vide. */
+        const cur = core.names();
+        if (!cur[0] && !cur[1]) core.setNames([n[1], n[0]]);
+        create(d, { duo: true, me: "b", room: { r: i.r, k: i.k }, n, phase: "play", gen: i.gen, setup: i.su });
+      } else if (act === "g-decline") {
+        clearInvite();
+        core.render();
+      } else if (act === "g-go" && s) {
+        s.phase = "play";
+        persist(s);
+        core.render();
+      } else if (act === "g-stop" && s) {
+        if (confirm("g-stop:" + d.id, el)) { stop(s); core.render(); }
+      } else if (act === "g-end" && s) {
+        stop(s);
+        core.render();
+      }
+    }
+
+    function playing() {
+      const d = routeDef(core.route()), s = d && load(d.id);
+      return s && s.phase === "play" && !(invite && invite.g === d.id) ? { d, g: handle(s) } : null;
+    }
+
+    resume(false);
+
+    return {
+      count: DEFS.length,
+      view, after, home,
+      click(act, el, ev) {
+        if (act.indexOf("g-") === 0) { kitAct(act, el); return true; }
+        const d = routeDef(core.route());
+        if (!d || act === "copy" || act === "share") return false;
+        const p = playing();
+        if (p) { if (p.d.act) call(() => p.d.act(p.g, act, el, ev)); return true; }
+        if (d.extraAct && el.closest("[data-extra]")) { call(() => d.extraAct(kit, act, el, ev)); return true; }
+        return false;
+      },
+      input(el, ev) { const p = playing(); if (p && p.d.input) call(() => p.d.input(p.g, el, ev)); return !!p; },
+      submit(form, ev) { const p = playing(); if (p && p.d.submit) call(() => p.d.submit(p.g, form, ev)); return !!p; },
+      key(ev) { const p = playing(); if (p && p.d.key) call(() => p.d.key(p.g, ev)); return !!p; },
+      /* Lien d'invitation à une partie (#g=…). Tout y est vérifié : le lien peut avoir été fabriqué. */
+      join(raw) {
+        let o = null;
+        try { o = core.decode(raw); } catch (e) { o = null; }
+        if (!isObj(o)) return core.fail("Ce lien d'invitation est illisible. Demande à l'autre de te le renvoyer.");
+        const d = typeof o.g === "string" ? BY[o.g] : null;
+        if (!d) return core.fail("Ce lien d'invitation ne correspond à aucun jeu de cette page.");
+        if (o.v !== d.v) return core.fail("Ce lien vient d'une ancienne version du jeu. Il faut relancer une partie.");
+        if (!isRoom(o.r, o.k) || !okSetup(o.su) || !isInt(o.gen, 1, GEN_MAX)) return core.fail("Ce lien d'invitation est incomplet. Demande à l'autre de te le renvoyer.");
+        if (!core.canRoom) return core.fail("Ce lien ne peut s'ouvrir que sur le site, dans un navigateur.");
+        const s = load(d.id);
+        /* Une partie que j'ai déjà rejointe, ou la mienne : on y retourne simplement. */
+        if (s && s.duo && s.room.r === o.r) return core.go("jeu-" + d.id);
+        if (mine().indexOf(o.r) >= 0) return core.fail("Ce lien est celui d'une partie que tu as lancée puis arrêtée sur ce téléphone. Lance une nouvelle partie pour inviter l'autre.");
+        invite = { g: d.id, v: d.v, r: o.r, k: o.k, su: o.su, gen: o.gen, n: cleanNames(o.n) };
+        store.set("ginvite", invite);
+        core.go("jeu-" + d.id);
+      }
+    };
+  };
+})();
+</script>
+<script>
 /* Entre Nous : moteur des tests à deux.
    Les questionnaires sont dans tests/*.js (window.TESTS). Ce fichier gère le
    parcours (accueil, questions, passage de main, rapport), le calcul des
@@ -1919,13 +3432,15 @@ button, input, textarea { font: inherit; color: inherit; }
   const ui = { codeOpen: false, codeErr: "" };
   let route = "";
   let busy = false;
+  let games = null; /* socle des jeux (assets/jeux.js), branché juste avant le démarrage */
 
   let framed = false;
   try { framed = window.self !== window.top; } catch (e) { framed = true; }
   const canLink = !framed && /^https?:$/.test(location.protocol);
   /* Mode « en même temps » : il faut un vrai site, le chiffrement du navigateur et le réseau. */
   const canRoom = canLink && !!(window.crypto && window.crypto.subtle) && typeof fetch === "function";
-  const RELAY = "https://ntfy.sh/";
+  /* En développement (localhost uniquement), les essais remplacent le relais par un faux. */
+  const RELAY = (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) && store.get("relay", null)) || "https://ntfy.sh/";
   const hasQr = () => typeof window.qrcode === "function";
 
   /* ---------- Outils ---------- */
@@ -2143,6 +3658,8 @@ button, input, textarea { font: inherit; color: inherit; }
     if (!txt) return failCode("Colle d'abord le code ou le lien que tu as reçu.");
     const mj = txt.match(/#j=([\w-]+)/);
     if (mj) return importJoin(mj[1]);
+    const mg = txt.match(/#g=([\w-]+)/);
+    if (mg && games) { ui.codeErr = ""; ui.codeOpen = false; return games.join(mg[1]); }
     let o;
     try { o = decode(txt); } catch (e) { return failCode("Ce code est illisible. Vérifie qu'il a été copié en entier."); }
     const t = o && BY_ID[o.t];
@@ -2486,7 +4003,7 @@ button, input, textarea { font: inherit; color: inherit; }
     return '<header class="top"><a class="brand" href="#accueil">' + LOGO + "<span>Entre Nous</span></a>" +
       (home
         ? '<button class="link" type="button" data-act="toggle-code" aria-expanded="' + ui.codeOpen + '">J\'ai reçu un code</button>'
-        : '<a class="link" href="#accueil">Tous les tests</a>') +
+        : '<a class="link" href="#accueil">Accueil</a>') +
       "</header>";
   }
 
@@ -2571,9 +4088,11 @@ button, input, textarea { font: inherit; color: inherit; }
   }
 
   function vHome() {
+    const play = games ? games.home() : { banners: "", group: "", count: 0 };
     const groups = GROUPS.map((g) => {
       const ts = TESTS.filter((t) => t.group === g.id);
-      return ts.length ? '<section class="group"><h2 class="group-title">' + esc(g.name) + '</h2><div class="cards">' + ts.map(card).join("") + "</div></section>" : "";
+      return (ts.length ? '<section class="group"><h2 class="group-title">' + esc(g.name) + '</h2><div class="cards">' + ts.map(card).join("") + "</div></section>" : "") +
+        (g.id === "commencer" ? play.group : "");
     }).join("");
     let banner = "";
     if (session) {
@@ -2591,9 +4110,10 @@ button, input, textarea { font: inherit; color: inherit; }
     return topbar(true) + '<main class="wrap">' +
       (ui.codeOpen ? '<section class="panel">' + codeForm("code-in", "Colle ici le code ou le lien que tu as reçu") + "</section>" : "") +
       '<section class="hero"><h1>Faites le point à deux.</h1><p class="sub">' + count +
-      " tests à passer chacun de son côté, en même temps si vous voulez, puis un rapport qui compare vos réponses. Gratuit et sans compte.</p>" +
-      namesForm("Premier prénom", "Second prénom") + "</section>" + banner + dash + groups +
-      '<footer class="foot"><p>Vos réponses sont enregistrées dans ce navigateur. ' + (canRoom
+      " tests à passer chacun de son côté, en même temps si vous voulez, puis un rapport qui compare vos réponses. " +
+      (play.count ? (NUMBERS[play.count] || String(play.count)) + (play.count >= 2 ? " jeux" : " jeu") + " pour s'amuser à deux. " : "") + "Gratuit et sans compte.</p>" +
+      namesForm("Premier prénom", "Second prénom") + "</section>" + banner + play.banners + dash + groups +
+      '<footer class="foot"><p>Vos réponses ' + (play.count ? "et vos parties " : "") + "sont enregistrées dans ce navigateur. " + (canRoom
         ? "En mode « chacun sur son téléphone », elles passent, chiffrées, par un relais (ntfy.sh) qui ne peut pas les lire et qui les efface au bout de douze heures."
         : "Rien n'est envoyé sur un serveur.") + '</p><p>Ces tests servent à ouvrir la discussion. Ils ne remplacent ni un diagnostic, ni une thérapie de couple.</p></footer></main>';
   }
@@ -2894,8 +4414,10 @@ button, input, textarea { font: inherit; color: inherit; }
   function render(keepScroll) {
     const m = /^(test|rapport)-([a-z0-9]+)$/.exec(route);
     const t = m && BY_ID[m[2]];
-    let html;
-    if (t && m[1] === "test") {
+    let html = games ? games.view(route) : null;
+    if (html != null) {
+      /* page d'un jeu : le socle a tout fourni */
+    } else if (t && m[1] === "test") {
       html = session && session.t === t.id ? (session.phase === "handoff" ? vHandoff(t) : session.phase === "invite" ? vInvite(t) : vQuiz(t)) : vIntro(t);
     } else if (t && m[1] === "rapport") {
       const r = results[t.id];
@@ -2908,6 +4430,7 @@ button, input, textarea { font: inherit; color: inherit; }
     const f = app.querySelector("[data-focus]");
     if (f) { try { f.focus({ preventScroll: true }); } catch (e) { /* sans importance */ } }
     watch();
+    if (games) games.after(route);
   }
 
   function go(h) {
@@ -2919,7 +4442,11 @@ button, input, textarea { font: inherit; color: inherit; }
   function boot() {
     let h = location.hash.slice(1);
     try { h = decodeURIComponent(h); } catch (e) { /* hash laissé tel quel */ }
+    /* Un lien reçu (invitation, réponses) contient une clé : on le retire de l'historique avant de
+       l'ouvrir, pour qu'il n'y reste pas et que le bouton Retour ne le rouvre pas en boucle. */
+    if (/^[jgc]=/.test(h)) { try { history.replaceState(null, "", location.pathname + location.search + "#accueil"); } catch (e) { /* cadre sans historique */ } }
     if (h.indexOf("j=") === 0) { importJoin(h.slice(2)); return; }
+    if (games && h.indexOf("g=") === 0) { ui.codeErr = ""; ui.codeOpen = false; games.join(h.slice(2)); return; }
     if (h.indexOf("c=") === 0) { importCode(h.slice(2)); return; }
     route = h;
     render();
@@ -2942,6 +4469,7 @@ button, input, textarea { font: inherit; color: inherit; }
     const el = e.target.closest("[data-act]");
     if (!el) return;
     const act = el.getAttribute("data-act");
+    if (games && games.click(act, el, e)) return;
     const m = /^(?:test|rapport)-([a-z0-9]+)$/.exec(route);
     const t = m && BY_ID[m[1]];
     if (act === "toggle-code") { ui.codeOpen = !ui.codeOpen; ui.codeErr = ""; render(true); const i = document.getElementById("code-in"); if (i) i.focus(); }
@@ -2984,14 +4512,17 @@ button, input, textarea { font: inherit; color: inherit; }
   app.addEventListener("input", (e) => {
     const k = e.target.getAttribute && e.target.getAttribute("data-name");
     if (k) { names[k] = e.target.value.slice(0, 20); store.set("names", names); }
+    else if (games) games.input(e.target, e);
   });
 
   app.addEventListener("submit", (e) => {
     e.preventDefault();
+    if (games && games.submit(e.target, e)) return;
     if (e.target.getAttribute("data-form") === "code") importCode(e.target.querySelector("textarea").value);
   });
 
   document.addEventListener("keydown", (e) => {
+    if (games && games.key(e)) return;
     if (!session || session.phase !== "quiz" || !/^test-/.test(route)) return;
     if (e.metaKey || e.ctrlKey || e.altKey || /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
     if (/^[1-9]$/.test(e.key)) pick(parseInt(e.key, 10) - 1);
@@ -3005,6 +4536,16 @@ button, input, textarea { font: inherit; color: inherit; }
   });
 
   document.addEventListener("visibilitychange", () => { if (!document.hidden) watch(); });
+
+  if (window.ENGames) {
+    games = window.ENGames({
+      app, store, esc, nm, de, que, pl, fill, other, encode, decode, newRoom, seal, unseal, RELAY, canRoom, canLink, hasQr,
+      shareBox, namesForm, readNames, setNames, topbar, venn, go, render,
+      names: () => [names.a || "", names.b || ""],
+      route: () => route,
+      fail: failCode
+    });
+  }
 
   boot();
   syncAll();
