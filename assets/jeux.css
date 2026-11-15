@@ -1,0 +1,74 @@
+/* Jeux : styles partagés par tous les jeux (les règles propres à un jeu sont dans
+   jeux/<id>.css). Mêmes encres que le reste du site : bleu pour la première personne,
+   orange pour la seconde. */
+
+/* L'encre d'un joueur, pour tout ce qui lui appartient à l'écran. */
+.game, .g-pass { --who: var(--ink); --who-soft: var(--wash); }
+.as-a { --who: var(--a); --who-soft: var(--a-soft); }
+.as-b { --who: var(--b); --who-soft: var(--b-soft); }
+
+/* ---------- Cadre d'une partie ---------- */
+.g-top { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; padding-block: 0.8rem; }
+.g-top > :last-child { justify-self: end; }
+/* Un titre long passe sur deux lignes plutôt que de déborder sur la pastille de liaison. */
+.g-name { min-width: 0; font: 600 0.78rem/1.3 var(--body); letter-spacing: 0.07em; text-transform: uppercase; text-align: center; text-wrap: balance; color: var(--muted); }
+.g-net { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; font-weight: 600; color: var(--ink-2); white-space: nowrap; }
+.g-net::before { content: ""; flex: none; width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--good); }
+.g-net[data-net="wait"]::before { background: var(--warn); }
+.g-net[data-net="err"]::before { background: var(--crit); }
+
+.game { gap: 1.1rem; min-height: calc(100vh - 4.5rem); min-height: calc(100dvh - 4.5rem); padding-block: 0.5rem 1.5rem; }
+.game button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+.g-foot { margin-top: auto; padding-top: 1.5rem; text-align: center; font-size: 0.85rem; }
+.g-foot .link { min-height: 44px; color: var(--muted); }
+
+.g-title { font: 700 clamp(1.7rem, 6vw, 2.4rem)/1.1 var(--display); letter-spacing: -0.025em; text-wrap: balance; }
+.g-lead { font-size: 1.05rem; color: var(--ink-2); }
+.g-note { padding: 0.8rem 1rem; border-radius: 12px; background: var(--wash); font-size: 0.9rem; color: var(--ink-2); }
+
+/* Pastille « encre + prénom » */
+.g-who { display: inline-flex; align-items: center; gap: 0.45rem; max-width: 100%; padding: 0.3rem 0.75rem; border-radius: 999px; background: var(--a-soft); color: var(--ink); font-size: 0.9rem; font-weight: 600; overflow-wrap: anywhere; }
+.g-who.b { background: var(--b-soft); }
+
+/* Étiquette courte (type de carte, « Adultes »…) */
+.g-tag { display: inline-flex; align-items: center; align-self: flex-start; padding: 0.2rem 0.6rem; border-radius: 999px; background: var(--wash); color: var(--ink-2); font: 600 0.72rem var(--body); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+.g-tag.a { background: var(--a-soft); color: var(--ink); }
+.g-tag.b { background: var(--b-soft); color: var(--ink); }
+
+/* Grande carte à jouer */
+.g-card { display: flex; flex-direction: column; justify-content: center; gap: 0.9rem; min-height: 15rem; padding: 1.5rem 1.3rem; border: 1px solid var(--line); border-radius: 22px; background: var(--surface); color: var(--ink); }
+.g-card.a { border-color: transparent; background: var(--a-soft); }
+.g-card.b { border-color: transparent; background: var(--b-soft); }
+.g-card-text { font: 650 clamp(1.35rem, 5vw, 1.8rem)/1.2 var(--display); letter-spacing: -0.015em; text-wrap: balance; overflow-wrap: anywhere; }
+
+/* Champ de saisie (16 px au moins : en dessous, iOS zoome sur le champ) */
+.g-field { width: 100%; min-height: 3.2rem; padding: 0.8rem 1rem; border: 1.5px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); font-size: 1.15rem; }
+.g-field:focus-visible { outline-color: var(--who); }
+
+/* Score à deux */
+.g-score { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; }
+.g-score > * { display: flex; flex-direction: column; align-items: flex-start; gap: 0.4rem; min-width: 0; padding: 0.9rem 1rem; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+.g-score b { font: 700 2rem/1 var(--body); font-variant-numeric: tabular-nums; color: var(--ink); }
+.g-big { font: 700 clamp(3.2rem, 15vw, 5.2rem)/0.95 var(--body); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; color: var(--ink); }
+
+/* Rangée de boutons collée en bas de l'écran, à portée de pouce */
+.g-actions { position: sticky; bottom: 0; z-index: 2; display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: auto; padding-block: 0.8rem max(0.8rem, env(safe-area-inset-bottom, 0px)); background: linear-gradient(to top, var(--bg) 70%, transparent); }
+.g-actions .btn { flex: 1 1 8rem; min-height: 3rem; }
+.g-actions + .g-foot { margin-top: 0; padding-top: 0.3rem; }
+
+/* Passage du téléphone, attente de l'autre */
+.g-pass { display: flex; flex-direction: column; gap: 1.1rem; padding-top: 2.5rem; }
+.g-pass h1 { font: 700 clamp(1.9rem, 6.5vw, 2.75rem)/1.08 var(--display); letter-spacing: -0.025em; text-wrap: balance; color: var(--ink); }
+.g-pass .btn { border-color: var(--who); background: var(--who); color: var(--on-fill); }
+.g-wait { display: flex; flex-direction: column; gap: 0.6rem; }
+.sync.is-here::before { background: var(--good); animation: none; }
+
+/* Options sur la présentation d'un jeu */
+.g-opts { display: flex; flex-direction: column; gap: 0.45rem; }
+.g-opts-label { font: 600 0.78rem var(--body); letter-spacing: 0.07em; text-transform: uppercase; color: var(--muted); }
+.g-choices { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: 0.5rem; }
+.g-choice { display: flex; flex-direction: column; gap: 0.2rem; min-height: 3rem; padding: 0.65rem 0.85rem; border: 1.5px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--ink); text-align: left; cursor: pointer; transition: border-color 0.12s, background 0.12s; }
+.g-choice:hover { border-color: var(--ink); }
+.g-choice[aria-pressed="true"] { border-color: var(--ink); background: var(--wash); }
+.g-choice b { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; font-weight: 600; }
+.g-choice > span { font-size: 0.85rem; color: var(--ink-2); }

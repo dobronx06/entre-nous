@@ -8,17 +8,18 @@ const read = (f) => fs.readFileSync(path.join(root, f), "utf8");
 
 const html = read("index.html");
 const fonts = html.match(/<link rel="stylesheet" href="https:\/\/fonts\.googleapis\.com[^>]+>/)[0];
+const styles = [...html.matchAll(/<link rel="stylesheet" href="(?!https?:)([^"]+)">/g)].map((m) => m[1]);
 const scripts = [...html.matchAll(/<script src="([^"]+)"><\/script>/g)].map((m) => m[1]);
 
 const out = [
   "<title>Entre Nous</title>",
   '<meta name="claude:viewport-fit-sides" content="cover">',
   fonts,
-  "<style>\n" + read("assets/styles.css") + "</style>",
+  "<style>\n" + styles.map(read).join("\n") + "</style>",
   '<div id="app"></div>',
   ...scripts.map((s) => "<script>\n" + read(s).replace(/<\/script/g, "<\\/script") + "</script>")
 ].join("\n");
 
 fs.mkdirSync(path.join(root, "artifact"), { recursive: true });
 fs.writeFileSync(path.join(root, "artifact/entre-nous.html"), out + "\n");
-console.log("artifact/entre-nous.html : " + (out.length / 1024).toFixed(1) + " Ko, " + scripts.length + " scripts");
+console.log("artifact/entre-nous.html : " + (out.length / 1024).toFixed(1) + " Ko, " + styles.length + " feuilles de style, " + scripts.length + " scripts");

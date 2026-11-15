@@ -57,13 +57,15 @@
   const ui = { codeOpen: false, codeErr: "" };
   let route = "";
   let busy = false;
+  let games = null; /* socle des jeux (assets/jeux.js), branché juste avant le démarrage */
 
   let framed = false;
   try { framed = window.self !== window.top; } catch (e) { framed = true; }
   const canLink = !framed && /^https?:$/.test(location.protocol);
   /* Mode « en même temps » : il faut un vrai site, le chiffrement du navigateur et le réseau. */
   const canRoom = canLink && !!(window.crypto && window.crypto.subtle) && typeof fetch === "function";
-  const RELAY = "https://ntfy.sh/";
+  /* En développement (localhost uniquement), les essais remplacent le relais par un faux. */
+  const RELAY = (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) && store.get("relay", null)) || "https://ntfy.sh/";
   const hasQr = () => typeof window.qrcode === "function";
 
   /* ---------- Outils ---------- */
@@ -281,6 +283,8 @@
     if (!txt) return failCode("Colle d'abord le code ou le lien que tu as reçu.");
     const mj = txt.match(/#j=([\w-]+)/);
     if (mj) return importJoin(mj[1]);
+    const mg = txt.match(/#g=([\w-]+)/);
+    if (mg && games) return games.join(mg[1]);
     let o;
     try { o = decode(txt); } catch (e) { return failCode("Ce code est illisible. Vérifie qu'il a été copié en entier."); }
     const t = o && BY_ID[o.t];
@@ -624,7 +628,7 @@
     return '<header class="top"><a class="brand" href="#accueil">' + LOGO + "<span>Entre Nous</span></a>" +
       (home
         ? '<button class="link" type="button" data-act="toggle-code" aria-expanded="' + ui.codeOpen + '">J\'ai reçu un code</button>'
-        : '<a class="link" href="#accueil">Tous les tests</a>') +
+        : '<a class="link" href="#accueil">Accueil</a>') +
       "</header>";
   }
 
@@ -709,9 +713,11 @@
   }
 
   function vHome() {
+    const play = games ? games.home() : { banners: "", group: "", count: 0 };
     const groups = GROUPS.map((g) => {
       const ts = TESTS.filter((t) => t.group === g.id);
-      return ts.length ? '<section class="group"><h2 class="group-title">' + esc(g.name) + '</h2><div class="cards">' + ts.map(card).join("") + "</div></section>" : "";
+      return (ts.length ? '<section class="group"><h2 class="group-title">' + esc(g.name) + '</h2><div class="cards">' + ts.map(card).join("") + "</div></section>" : "") +
+        (g.id === "commencer" ? play.group : "");
     }).join("");
     let banner = "";
     if (session) {
@@ -729,9 +735,10 @@
     return topbar(true) + '<main class="wrap">' +
       (ui.codeOpen ? '<section class="panel">' + codeForm("code-in", "Colle ici le code ou le lien que tu as reçu") + "</section>" : "") +
       '<section class="hero"><h1>Faites le point à deux.</h1><p class="sub">' + count +
-      " tests à passer chacun de son côté, en même temps si vous voulez, puis un rapport qui compare vos réponses. Gratuit et sans compte.</p>" +
-      namesForm("Premier prénom", "Second prénom") + "</section>" + banner + dash + groups +
-      '<footer class="foot"><p>Vos réponses sont enregistrées dans ce navigateur. ' + (canRoom
+      " tests à passer chacun de son côté, en même temps si vous voulez, puis un rapport qui compare vos réponses. " +
+      (play.count ? (NUMBERS[play.count] || String(play.count)) + (play.count >= 2 ? " jeux" : " jeu") + " pour s'amuser à deux. " : "") + "Gratuit et sans compte.</p>" +
+      namesForm("Premier prénom", "Second prénom") + "</section>" + banner + play.banners + dash + groups +
+      '<footer class="foot"><p>Vos réponses ' + (play.count ? "et vos parties " : "") + "sont enregistrées dans ce navigateur. " + (canRoom
         ? "En mode « chacun sur son téléphone », elles passent, chiffrées, par un relais (ntfy.sh) qui ne peut pas les lire et qui les efface au bout de douze heures."
         : "Rien n'est envoyé sur un serveur.") + '</p><p>Ces tests servent à ouvrir la discussion. Ils ne remplacent ni un diagnostic, ni une thérapie de couple.</p></footer></main>';
   }
@@ -1032,8 +1039,10 @@
   function render(keepScroll) {
     const m = /^(test|rapport)-([a-z0-9]+)$/.exec(route);
     const t = m && BY_ID[m[2]];
-    let html;
-    if (t && m[1] === "test") {
+    let html = games ? games.view(route) : null;
+    if (html != null) {
+      /* page d'un jeu : le socle a tout fourni */
+    } else if (t && m[1] === "test") {
       html = session && session.t === t.id ? (session.phase === "handoff" ? vHandoff(t) : session.phase === "invite" ? vInvite(t) : vQuiz(t)) : vIntro(t);
     } else if (t && m[1] === "rapport") {
       const r = results[t.id];
@@ -1046,6 +1055,7 @@
     const f = app.querySelector("[data-focus]");
     if (f) { try { f.focus({ preventScroll: true }); } catch (e) { /* sans importance */ } }
     watch();
+    if (games) games.after(route);
   }
 
   function go(h) {
@@ -1058,6 +1068,7 @@
     let h = location.hash.slice(1);
     try { h = decodeURIComponent(h); } catch (e) { /* hash laissé tel quel */ }
     if (h.indexOf("j=") === 0) { importJoin(h.slice(2)); return; }
+    if (games && h.indexOf("g=") === 0) { games.join(h.slice(2)); return; }
     if (h.indexOf("c=") === 0) { importCode(h.slice(2)); return; }
     route = h;
     render();
@@ -1080,6 +1091,7 @@
     const el = e.target.closest("[data-act]");
     if (!el) return;
     const act = el.getAttribute("data-act");
+    if (games && games.click(act, el, e)) return;
     const m = /^(?:test|rapport)-([a-z0-9]+)$/.exec(route);
     const t = m && BY_ID[m[1]];
     if (act === "toggle-code") { ui.codeOpen = !ui.codeOpen; ui.codeErr = ""; render(true); const i = document.getElementById("code-in"); if (i) i.focus(); }
@@ -1122,14 +1134,17 @@
   app.addEventListener("input", (e) => {
     const k = e.target.getAttribute && e.target.getAttribute("data-name");
     if (k) { names[k] = e.target.value.slice(0, 20); store.set("names", names); }
+    else if (games) games.input(e.target, e);
   });
 
   app.addEventListener("submit", (e) => {
     e.preventDefault();
+    if (games && games.submit(e.target, e)) return;
     if (e.target.getAttribute("data-form") === "code") importCode(e.target.querySelector("textarea").value);
   });
 
   document.addEventListener("keydown", (e) => {
+    if (games && games.key(e)) return;
     if (!session || session.phase !== "quiz" || !/^test-/.test(route)) return;
     if (e.metaKey || e.ctrlKey || e.altKey || /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) return;
     if (/^[1-9]$/.test(e.key)) pick(parseInt(e.key, 10) - 1);
@@ -1143,6 +1158,16 @@
   });
 
   document.addEventListener("visibilitychange", () => { if (!document.hidden) watch(); });
+
+  if (window.ENGames) {
+    games = window.ENGames({
+      app, store, esc, nm, de, que, pl, fill, other, encode, decode, newRoom, seal, unseal, RELAY, canRoom, canLink, hasQr,
+      shareBox, namesForm, readNames, setNames, topbar, venn, go, render,
+      names: () => [names.a || "", names.b || ""],
+      route: () => route,
+      fail: failCode
+    });
+  }
 
   boot();
   syncAll();
